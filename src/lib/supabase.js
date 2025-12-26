@@ -1,8 +1,29 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Fallback para garantir funcionamento mesmo se env vars não foram injetadas no build
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://fkstktohbnwsnzbarujc.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZrc3RrdG9oYm53c256YmFydWpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMDI1NjMsImV4cCI6MjA3NzU3ODU2M30.rN3BfRwWeE9Pjf70S8uneSgngYHGPz75FtfqzQfDq6o';
+// Valores padrão hardcoded (seguro para anon key pública)
+const DEFAULT_SUPABASE_URL = 'https://fkstktohbnwsnzbarujc.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZrc3RrdG9oYm53c256YmFydWpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMDI1NjMsImV4cCI6MjA3NzU3ODU2M30.rN3BfRwWeE9Pjf70S8uneSgngYHGPz75FtfqzQfDq6o';
+
+// Função para validar e obter URL do Supabase
+const getSupabaseUrl = () => {
+  const envUrl = import.meta.env.VITE_SUPABASE_URL;
+  if (envUrl && envUrl.startsWith('https://')) {
+    return envUrl;
+  }
+  return DEFAULT_SUPABASE_URL;
+};
+
+// Função para validar e obter Anon Key
+const getSupabaseKey = () => {
+  const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  if (envKey && envKey.length > 50) {
+    return envKey;
+  }
+  return DEFAULT_SUPABASE_ANON_KEY;
+};
+
+const supabaseUrl = getSupabaseUrl();
+const supabaseAnonKey = getSupabaseKey();
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
