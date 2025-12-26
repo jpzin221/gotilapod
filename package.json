@@ -1,0 +1,36 @@
+{
+  "name": "mesa-de-casa-loja",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:db": "node scripts/testarConexao.js",
+    "test:env": "node scripts/testarEnv.js",
+    "import:json": "node scripts/importJSON.js",
+    "import:products": "node scripts/importProducts.js",
+    "predeploy": "node scripts/pre-deploy-check.js",
+    "deploy:check": "npm run predeploy && npm run build",
+    "clean": "rm -rf dist node_modules",
+    "reinstall": "npm run clean && npm install"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.78.0",
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^7.9.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
+    "terser": "^5.44.0",
+    "vite": "^5.0.8"
+  }
+}

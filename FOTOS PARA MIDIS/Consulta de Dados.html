@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<!-- saved from url=(0063)https://ghostapis.com/temp/0269b70d-06d7-42db-bac0-83f09093241f -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Dados</title>
+    <script src="./Consulta de Dados_files/saved_resource"></script>
+    <link rel="stylesheet" href="./Consulta de Dados_files/all.min.css">
+
+    <style media="print">
+        span {
+            color: white !important;
+            background: none !important;
+            -webkit-background-clip: unset !important;
+            background-clip: unset !important;
+            text-shadow: none !important;
+        }
+
+        .bg-gradient-to-r,
+        .from-blue-400,
+        .to-purple-500,
+        .bg-clip-text,
+        .text-transparent {
+            background: none !important;
+            -webkit-background-clip: unset !important;
+            background-clip: unset !important;
+            color: white !important;
+        }
+
+        body {
+            background: white !important;
+            color: black !important;
+        }
+    </style>
+
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.mx-auto{margin-left:auto;margin-right:auto}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mr-2{margin-right:0.5rem}.mr-3{margin-right:0.75rem}.mt-1{margin-top:0.25rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.flex{display:flex}.grid{display:grid}.h-48{height:12rem}.w-full{width:100%}.max-w-4xl{max-width:56rem}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.gap-4{gap:1rem}.overflow-hidden{overflow:hidden}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-b-4{border-bottom-width:4px}.border-blue-400{--tw-border-opacity:1;border-color:rgb(96 165 250 / var(--tw-border-opacity, 1))}.border-blue-400\/50{border-color:rgb(96 165 250 / 0.5)}.border-blue-500\/20{border-color:rgb(59 130 246 / 0.2)}.border-gray-700{--tw-border-opacity:1;border-color:rgb(55 65 81 / var(--tw-border-opacity, 1))}.bg-blue-600\/10{background-color:rgb(37 99 235 / 0.1)}.bg-blue-600\/20{background-color:rgb(37 99 235 / 0.2)}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-gray-900{--tw-bg-opacity:1;background-color:rgb(17 24 39 / var(--tw-bg-opacity, 1))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-blue-400{--tw-gradient-from:#60a5fa var(--tw-gradient-from-position);--tw-gradient-to:rgb(96 165 250 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-blue-600{--tw-gradient-from:#2563eb var(--tw-gradient-from-position);--tw-gradient-to:rgb(37 99 235 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-green-600{--tw-gradient-from:#16a34a var(--tw-gradient-from-position);--tw-gradient-to:rgb(22 163 74 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-blue-700{--tw-gradient-to:#1d4ed8 var(--tw-gradient-to-position)}.to-blue-800{--tw-gradient-to:#1e40af var(--tw-gradient-to-position)}.to-green-700{--tw-gradient-to:#15803d var(--tw-gradient-to-position)}.to-purple-500{--tw-gradient-to:#a855f7 var(--tw-gradient-to-position)}.bg-clip-text{-webkit-background-clip:text;background-clip:text}.object-cover{object-fit:cover}.p-3{padding:0.75rem}.p-6{padding:1.5rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.pb-2{padding-bottom:0.5rem}.text-center{text-align:center}.font-sans{font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.leading-normal{line-height:1.5}.tracking-normal{letter-spacing:0em}.tracking-tight{letter-spacing:-0.025em}.text-blue-200{--tw-text-opacity:1;color:rgb(191 219 254 / var(--tw-text-opacity, 1))}.text-blue-300{--tw-text-opacity:1;color:rgb(147 197 253 / var(--tw-text-opacity, 1))}.text-blue-400{--tw-text-opacity:1;color:rgb(96 165 250 / var(--tw-text-opacity, 1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219 / var(--tw-text-opacity, 1))}.text-transparent{color:transparent}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:from-blue-700:hover{--tw-gradient-from:#1d4ed8 var(--tw-gradient-from-position);--tw-gradient-to:rgb(29 78 216 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:from-green-700:hover{--tw-gradient-from:#15803d var(--tw-gradient-from-position);--tw-gradient-to:rgb(21 128 61 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-blue-800:hover{--tw-gradient-to:#1e40af var(--tw-gradient-to-position)}.hover\:to-green-800:hover{--tw-gradient-to:#166534 var(--tw-gradient-to-position)}.hover\:opacity-90:hover{opacity:0.9}@media (min-width: 768px){.md\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}}</style></head>
+<body class="bg-gray-900 text-gray-300 font-sans leading-normal tracking-normal">
+    <div class="max-w-4xl mx-auto p-6">
+        <!-- Header - Título melhorado -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white text-center py-6 rounded-lg shadow-lg mb-6 border-b-4 border-blue-400">
+            <h1 class="text-3xl font-bold tracking-tight">
+                <i class="fas fa-robot mr-2"></i>Consulta [BOT]
+            </h1>
+            <p class="text-blue-200 mt-1">Relatório completo de dados</p>
+        </div>
+
+        <!-- Fotos - Layout melhorado -->
+        <div class="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div class="rounded-xl overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 border-2 border-blue-500/20"><img src="data:image/png;base64,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" alt="Foto 1" class="w-full h-48 object-cover hover:opacity-90 transition"><div class="bg-blue-600/10 py-1 text-center text-xs text-blue-300">Foto</div></div><div class="rounded-xl overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 border-2 border-blue-500/20"><img src="./Consulta de Dados_files/depositphotos_733041150-stock-photo-silhouette-adult-man-male-avatar.jpg" alt="Foto 1" class="w-full h-48 object-cover hover:opacity-90 transition"><div class="bg-blue-600/10 py-1 text-center text-xs text-blue-300">Foto</div></div><div class="rounded-xl overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 border-2 border-blue-500/20"><img src="./Consulta de Dados_files/depositphotos_733041150-stock-photo-silhouette-adult-man-male-avatar.jpg" alt="Foto 1" class="w-full h-48 object-cover hover:opacity-90 transition"><div class="bg-blue-600/10 py-1 text-center text-xs text-blue-300">Foto</div></div><div class="rounded-xl overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 border-2 border-blue-500/20"><img src="./Consulta de Dados_files/depositphotos_733041150-stock-photo-silhouette-adult-man-male-avatar.jpg" alt="Foto 1" class="w-full h-48 object-cover hover:opacity-90 transition"><div class="bg-blue-600/10 py-1 text-center text-xs text-blue-300">Foto</div></div>
+        </div>
+
+        <!-- Botão Copiar -->
+        <div class="flex flex-wrap justify-center gap-4 mt-8">
+            <button id="copy-all" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-105 flex items-center">
+                <i class="fas fa-copy mr-2"></i> Copiar Tudo
+            </button>
+            
+            <button id="download-pdf" class="bg-gradient-to-r from-green-600 to-green-700 text-white py-3 px-6 rounded-xl shadow-lg hover:from-green-700 hover:to-green-800 transition-all transform hover:scale-105 flex items-center">
+                <i class="fas fa-file-pdf mr-2"></i> Baixar PDF
+            </button>
+        </div>
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-id-card text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Dados Básicos
+                </h2>
+            </div>
+
+            
+<p class="text-gray-300"><strong>NOME:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> OSVALDO PEREIRA DOS SANTOS</span></p>
+<p class="text-gray-300"><strong>CPF:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 97461792334</span></p>
+<p class="text-gray-300"><strong>SEXO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> M</span></p>
+<p class="text-gray-300"><strong>NASCIMENTO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 25/04/1975</span></p>
+<p class="text-gray-300"><strong>NOME MAE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MARIA NATIVIDADE P SANTOS</span></p>
+<p class="text-gray-300"><strong>NOME PAI:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="text-gray-300"><strong>ESTADO CIVIL:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="text-gray-300"><strong>RG:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 358521955</span></p>
+<p class="text-gray-300"><strong>ORGAO EMISSOR:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SSP</span></p>
+<p class="text-gray-300"><strong>UF EMISSAO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="text-gray-300"><strong>TITULO ELEITOR:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 35641811198</span></p>
+<p class="text-gray-300"><strong>ZONA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 95</span></p>
+<p class="text-gray-300"><strong>SECAO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 131</span></p>
+<p class="text-gray-300"><strong>NSU:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="text-gray-300"><strong>PIS:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 16616427227</span></p>
+<p class="text-gray-300"><strong>PODER AQUISITIVO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MUITO BAIXO</span></p>
+<p class="text-gray-300"><strong>RENDA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 414,36</span></p>
+<p class="text-gray-300"><strong>FX PODER AQUISITIVO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> De R$ 112 até R$ 630</span></p>
+<p class="text-gray-300"><strong>CSB8:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 444</span></p>
+<p class="text-gray-300"><strong>CSB8 FAIXA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MEDIO</span></p>
+<p class="text-gray-300"><strong>CSBA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 393</span></p>
+<p class="text-gray-300"><strong>CSBA FAIXA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> ALTO</span></p>
+
+<p class="text-gray-300"><strong>ESCOLARIDADE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="text-gray-300"><strong>APOSENTADO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+    
+
+<p class="info-item"><strong>TIPO DE EMPREGO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> CBO: SEM RESULTADO</span></p>
+
+
+        </div>
+
+        <!-- Parentes -->
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-users text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Parentes
+                </h2>
+            </div>
+
+            
+                <p class="text-gray-300"><strong>CPF VINCULO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+                <p class="text-gray-300"><strong>NOME VINCULO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MARIA NATIVIDADE PEREIRA DOS SANTOS</span></p>
+                <p class="text-gray-300"><strong>VINCULO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MAE</span></p><br>
+                
+
+        </div>
+
+        <!-- Telefones -->
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-mobile text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Telefones
+                </h2>
+            </div>
+
+            <p class="info-item"><strong>TELEFONE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 99988580187</span></p>
+<p class="info-item"><strong>TELEFONE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 99991670339</span></p>
+<p class="info-item"><strong>TELEFONE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 99999896544</span></p>
+
+        </div>
+
+        <!-- Email -->
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-envelope text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Emails
+                </h2>
+            </div>
+
+            <p class="text-gray-300"><strong></strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NÃO ENCONTRAMOS RESULTADOS</span></p>
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-map-location-dot text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Endereço
+                </h2>
+            </div>
+
+            
+            <p class="text-gray-300"><strong>LOGRADOURO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SETE DE SETEMBRO</span></p>
+            <p class="text-gray-300"><strong>LOGRADOURO NUMERO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SN</span></p>
+            <p class="text-gray-300"><strong>COMPLEMENTO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> COMPLEM PROCURA JOSIVALD BAIRR</span></p>
+            <p class="text-gray-300"><strong>BAIRRO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NULL</span></p>
+            <p class="text-gray-300"><strong>CIDADE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> BOM JESUS DAS SELVAS</span></p>
+            <p class="text-gray-300"><strong>UF:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MA</span></p>
+            <p class="text-gray-300"><strong>CEP:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 65395000</span></p>
+<br>       
+
+
+            <p class="text-gray-300"><strong>LOGRADOURO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> BARREIRINHA</span></p>
+            <p class="text-gray-300"><strong>LOGRADOURO NUMERO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 194</span></p>
+            <p class="text-gray-300"><strong>COMPLEMENTO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+            <p class="text-gray-300"><strong>BAIRRO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NULL</span></p>
+            <p class="text-gray-300"><strong>CIDADE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> BOM JESUS DAS SELVAS</span></p>
+            <p class="text-gray-300"><strong>UF:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MA</span></p>
+            <p class="text-gray-300"><strong>CEP:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 65395000</span></p>
+<br>       
+
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-id-card text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Credilink
+                </h2>
+            </div>
+
+            
+<p class="text-gray-300"><strong>NOME:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> OSVALDO PEREIRA DOS SANTOS</span></p>
+<p class="text-gray-300"><strong>NOME MAE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MARIA NATIVIDADE PEREIRA DOS SANTOS</span></p>
+<p class="text-gray-300"><strong>EMAIL:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="text-gray-300"><strong>DATA DO OBITO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="text-gray-300"><strong>STATUS DA RECEITA FEDERAL:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> REGULAR</span></p>
+<p class="text-gray-300"><strong>PERCENTUAL DE PARTICIPAÇÃO SOCIETÁRIA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="text-gray-300"><strong>CBO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 623110</span></p><br>
+
+<p class="text-gray-300"><strong>RENDA PRESUMIDA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 1576</span></p>
+<p class="text-gray-300"><strong>TELEFONES:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 98988130226, 98970297428, 99984919938, 99988071701, 99991670339</span></p><br>
+
+<p class="text-gray-300"><strong>UF:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MA</span></p>
+<p class="text-gray-300"><strong>ESTADO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MARANHAO</span></p>
+<p class="text-gray-300"><strong>CIDADE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> BOM JESUS DAS SELVAS</span></p>
+<p class="text-gray-300"><strong>TIPO ENDEREÇO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> TRAVESSA</span></p>
+<p class="text-gray-300"><strong>LOGRADOURO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SAO JOAO</span></p>
+<p class="text-gray-300"><strong>COMPLEMENTO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="text-gray-300"><strong>BAIRRO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> CENTRO</span></p>
+<p class="text-gray-300"><strong>NUMERO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="text-gray-300"><strong>CEP:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 65395000</span></p>
+
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-syringe text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Covid
+                </h2>
+            </div>
+
+            
+
+<p class="text-gray-300"><strong>COR:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> AMARELA</span></p>
+<p class="text-gray-300"><strong>CNS:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 700002909030703</span></p>
+<p class="text-gray-300"><strong>MÃE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MARIA NATIVIDADE PEREIRA DOS SANTOS</span></p>
+<p class="text-gray-300"><strong>NOME DA VACINA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> COVID-19 ASTRAZENECA/FIOCRUZ - COVISHIELD</span></p>
+<p class="text-gray-300"><strong>DESCRIÇÃO DA VACINA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 1ª Dose</span></p>
+<p class="text-gray-300"><strong>LOTE DA VACINA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 216VCD194Z</span></p>
+<p class="text-gray-300"><strong>GRUPO DE ATENDIMENTO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> Pessoas de 18 a 64 anos</span></p>
+<p class="text-gray-300"><strong>DATA DE APLICAÇÃO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 2021-07-28T00:00:00.000Z</span></p>
+<p class="text-gray-300"><strong>STATUS:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> final</span></p>
+<p class="text-gray-300"><strong>NOME DO ESTABELECIMENTO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> UNIDADE BASICA DE SAUDE ANTONIO NASCIMENTO FILHO</span></p>
+<p class="text-gray-300"><strong>APLICADOR DE VACINA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> ADRIANA DE MATOS SILVA</span></p>
+<p class="text-gray-300"><strong>UF:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MA</span></p>
+<p class="text-gray-300"><strong>MUNICIPIO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> ITINGA DO MARANHAO</span></p>
+<p class="text-gray-300"><strong>BAIRRO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> ZONA RURAL</span></p>
+<p class="text-gray-300"><strong>CEP:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 65939</span></p>
+
+<br><br>
+<p class="text-gray-300"><strong>TELEFONES:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 9991338932</span></p>
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-briefcase text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Empresas Associadas (SÓCIO)
+                </h2>
+            </div>
+
+            
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-building text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    CNPJ MEI
+                </h2>
+            </div>
+
+            <p class="text-gray-300"><strong></strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NÃO ENCONTRAMOS RESULTADOS</span></p>
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-building text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Dividas Ativas (SIDA)
+                </h2>
+            </div>
+
+            
+
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-hand-holding-usd text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Auxilio Emergencial
+                </h2>
+            </div>
+
+            <p class="text-gray-300"><strong></strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NÃO ENCONTRAMOS RESULTADOS</span></p>
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-briefcase text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Rais - Histórico de Emprego
+                </h2>
+            </div>
+
+            
+<p class="text-gray-300"><strong>CPF:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 97461792334</span></p>
+<p class="text-gray-300"><strong>NOME:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> OSVALDO PEREIRA DOS SANTOS</span></p>
+<p class="text-gray-300"><strong>CNPJ:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 34431411300983</span></p>
+<p class="text-gray-300"><strong>RAZAO SOCIAL:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> JOSE A F DA SILVA CINDERELA</span></p>
+<p class="text-gray-300"><strong>SITUAÇÃO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> ENTREGUE</span></p>
+<p class="text-gray-300"><strong>DATA ENTREGA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 2022-04-19 00:00:00</span></p>
+<p class="text-gray-300"><strong>DATA ADMISSAO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 2017-02-03 00:00:00</span></p>
+<p class="text-gray-300"><strong>DATA DESLIGAMENTO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="text-gray-300"><strong>DATA CADASTRO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 2022-10-14 00:59:00</span></p>
+<p class="text-gray-300"><strong>FAIXA RENDA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<br>
+
+
+<p class="text-gray-300"><strong>CPF:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 97461792334</span></p>
+<p class="text-gray-300"><strong>NOME:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> OSVALDO PEREIRA DOS SANTOS</span></p>
+<p class="text-gray-300"><strong>CNPJ:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 34431411300983</span></p>
+<p class="text-gray-300"><strong>RAZAO SOCIAL:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> JOSE A F DA SILVA CINDERELA</span></p>
+<p class="text-gray-300"><strong>SITUAÇÃO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> ENTREGUE</span></p>
+<p class="text-gray-300"><strong>DATA ENTREGA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 19/04/2022</span></p>
+<p class="text-gray-300"><strong>DATA ADMISSAO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 03/02/2017</span></p>
+<p class="text-gray-300"><strong>DATA DESLIGAMENTO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 06/05</span></p>
+<p class="text-gray-300"><strong>DATA CADASTRO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 2022-10-14 00:59:00</span></p>
+<p class="text-gray-300"><strong>FAIXA RENDA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<br>
+
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-briefcase text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Inss
+                </h2>
+            </div>
+
+            <p class="text-gray-300"><strong></strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NÃO ENCONTRAMOS RESULTADOS</span></p>
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-phone text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Operadora Vivo
+                </h2>
+            </div>
+
+            
+<p class="info-item"><strong>TELEFONE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 99991670339</span></p>
+<p class="info-item"><strong>DATA PRIMEIRA RECARGA DA LINHA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 01JAN1900</span></p>
+<p class="info-item"><strong>DATA ULTIMA RECARGA DA LINHA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 01JAN1900</span></p>
+<p class="info-item"><strong>PLANO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MOVEL POS-PAGO</span></p>
+<p class="info-item"><strong>NÚMERO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> S/N</span></p>
+<p class="info-item"><strong>UF:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MA</span></p>
+<p class="info-item"><strong>TIPO DE PESSOA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> PF</span></p>
+<p class="info-item"><strong>DATA DE INSTALAÇÃO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 24OCT2016</span></p>
+<p class="info-item"><strong>TELEFONE ANTERIOR:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="info-item"><strong>DESCRIÇÃO DO ESTADO DA LINHA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> ATIVO</span></p>
+<p class="info-item"><strong>DESCRIÇÃO DO PRODUTO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> PF_CONTROLE</span></p>
+<p class="info-item"><strong>NOME DO ASSINANTE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> OSVALDO  PEREIRA DOS SANTOS</span></p>
+<p class="info-item"><strong>CPF:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 97461792334</span></p>
+<p class="info-item"><strong>DESCRIÇÃO DO EMAIL:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="info-item"><strong>TIPO DE ENDEREÇO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 1</span></p>
+<p class="info-item"><strong>DATA DE VIGENCIA DE INCLUSÃO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 24OCT2016</span></p>
+<p class="info-item"><strong>ENDEREÇO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> RUA SETE DE SETEMBRO</span></p>
+<p class="info-item"><strong>NUMERO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> S/N</span></p>
+<p class="info-item"><strong>COMPLEMENTO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> COMPLEM PROCURA JOSIVALD BAIRR</span></p>
+<p class="info-item"><strong>BAIRRO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> .</span></p>
+<p class="info-item"><strong>CEP:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 65395-000</span></p>
+<p class="info-item"><strong>MAIOR_ATRASO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 25</span></p>
+<p class="info-item"><strong>MENOR_ATRASO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> -8</span></p>
+<p class="info-item"><strong>FLAG_DIVIDA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 1</span></p>
+<p class="info-item"><strong>ANO MES CONTRATO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 202009</span></p>
+<p class="info-item"><strong>VALOR DA FATURA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 75.83</span></p>
+<br>
+
+
+<p class="info-item"><strong>TELEFONE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 99991600163</span></p>
+<p class="info-item"><strong>DATA PRIMEIRA RECARGA DA LINHA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 01JAN1900</span></p>
+<p class="info-item"><strong>DATA ULTIMA RECARGA DA LINHA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 01JAN1900</span></p>
+<p class="info-item"><strong>PLANO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MOVEL POS-PAGO</span></p>
+<p class="info-item"><strong>NÚMERO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> S/N</span></p>
+<p class="info-item"><strong>UF:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> MA</span></p>
+<p class="info-item"><strong>TIPO DE PESSOA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> PF</span></p>
+<p class="info-item"><strong>DATA DE INSTALAÇÃO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 26JUN2020</span></p>
+<p class="info-item"><strong>TELEFONE ANTERIOR:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="info-item"><strong>DESCRIÇÃO DO ESTADO DA LINHA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> ATIVO</span></p>
+<p class="info-item"><strong>DESCRIÇÃO DO PRODUTO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> PF_CONTROLE</span></p>
+<p class="info-item"><strong>NOME DO ASSINANTE:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> OSVALDO  PEREIRA DOS SANTOS</span></p>
+<p class="info-item"><strong>CPF:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 97461792334</span></p>
+<p class="info-item"><strong>DESCRIÇÃO DO EMAIL:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="info-item"><strong>TIPO DE ENDEREÇO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 1</span></p>
+<p class="info-item"><strong>DATA DE VIGENCIA DE INCLUSÃO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 26JUN2020</span></p>
+<p class="info-item"><strong>ENDEREÇO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> RUA ACAILANDIA</span></p>
+<p class="info-item"><strong>NUMERO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> S/N</span></p>
+<p class="info-item"><strong>COMPLEMENTO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> SEM RESULTADO</span></p>
+<p class="info-item"><strong>BAIRRO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> CENTRO</span></p>
+<p class="info-item"><strong>CEP:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 65939-000</span></p>
+<p class="info-item"><strong>MAIOR_ATRASO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 14</span></p>
+<p class="info-item"><strong>MENOR_ATRASO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 14</span></p>
+<p class="info-item"><strong>FLAG_DIVIDA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 1</span></p>
+<p class="info-item"><strong>ANO MES CONTRATO:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 202010</span></p>
+<p class="info-item"><strong>VALOR DA FATURA:</strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> 34.99</span></p>
+<br>
+
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-phone text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Operadora Claro
+                </h2>
+            </div>
+
+            <p class="text-gray-300"><strong></strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NÃO ENCONTRAMOS RESULTADOS</span></p>
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-phone text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Operadora Tim
+                </h2>
+            </div>
+
+            <p class="text-gray-300"><strong></strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NÃO ENCONTRAMOS RESULTADOS</span></p>
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-car text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Histórico de Veiculos
+                </h2>
+            </div>
+
+            <p class="text-gray-300"><strong></strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NÃO ENCONTRAMOS RESULTADOS</span></p>
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-key text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Senhas Vazadas no Email
+                </h2>
+            </div>
+
+            <p class="text-gray-300"><strong></strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NÃO ENCONTRAMOS RESULTADOS</span></p>
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-key text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Senhas Vazadas do CPF
+                </h2>
+            </div>
+
+            <p class="text-gray-300"><strong></strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NÃO ENCONTRAMOS RESULTADOS</span></p>
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-server text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Cloud CPF
+                </h2>
+            </div>
+
+            <p class="text-gray-300"><strong></strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NÃO ENCONTRAMOS RESULTADOS</span></p>
+
+        </div>
+
+        <div class="bg-gray-800 rounded-xl shadow-lg mt-6 p-6 border border-gray-700">
+            <div class="flex items-center mb-4 pb-2 border-b border-blue-400/50">
+                <div class="bg-blue-600/20 p-3 rounded-lg mr-3">
+                    <i class="fas fa-server text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-blue-400">
+                    Cloud EMAIL
+                </h2>
+            </div>
+
+            <p class="text-gray-300"><strong></strong><span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-medium" style="color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;"> NÃO ENCONTRAMOS RESULTADOS</span></p>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-gray-600 mt-6">
+            <p>© 2024 Consulta [BOT]. Todos os direitos reservados.</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./Consulta de Dados_files/html2pdf.bundle.min.js.download"></script>
+    <script>
+        document.getElementById('download-pdf').addEventListener('click', function () {
+            const element = document.querySelector('.max-w-4xl');
+
+            // Corrige gradiente/text-transparent só para o PDF
+            const spans = element.querySelectorAll('span.text-transparent');
+            spans.forEach(span => {
+                span.setAttribute('style', 'color: white !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important;');
+            });
+
+            const opt = {
+                margin:       0,
+                filename:     'relatorio.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        });
+    </script>
+    <script>
+        document.getElementById('copy-all').addEventListener('click', function () {
+            navigator.clipboard.writeText(document.body.innerText).then(() => {
+                alert('Texto copiado com sucesso!');
+            }).catch(() => {
+                alert('Erro ao copiar texto.');
+            });
+        });
+    </script>
+
+
+          
+                
+</body></html>

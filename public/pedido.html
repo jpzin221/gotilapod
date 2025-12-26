@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rastreamento do Pedido</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-center;
+            margin: 0 auto 20px;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .success-icon i {
+            font-size: 40px;
+            color: white;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .pedido-numero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: 700;
+            font-size: 20px;
+            margin: 20px 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .info-box i {
+            font-size: 30px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .info-label {
+            color: #999;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .timeline-section h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .timeline {
+            position: relative;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 25px;
+            top: 60px;
+            bottom: -30px;
+            width: 2px;
+            background: #e0e0e0;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-icon-wrapper {
+            flex-shrink: 0;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-center;
+            font-size: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-item.completed .timeline-icon-wrapper {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+        }
+
+        .timeline-item.active .timeline-icon-wrapper {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .timeline-item.pending .timeline-icon-wrapper {
+            background: #f0f0f0;
+            color: #ccc;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 5px 25px rgba(102, 126, 234, 0.5);
+            }
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid #e0e0e0;
+        }
+
+        .timeline-item.completed .timeline-content {
+            border-left-color: #38ef7d;
+        }
+
+        .timeline-item.active .timeline-content {
+            border-left-color: #667eea;
+            background: linear-gradient(135deg, #f5f7ff 0%, #f0f2ff 100%);
+        }
+
+        .timeline-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .timeline-item.active .timeline-title {
+            color: #667eea;
+        }
+
+        .timeline-desc {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .timeline-meta {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .timeline-time {
+            color: #999;
+            font-size: 13px;
+        }
+
+        .timeline-item.active .timeline-time {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .endereco-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .endereco-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .endereco-card p {
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f7ff;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-container {
+                flex-direction: column;
+            }
+
+            .timeline-item {
+                gap: 15px;
+            }
+
+            .timeline-icon-wrapper {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .timeline-item::before {
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <!-- Header -->
+            <div class="header">
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h1>Pedido Confirmado!</h1>
+                <p class="subtitle">Seu pagamento foi aprovado com sucesso</p>
+                <div class="pedido-numero" id="numeroPedido">#805061</div>
+            </div>
+
+            <!-- Informações Rápidas -->
+            <div class="info-grid">
+                <div class="info-box">
+                    <i class="fas fa-dollar-sign"></i>
+                    <div class="info-label">Valor Total</div>
+                    <div class="info-value" id="valorTotal">R$ 85,00</div>
+                </div>
+                <div class="info-box">
+                    <i class="fas fa-clock"></i>
+                    <div class="info-label">Previsão</div>
+                    <div class="info-value">30-45 min</div>
+                </div>
+                <div class="info-box">
+                    <i class="fas fa-phone"></i>
+                    <div class="info-label">Telefone</div>
+                    <div class="info-value" id="telefone">(11) 98765-4321</div>
+                </div>
+            </div>
+
+            <!-- Endereço -->
+            <div class="endereco-card">
+                <h3><i class="fas fa-map-marker-alt"></i> Endereço de Entrega</h3>
+                <p id="endereco">
+                    Rua Exemplo, 123 - Apto 45<br>
+                    Centro - Curitiba/PR<br>
+                    CEP: 80000-000
+                </p>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="card timeline-section">
+            <h2><i class="fas fa-route"></i> Rastreamento em Tempo Real</h2>
+            <div class="timeline" id="timeline">
+                <!-- Etapas serão inseridas aqui via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Botões -->
+        <div class="btn-container">
+            <a href="/" class="btn btn-secondary">
+                <i class="fas fa-home"></i>
+                Voltar à Loja
+            </a>
+            <button class="btn btn-primary" onclick="atualizarStatus()">
+                <i class="fas fa-sync-alt"></i>
+                Atualizar Status
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Etapas do pedido
+        const etapas = [
+            {
+                id: 'confirmado',
+                icon: 'fa-check-circle',
+                titulo: 'Pagamento Aprovado',
+                descricao: 'Seu pagamento foi confirmado com sucesso',
+                tempo: 'Há 2 minutos'
+            },
+            {
+                id: 'preparando',
+                icon: 'fa-box',
+                titulo: 'Preparando Pedido',
+                descricao: 'Estamos separando seus produtos',
+                tempo: 'Há 1 minuto'
+            },
+            {
+                id: 'guardando',
+                icon: 'fa-warehouse',
+                titulo: 'Armazenando',
+                descricao: 'Produtos embalados e prontos para coleta',
+                tempo: 'Em andamento'
+            },
+            {
+                id: 'motoboy_caminho',
+                icon: 'fa-motorcycle',
+                titulo: 'Motoboy a Caminho',
+                descricao: 'Motoboy está indo buscar o pedido',
+                tempo: 'Aguardando'
+            },
+            {
+                id: 'coleta',
+                icon: 'fa-store',
+                titulo: 'Coletado',
+                descricao: 'Pedido coletado pela loja parceira',
+                tempo: 'Aguardando'
+            },
+            {
+                id: 'em_rota',
+                icon: 'fa-truck',
+                titulo: 'Em Rota de Entrega',
+                descricao: 'Seu pedido está a caminho',
+                tempo: 'Aguardando'
+            },
+            {
+                id: 'entregue',
+                icon: 'fa-check-double',
+                titulo: 'Entregue',
+                descricao: 'Pedido entregue com sucesso!',
+                tempo: 'Aguardando'
+            }
+        ];
+
+        let etapaAtual = 2; // Começa em "Armazenando"
+
+        function renderTimeline() {
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = '';
+
+            etapas.forEach((etapa, index) => {
+                let status = 'pending';
+                let badge = 'info';
+                let badgeText = 'Pendente';
+
+                if (index < etapaAtual) {
+                    status = 'completed';
+                    badge = 'success';
+                    badgeText = 'Concluído';
+                } else if (index === etapaAtual) {
+                    status = 'active';
+                    badge = 'warning';
+                    badgeText = 'Em andamento';
+                }
+
+                const item = `
+                    <div class="timeline-item ${status}">
+                        <div class="timeline-icon-wrapper">
+                            <i class="fas ${etapa.icon}"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">${etapa.titulo}</div>
+                            <div class="timeline-desc">${etapa.descricao}</div>
+                            <div class="timeline-meta">
+                                <div class="timeline-time">${etapa.tempo}</div>
+                                <span class="status-badge ${badge}">${badgeText}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                timeline.innerHTML += item;
+            });
+        }
+
+        function avancarEtapa() {
+            if (etapaAtual < etapas.length - 1) {
+                etapaAtual++;
+                renderTimeline();
+            }
+        }
+
+        function atualizarStatus() {
+            // Simular atualização
+            const btn = event.target.closest('button');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                avancarEtapa();
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }, 1500);
+        }
+
+        // Carregar dados da URL
+        function carregarDadosURL() {
+            const params = new URLSearchParams(window.location.search);
+            
+            if (params.get('pedido')) {
+                document.getElementById('numeroPedido').textContent = params.get('pedido');
+            }
+            if (params.get('valor')) {
+                document.getElementById('valorTotal').textContent = 'R$ ' + params.get('valor');
+            }
+            if (params.get('telefone')) {
+                document.getElementById('telefone').textContent = params.get('telefone');
+            }
+        }
+
+        // Inicializar
+        renderTimeline();
+        carregarDadosURL();
+
+        // Simular progresso automático (DEMO)
+        setInterval(avancarEtapa, 8000);
+    </script>
+</body>
+</html>

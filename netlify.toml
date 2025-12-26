@@ -1,0 +1,67 @@
+# Configuração do Netlify para o projeto
+
+[build]
+  # Comando de build
+  command = "npm run build"
+  
+  # Diretório de saída do build
+  publish = "dist"
+  
+  # Variáveis de ambiente (configure no painel do Netlify)
+  # VITE_SUPABASE_URL
+  # VITE_SUPABASE_ANON_KEY
+
+# Redirecionamento para SPA (Single Page Application)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers de segurança e cache
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # HSTS - force HTTPS
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    # CSP - proteção contra XSS e injeção de código (permite funções Netlify)
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: http:; connect-src 'self' https://*.supabase.co https://api.bspay.co https://viacep.com.br https://www.google-analytics.com https://*.netlify.app https://*.netlify.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'"
+    # Permissions Policy - restringir recursos do navegador
+    Permissions-Policy = "geolocation=(self), microphone=(), camera=(), payment=(self)"
+    # Cross-Origin policies
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Embedder-Policy = "credentialless"
+
+# Cache para assets estáticos (imagens, fontes, etc)
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache para imagens
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# Configurações de função serverless (se necessário no futuro)
+[functions]
+  directory = "netlify/functions"

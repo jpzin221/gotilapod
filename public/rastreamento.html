@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rastreamento do Pedido</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 18px;
+        }
+
+        .pedido-info {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .pedido-info h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        .timeline {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .timeline h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 50px;
+            padding-bottom: 40px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 30px;
+            bottom: -10px;
+            width: 2px;
+            background: #e0e0e0;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            z-index: 1;
+        }
+
+        .timeline-item.completed .timeline-icon {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            box-shadow: 0 3px 10px rgba(17, 153, 142, 0.3);
+        }
+
+        .timeline-item.active .timeline-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .timeline-item.pending .timeline-icon {
+            background: #e0e0e0;
+            color: #999;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 3px solid #e0e0e0;
+        }
+
+        .timeline-item.completed .timeline-content {
+            border-left-color: #38ef7d;
+        }
+
+        .timeline-item.active .timeline-content {
+            border-left-color: #667eea;
+            background: linear-gradient(135deg, #f5f7ff 0%, #f0f2ff 100%);
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .timeline-item.active .timeline-title {
+            color: #667eea;
+        }
+
+        .timeline-desc {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .timeline-time {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .timeline-item.active .timeline-time {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .btn-home {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 30px auto 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .header p {
+                font-size: 14px;
+            }
+
+            .timeline {
+                padding: 20px;
+            }
+
+            .timeline-item {
+                padding-left: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎉 Pedido Confirmado!</h1>
+            <p>Acompanhe seu pedido em tempo real</p>
+        </div>
+
+        <!-- Informações do Pedido -->
+        <div class="pedido-info">
+            <h2>📦 Detalhes do Pedido</h2>
+            <div class="info-row">
+                <span class="info-label">Número do Pedido:</span>
+                <span class="info-value">#805061</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Valor Total:</span>
+                <span class="info-value">R$ 85,00</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Previsão de Entrega:</span>
+                <span class="info-value">30-45 minutos</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Endereço:</span>
+                <span class="info-value">Rua Exemplo, 123 - Centro</span>
+            </div>
+        </div>
+
+        <!-- Timeline de Rastreamento -->
+        <div class="timeline">
+            <h2>📍 Rastreamento em Tempo Real</h2>
+
+            <!-- Pagamento Aprovado -->
+            <div class="timeline-item completed">
+                <div class="timeline-icon">✓</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Pagamento Aprovado</div>
+                    <div class="timeline-desc">Seu pagamento foi confirmado com sucesso</div>
+                    <div class="timeline-time">Há 2 minutos</div>
+                    <span class="badge badge-success">Concluído</span>
+                </div>
+            </div>
+
+            <!-- Preparando Pedido -->
+            <div class="timeline-item completed">
+                <div class="timeline-icon">✓</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Preparando Pedido</div>
+                    <div class="timeline-desc">Estamos separando seus produtos</div>
+                    <div class="timeline-time">Há 1 minuto</div>
+                    <span class="badge badge-success">Concluído</span>
+                </div>
+            </div>
+
+            <!-- Armazenando -->
+            <div class="timeline-item active">
+                <div class="timeline-icon">📦</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Armazenando</div>
+                    <div class="timeline-desc">Produtos embalados e prontos para coleta</div>
+                    <div class="timeline-time">Em andamento</div>
+                    <span class="badge badge-warning">Processando</span>
+                </div>
+            </div>
+
+            <!-- Motoboy a Caminho -->
+            <div class="timeline-item pending">
+                <div class="timeline-icon">🏍️</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Motoboy a Caminho</div>
+                    <div class="timeline-desc">Motoboy está indo buscar o pedido</div>
+                    <div class="timeline-time">Aguardando</div>
+                    <span class="badge badge-info">Pendente</span>
+                </div>
+            </div>
+
+            <!-- Coletado -->
+            <div class="timeline-item pending">
+                <div class="timeline-icon">🏪</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Coletado</div>
+                    <div class="timeline-desc">Pedido coletado pela loja parceira</div>
+                    <div class="timeline-time">Aguardando</div>
+                    <span class="badge badge-info">Pendente</span>
+                </div>
+            </div>
+
+            <!-- Em Rota de Entrega -->
+            <div class="timeline-item pending">
+                <div class="timeline-icon">🚚</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Em Rota de Entrega</div>
+                    <div class="timeline-desc">Seu pedido está a caminho</div>
+                    <div class="timeline-time">Aguardando</div>
+                    <span class="badge badge-info">Pendente</span>
+                </div>
+            </div>
+
+            <!-- Entregue -->
+            <div class="timeline-item pending">
+                <div class="timeline-icon">✨</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Entregue</div>
+                    <div class="timeline-desc">Pedido entregue com sucesso!</div>
+                    <div class="timeline-time">Aguardando</div>
+                    <span class="badge badge-info">Pendente</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botão Voltar -->
+        <a href="/" class="btn-home">🏠 Voltar para a Loja</a>
+    </div>
+
+    <script>
+        // Simular progresso automático (DEMO)
+        const etapas = document.querySelectorAll('.timeline-item');
+        let currentStep = 2; // Começa em "Armazenando" (índice 2)
+
+        function avancarEtapa() {
+            if (currentStep >= etapas.length) return;
+
+            // Marcar etapa atual como concluída
+            etapas[currentStep].classList.remove('active');
+            etapas[currentStep].classList.add('completed');
+            etapas[currentStep].querySelector('.timeline-icon').textContent = '✓';
+            etapas[currentStep].querySelector('.badge').className = 'badge badge-success';
+            etapas[currentStep].querySelector('.badge').textContent = 'Concluído';
+
+            currentStep++;
+
+            // Ativar próxima etapa
+            if (currentStep < etapas.length) {
+                etapas[currentStep].classList.remove('pending');
+                etapas[currentStep].classList.add('active');
+                etapas[currentStep].querySelector('.badge').className = 'badge badge-warning';
+                etapas[currentStep].querySelector('.badge').textContent = 'Processando';
+                etapas[currentStep].querySelector('.timeline-time').textContent = 'Em andamento';
+            }
+        }
+
+        // Avançar a cada 5 segundos (DEMO)
+        setInterval(avancarEtapa, 5000);
+
+        // Atualizar tempo relativo
+        function atualizarTempo() {
+            const tempos = document.querySelectorAll('.timeline-time');
+            // Aqui você pode implementar lógica real de tempo
+        }
+
+        setInterval(atualizarTempo, 60000); // Atualizar a cada minuto
+    </script>
+</body>
+</html>
