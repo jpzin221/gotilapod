@@ -6,6 +6,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.78.0",
     "gn-api-sdk-node": "^3.0.4",
+    "node-fetch": "^2.7.0",
     "qrcode": "^1.5.4"
   }
 }
