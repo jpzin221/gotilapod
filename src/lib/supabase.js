@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Fallback para garantir funcionamento mesmo se env vars não foram injetadas no build
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://fkstktohbnwsnzbarujc.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZrc3RrdG9oYm53c256YmFydWpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMDI1NjMsImV4cCI6MjA3NzU3ODU2M30.rN3BfRwWeE9Pjf70S8uneSgngYHGPz75FtfqzQfDq6o';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
