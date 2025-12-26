@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Bike, Instagram } from 'lucide-react';
 import Header from './components/Header';
@@ -96,101 +96,95 @@ function App() {
     }
   };
 
-  const handleProductClick = (product) => {
-    console.log('🎯 Produto clicado:', product.name);
-    console.log('  Product completo:', product);
-    console.log('  Product.flavors:', product.flavors);
-    console.log('  Tem flavors?', product.flavors ? 'SIM' : 'NÃO');
-    console.log('  Quantidade de flavors:', product.flavors?.length || 0);
+  const handleProductClick = useCallback((product) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
-    setTimeout(() => setSelectedProduct(null), 300); // Delay para animação
-  };
+    setTimeout(() => setSelectedProduct(null), 300);
+  }, []);
 
-  // Filtrar produtos por categoria
-  const filterByCategory = (product) => {
-    if (activeCategory === 'all') return true;
-    return product.category_id === activeCategory;
-  };
+  // Memoized: Produtos filtrados e ordenados
+  const filteredProducts = useMemo(() => {
+    let result = products.filter(product => {
+      // Filtrar por categoria
+      if (activeCategory !== 'all' && product.category_id !== activeCategory) return false;
 
-  // Filtrar produtos por busca
-  const filterBySearch = (product) => {
-    if (!searchTerm) return true;
-    return product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase());
-  };
+      // Filtrar por busca
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        if (!product.name.toLowerCase().includes(term) &&
+          !product.description?.toLowerCase().includes(term)) return false;
+      }
 
-  // Filtrar produtos por sabor
-  const filterByFlavor = (product) => {
-    if (!selectedFlavor) return true;
-    if (!product.flavors || product.flavors.length === 0) return false;
-    return product.flavors.some(pf => pf.flavor.name === selectedFlavor);
-  };
+      // Filtrar por sabor
+      if (selectedFlavor) {
+        if (!product.flavors?.some(pf => pf.flavor?.name === selectedFlavor)) return false;
+      }
 
-  // Filtrar produtos por puffs
-  const filterByPuff = (product) => {
-    if (!selectedPuff) return true;
-    return product.puff_count === selectedPuff;
-  };
+      // Filtrar por puffs
+      if (selectedPuff && product.puff_count !== selectedPuff) return false;
 
-  // Aplicar filtros e ordenação
-  let filteredProducts = products.filter(product =>
-    filterByCategory(product) && filterBySearch(product) && filterByFlavor(product) && filterByPuff(product)
-  );
+      return true;
+    });
 
-  // Para a seção de promoções: mostrar produtos em promoção da categoria selecionada
-  // Se "TODOS" estiver selecionado, mostra todos os produtos em promoção
-  // Se uma categoria específica estiver selecionada, mostra apenas produtos em promoção daquela categoria
-  const promotionProducts = products.filter(product => {
-    const isPromotion = product.em_promocao === true;
-    const matchesCategory = activeCategory === 'TODOS' || product.category.toUpperCase() === activeCategory;
-    const matchesSearch = filterBySearch(product);
-    const matchesFlavor = filterByFlavor(product);
-    const matchesPuff = filterByPuff(product);
-
-    return isPromotion && matchesCategory && matchesSearch && matchesFlavor && matchesPuff;
-  });
-
-  // Ordenar produtos
-  if (sortBy === 'best-sellers') {
-    filteredProducts = [...filteredProducts].sort((a, b) => (b.reviews || 0) - (a.reviews || 0));
-  } else if (sortBy === 'price-low') {
-    filteredProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
-  } else if (sortBy === 'price-high') {
-    filteredProducts = [...filteredProducts].sort((a, b) => b.price - a.price);
-  }
-
-  // Extrair sabores e puffs disponíveis dos produtos filtrados (antes dos filtros de sabor/puff)
-  const productsForFilters = products.filter(product =>
-    filterByCategory(product) && filterBySearch(product)
-  );
-
-  const availableFlavors = [...new Set(
-    productsForFilters
-      .flatMap(p => p.flavors || [])
-      .map(pf => pf.flavor.name)
-  )].sort();
-
-  const availablePuffs = [...new Set(
-    productsForFilters
-      .map(p => p.puff_count)
-      .filter(count => count != null)
-  )].sort((a, b) => a - b);
-
-  // Agrupar produtos por categoria
-  const groupedProducts = filteredProducts.reduce((acc, product) => {
-    const category = categories.find(c => c.id === product.category_id);
-    const categoryName = category?.name || 'Sem Categoria';
-    if (!acc[categoryName]) {
-      acc[categoryName] = [];
+    // Ordenar
+    if (sortBy === 'best-sellers') {
+      result = [...result].sort((a, b) => (b.reviews || 0) - (a.reviews || 0));
+    } else if (sortBy === 'price-low') {
+      result = [...result].sort((a, b) => a.price - b.price);
+    } else if (sortBy === 'price-high') {
+      result = [...result].sort((a, b) => b.price - a.price);
     }
-    acc[categoryName].push(product);
-    return acc;
-  }, {});
+
+    return result;
+  }, [products, activeCategory, searchTerm, selectedFlavor, selectedPuff, sortBy]);
+
+  // Memoized: Produtos em promoção
+  const promotionProducts = useMemo(() => {
+    return products.filter(product => {
+      if (!product.em_promocao) return false;
+      if (activeCategory !== 'TODOS' && product.category?.toUpperCase() !== activeCategory) return false;
+      if (searchTerm && !product.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+      if (selectedFlavor && !product.flavors?.some(pf => pf.flavor?.name === selectedFlavor)) return false;
+      if (selectedPuff && product.puff_count !== selectedPuff) return false;
+      return true;
+    });
+  }, [products, activeCategory, searchTerm, selectedFlavor, selectedPuff]);
+
+  // Memoized: Sabores e puffs disponíveis
+  const { availableFlavors, availablePuffs } = useMemo(() => {
+    const productsForFilters = products.filter(product => {
+      if (activeCategory !== 'all' && product.category_id !== activeCategory) return false;
+      if (searchTerm && !product.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+      return true;
+    });
+
+    const flavors = [...new Set(
+      productsForFilters.flatMap(p => p.flavors || []).map(pf => pf.flavor?.name).filter(Boolean)
+    )].sort();
+
+    const puffs = [...new Set(
+      productsForFilters.map(p => p.puff_count).filter(count => count != null)
+    )].sort((a, b) => a - b);
+
+    return { availableFlavors: flavors, availablePuffs: puffs };
+  }, [products, activeCategory, searchTerm]);
+
+  // Memoized: Produtos agrupados por categoria
+  const groupedProducts = useMemo(() => {
+    return filteredProducts.reduce((acc, product) => {
+      const category = categories.find(c => c.id === product.category_id);
+      const categoryName = category?.name || 'Sem Categoria';
+      if (!acc[categoryName]) {
+        acc[categoryName] = [];
+      }
+      acc[categoryName].push(product);
+      return acc;
+    }, {});
+  }, [filteredProducts, categories]);
 
   return (
     <div className="min-h-screen bg-gray-50">
