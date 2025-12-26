@@ -64,12 +64,9 @@ export default function Header({ storeInfo }) {
         </div>
       </div>
 
-      {/* Barra de Geolocalização - Otimizada para Mobile */}
+      {/* Barra de Geolocalização - Sempre positiva */}
       {bannerVisible && (
-        <div className={`${localizacao?.distanciaParaSede && localizacao.distanciaParaSede <= CONFIG.distanciaProxima
-          ? 'bg-gradient-to-r from-amber-500 to-orange-500'
-          : 'bg-gradient-to-r from-green-500 to-emerald-600'
-          } text-white py-1.5 sm:py-2 px-2 sm:px-4 shadow-md`}>
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white py-1.5 sm:py-2 px-2 sm:px-4 shadow-md">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between gap-2">
               {/* Informações Compactas */}
@@ -87,8 +84,7 @@ export default function Header({ storeInfo }) {
                     ) : (
                       <>
                         <div className="font-bold truncate">
-                          {localizacao?.distanciaParaSede && localizacao.distanciaParaSede <= CONFIG.distanciaProxima ? '🎉 ' : ''}
-                          {localizacao?.cidade || 'Sua região'}, {localizacao?.estado || 'BR'}
+                          ✅ {localizacao?.cidade || 'Sua região'}, {localizacao?.estado || 'BR'}
                         </div>
                         <div className="opacity-90 text-[9px] sm:text-[10px] truncate">
                           {localizacao?.distanciaParaSede ? (
@@ -97,22 +93,14 @@ export default function Header({ storeInfo }) {
                               <span className="hidden sm:inline"> de distância</span>
                               {' • '}
                               <span className="hidden sm:inline">
-                                {!localizacao?.entregaDisponivel
-                                  ? 'Verificar disponibilidade'
-                                  : localizacao.distanciaParaSede <= CONFIG.distanciaProxima
-                                    ? 'Entrega ultra rápida'
-                                    : 'Entrega disponível'}
+                                Entrega disponível
                               </span>
                               <span className="sm:hidden">
-                                {!localizacao?.entregaDisponivel
-                                  ? 'Verificar'
-                                  : localizacao.distanciaParaSede <= CONFIG.distanciaProxima
-                                    ? 'Ultra rápido'
-                                    : 'Disponível'}
+                                Disponível
                               </span>
                             </>
                           ) : (
-                            'Atendemos sua região'
+                            'Entrega disponível para sua região'
                           )}
                         </div>
                       </>
@@ -125,27 +113,13 @@ export default function Header({ storeInfo }) {
 
                 {/* Ícone + Entrega - Apenas desktop */}
                 <div className="hidden md:flex items-center gap-2">
-                  {!localizacao?.entregaDisponivel && localizacao?.distanciaParaSede ? (
-                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                  ) : (
-                    <Store className="w-4 h-4 flex-shrink-0" />
-                  )}
+                  <Store className="w-4 h-4 flex-shrink-0" />
                   <div className="text-xs">
                     <span className="font-bold">
-                      {!localizacao?.entregaDisponivel && localizacao?.distanciaParaSede
-                        ? '📦 Verificar Disponibilidade'
-                        : localizacao?.distanciaParaSede && localizacao.distanciaParaSede <= CONFIG.distanciaProxima
-                          ? '🚀 Entrega Ultra Rápida'
-                          : 'Entrega Disponível'}
+                      🚀 Entrega Disponível
                     </span>
                     <span className="opacity-90 ml-2">
-                      • {!localizacao?.entregaDisponivel && localizacao?.distanciaParaSede
-                        ? 'Fora do raio'
-                        : localizacao?.distanciaParaSede && localizacao.distanciaParaSede <= CONFIG.distanciaProxima
-                          ? 'Mesma cidade!'
-                          : localizacao?.estaDentroDoRaio
-                            ? 'Dentro do raio'
-                            : 'Consulte-nos'}
+                      • Atendemos sua região
                     </span>
                   </div>
                 </div>

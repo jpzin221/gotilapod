@@ -50,7 +50,7 @@ export default function NearbyStoresBanner() {
     : 'bg-gradient-to-r from-green-500 to-emerald-600';
 
   return (
-    <div className={`${bannerClass} text - white py - 2 px - 4 shadow - md sticky top - [80px] sm: top - [112px] z - 40`}>
+    <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white py-2 px-4 shadow-md sticky top-[80px] sm:top-[112px] z-40">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between gap-3">
           {/* Informações Compactas */}
@@ -68,10 +68,10 @@ export default function NearbyStoresBanner() {
                 ) : (
                   <>
                     <span className="font-bold">
-                      📍 {isProximo ? '🎉 ' : ''}Lojas Parceiras em {cidade}, {estado}
+                      ✅ Lojas Parceiras em {cidade}, {estado}
                     </span>
                     <span className="opacity-90 ml-2">
-                      • {distancia ? `${formatarDistancia(distancia)} de distância` : 'Atendemos sua região'}
+                      • {distancia ? `${formatarDistancia(distancia)} de distância` : 'Entrega disponível'}
                     </span>
                   </>
                 )}
@@ -83,27 +83,13 @@ export default function NearbyStoresBanner() {
 
             {/* Ícone + Entrega */}
             <div className="hidden sm:flex items-center gap-2">
-              {!entregaDisponivel && distancia ? (
-                <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-              ) : (
-                <Store className="w-4 h-4 flex-shrink-0" />
-              )}
+              <Store className="w-4 h-4 flex-shrink-0" />
               <div className="text-xs">
                 <span className="font-bold">
-                  {!entregaDisponivel && distancia
-                    ? '📦 Verificar Disponibilidade'
-                    : isProximo
-                      ? '🚀 Entrega Ultra Rápida'
-                      : 'Entrega Disponível'}
+                  🚀 Entrega Disponível
                 </span>
                 <span className="opacity-90 ml-2">
-                  • {!entregaDisponivel && distancia
-                    ? 'Fora do raio de entrega'
-                    : isProximo
-                      ? 'Mesma cidade!'
-                      : estaDentroDoRaio
-                        ? 'Dentro do raio'
-                        : 'Consulte-nos'}
+                  • Atendemos sua região
                 </span>
               </div>
             </div>
