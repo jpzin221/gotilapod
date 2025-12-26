@@ -36,10 +36,19 @@ export async function createBSPayCharge({
         console.log('💰 Valor:', amount);
         console.log('👤 Cliente:', customerName);
 
-        // Usar backend Express local
-        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+        // Em produção, usar Netlify Functions; em desenvolvimento, usar backend local
+        const isProduction = import.meta.env.PROD;
+        const netlifyFunctionsUrl = '/.netlify/functions/bspay-create';
+        const localBackendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
-        const response = await fetch(`${backendUrl}/api/pix/create`, {
+        // Em produção, SEMPRE usar Netlify Functions
+        const apiUrl = isProduction
+            ? netlifyFunctionsUrl
+            : `${localBackendUrl}/api/pix/create`;
+
+        console.log('🌐 API URL:', apiUrl);
+
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -104,9 +113,16 @@ export async function getBSPayStatus(transactionId, credentials = {}) {
     try {
         console.log('🔍 [BS Pay] Consultando status:', transactionId);
 
-        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+        // Em produção, usar Netlify Functions; em desenvolvimento, usar backend local
+        const isProduction = import.meta.env.PROD;
+        const netlifyFunctionsUrl = '/.netlify/functions/bspay-status';
+        const localBackendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
-        const response = await fetch(`${backendUrl}/api/pix/status`, {
+        const apiUrl = isProduction
+            ? netlifyFunctionsUrl
+            : `${localBackendUrl}/api/pix/status`;
+
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
