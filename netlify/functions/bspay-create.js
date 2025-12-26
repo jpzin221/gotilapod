@@ -11,6 +11,7 @@
  */
 
 const fetch = require('node-fetch');
+const QRCode = require('qrcode');
 
 // Lista de origens permitidas - usado para log, permite todas em produção
 const ALLOWED_ORIGINS = [
@@ -273,6 +274,25 @@ exports.handler = async (event, context) => {
         const expirationSeconds = data.calendar?.expiration || 3600;
         const expiresAt = new Date(Date.now() + expirationSeconds * 1000).toISOString();
 
+        // Gerar imagem do QR Code a partir do texto PIX
+        let imagemQrcode = null;
+        if (data.qrcode) {
+            try {
+                // Gerar QR Code como Data URL (base64)
+                imagemQrcode = await QRCode.toDataURL(data.qrcode, {
+                    width: 256,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                });
+                console.log('✅ QR Code imagem gerado com sucesso');
+            } catch (qrError) {
+                console.error('⚠️ Erro ao gerar imagem do QR Code:', qrError);
+            }
+        }
+
         // Retornar no formato esperado pelo PixPayment
         return {
             statusCode: 200,
@@ -286,6 +306,7 @@ exports.handler = async (event, context) => {
                 amount: data.amount,
                 pixCopiaECola: data.qrcode, // String do QR Code PIX (Copia e Cola)
                 qrcode: data.qrcode,
+                imagemQrcode: imagemQrcode, // Imagem base64 do QR Code
                 expiresAt: expiresAt,
                 debtor: data.debtor,
                 calendar: data.calendar,
