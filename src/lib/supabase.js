@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Valores padrão hardcoded (seguro para anon key pública)
-const DEFAULT_SUPABASE_URL = 'https://fkstktohbnwsnzbarujc.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZrc3RrdG9oYm53c256YmFydWpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMDI1NjMsImV4cCI6MjA3NzU3ODU2M30.rN3BfRwWeE9Pjf70S8uneSgngYHGPz75FtfqzQfDq6o';
+const DEFAULT_SUPABASE_URL = 'https://fibasvshtaczzozwhusj.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpYmFzdnNodGFjenpvendodXNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5MDAyOTQsImV4cCI6MjA4MTQ3NjI5NH0.BteSzkb5t5fC0p7nPZ2kb4LKsUcZzJsdtySnYFcmB_I';
 
 // Função para validar e obter URL do Supabase
 const getSupabaseUrl = () => {
