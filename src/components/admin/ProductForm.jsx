@@ -250,7 +250,7 @@ export default function ProductForm({ product, onSave, onClose }) {
         price: parseFloat(formData.price) || 0,
         original_price: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
         image: formData.image || null,
-        category_id: formData.category_id || null,
+        category_id: formData.category_id ? parseInt(formData.category_id) : null,
         category: formData.category, // Manter para retrocompatibilidade
         badge: formData.badge || null,
         badge_color: formData.badgeColor || 'purple',
