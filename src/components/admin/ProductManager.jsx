@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, ChevronDown, ChevronUp, Package, GripVertical } from 'lucide-react';
 import ProductForm from './ProductForm';
+import { categoryService } from '../../lib/supabase';
 
 export default function ProductManager({ products, onSave, onDelete, onRefresh }) {
   const [showProductForm, setShowProductForm] = useState(false);
@@ -10,16 +11,37 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
   const [draggedProduct, setDraggedProduct] = useState(null);
   const [dragOverProduct, setDragOverProduct] = useState(null);
   const [isReordering, setIsReordering] = useState(false);
+  const [availableCategories, setAvailableCategories] = useState([]);
 
-  // Agrupar produtos por categoria e ordenar por display_order
-  // Usa category (string) para retrocompatibilidade com produtos antigos
+  // Carregar categorias do banco
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categories = await categoryService.getAll();
+        setAvailableCategories(categories || []);
+      } catch (error) {
+        console.error('Erro ao carregar categorias:', error);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  // Criar mapa de category_id para nome da categoria
+  const categoryMap = availableCategories.reduce((acc, cat) => {
+    acc[cat.id] = cat.name;
+    return acc;
+  }, {});
+
+  // Agrupar produtos por category_id (mais confiável)
   const groupedProducts = products.reduce((acc, product) => {
-    // Preferir category (string) pois é o que está sendo salvo
-    const category = product.category || 'Sem Categoria';
-    if (!acc[category]) {
-      acc[category] = [];
+    // Usar category_id para agrupamento, com fallback para category string
+    const categoryId = product.category_id;
+    const categoryName = categoryId ? (categoryMap[categoryId] || product.category || 'Sem Categoria') : (product.category || 'Sem Categoria');
+
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
     }
-    acc[category].push(product);
+    acc[categoryName].push(product);
     return acc;
   }, {});
 
@@ -42,7 +64,7 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
       expanded[cat] = true;
     });
     setExpandedCategories(expanded);
-  }, [products]);
+  }, [products, availableCategories]);
 
   const toggleCategory = (category) => {
     setExpandedCategories(prev => ({
