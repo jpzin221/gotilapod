@@ -12,7 +12,9 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
   const [isReordering, setIsReordering] = useState(false);
 
   // Agrupar produtos por categoria e ordenar por display_order
+  // Usa category (string) para retrocompatibilidade com produtos antigos
   const groupedProducts = products.reduce((acc, product) => {
+    // Preferir category (string) pois é o que está sendo salvo
     const category = product.category || 'Sem Categoria';
     if (!acc[category]) {
       acc[category] = [];
@@ -111,7 +113,7 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
 
     const category = draggedProduct.category || 'Sem Categoria';
     const categoryProducts = groupedProducts[category];
-    
+
     // Encontrar índices
     const draggedIndex = categoryProducts.findIndex(p => p.id === draggedProduct.id);
     const targetIndex = categoryProducts.findIndex(p => p.id === targetProduct.id);
@@ -123,7 +125,7 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
 
     // Atualizar display_order de todos os produtos da categoria
     setIsReordering(true);
-    
+
     try {
       // Salvar todos os produtos em paralelo para ser mais rápido
       const savePromises = reordered.map((product, index) => {
@@ -148,7 +150,7 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
           box_discount_percent: product.box_discount_percent,
           display_order: index // Nova ordem
         };
-        
+
         return onSave(productData);
       });
 
@@ -166,7 +168,7 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
   };
 
   // Filtrar produtos por categoria selecionada
-  const filteredCategories = selectedCategory === 'all' 
+  const filteredCategories = selectedCategory === 'all'
     ? Object.entries(groupedProducts)
     : Object.entries(groupedProducts).filter(([cat]) => cat === selectedCategory);
 
@@ -209,11 +211,10 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-lg font-medium transition ${
-                selectedCategory === cat
+              className={`px-4 py-2 rounded-lg font-medium transition ${selectedCategory === cat
                   ? 'bg-primary text-white shadow-md'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+                }`}
             >
               {cat === 'all' ? '📦 Todas' : cat}
               {cat !== 'all' && ` (${groupedProducts[cat]?.length || 0})`}
@@ -264,7 +265,7 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
                     const isOutOfStock = product.stock_quantity === 0;
                     const isDragging = draggedProduct?.id === product.id;
                     const isDragOver = dragOverProduct?.id === product.id;
-                    
+
                     return (
                       <div
                         key={product.id}
@@ -274,11 +275,10 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
                         onDragOver={handleDragOver}
                         onDragEnter={(e) => handleDragEnter(e, product)}
                         onDrop={(e) => handleDrop(e, product)}
-                        className={`p-4 transition relative cursor-move ${
-                          isOutOfStock 
-                            ? 'bg-gray-100 opacity-60' 
+                        className={`p-4 transition relative cursor-move ${isOutOfStock
+                            ? 'bg-gray-100 opacity-60'
                             : 'hover:bg-gray-50'
-                        } ${isDragging ? 'opacity-50' : ''} ${isDragOver ? 'border-t-4 border-primary' : ''}`}
+                          } ${isDragging ? 'opacity-50' : ''} ${isDragOver ? 'border-t-4 border-primary' : ''}`}
                       >
                         {/* Badge de Esgotado */}
                         {isOutOfStock && (
@@ -299,9 +299,8 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
                               <img
                                 src={product.image}
                                 alt={product.name}
-                                className={`w-20 h-20 object-cover rounded-lg shadow-sm ${
-                                  isOutOfStock ? 'grayscale' : ''
-                                }`}
+                                className={`w-20 h-20 object-cover rounded-lg shadow-sm ${isOutOfStock ? 'grayscale' : ''
+                                  }`}
                               />
                               {isOutOfStock && (
                                 <div className="absolute inset-0 bg-black bg-opacity-40 rounded-lg flex items-center justify-center">
@@ -311,59 +310,59 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
                             </div>
                           )}
 
-                        {/* Informações do Produto */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <h4 className="text-lg font-bold text-gray-900 mb-1">
-                                {product.name}
-                              </h4>
-                              <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                                {product.description}
-                              </p>
-                              <div className="flex flex-wrap items-center gap-3 text-sm">
-                                <span className="font-bold text-primary text-lg">
-                                  R$ {product.price.toFixed(2)}
-                                </span>
-                                {product.originalPrice && (
-                                  <span className="text-gray-500 line-through">
-                                    R$ {product.originalPrice.toFixed(2)}
+                          {/* Informações do Produto */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <h4 className="text-lg font-bold text-gray-900 mb-1">
+                                  {product.name}
+                                </h4>
+                                <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                                  {product.description}
+                                </p>
+                                <div className="flex flex-wrap items-center gap-3 text-sm">
+                                  <span className="font-bold text-primary text-lg">
+                                    R$ {product.price.toFixed(2)}
                                   </span>
-                                )}
-                                {product.badge && (
-                                  <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                                    {product.badge}
-                                  </span>
-                                )}
-                                {product.rating && (
-                                  <span className="text-yellow-500">
-                                    ⭐ {product.rating}
-                                  </span>
-                                )}
+                                  {product.originalPrice && (
+                                    <span className="text-gray-500 line-through">
+                                      R$ {product.originalPrice.toFixed(2)}
+                                    </span>
+                                  )}
+                                  {product.badge && (
+                                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                                      {product.badge}
+                                    </span>
+                                  )}
+                                  {product.rating && (
+                                    <span className="text-yellow-500">
+                                      ⭐ {product.rating}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                            </div>
 
-                            {/* Botões de Ação */}
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => handleEdit(product)}
-                                className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
-                                title="Editar"
-                              >
-                                <Edit2 className="w-5 h-5" />
-                              </button>
-                              <button
-                                onClick={() => onDelete(product.id)}
-                                className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
-                                title="Deletar"
-                              >
-                                <Trash2 className="w-5 h-5" />
-                              </button>
+                              {/* Botões de Ação */}
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleEdit(product)}
+                                  className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
+                                  title="Editar"
+                                >
+                                  <Edit2 className="w-5 h-5" />
+                                </button>
+                                <button
+                                  onClick={() => onDelete(product.id)}
+                                  className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
+                                  title="Deletar"
+                                >
+                                  <Trash2 className="w-5 h-5" />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
                     );
                   })}
                 </div>

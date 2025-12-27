@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Save, Loader2, Upload, Image as ImageIcon } from 'lucide-react';
-import { flavorService, productFlavorService, imageUploadService } from '../../lib/supabase';
+import { flavorService, productFlavorService, imageUploadService, categoryService } from '../../lib/supabase';
 
 // Templates por categoria
 const CATEGORY_TEMPLATES = {
@@ -69,7 +69,8 @@ export default function ProductForm({ product, onSave, onClose }) {
         price: product?.price || '',
         originalPrice: product?.original_price || product?.originalPrice || '',
         image: product?.image || '',
-        category: product?.category || 'IGNITE',
+        category_id: product?.category_id || null,
+        category: product?.category || '',
         badge: product?.badge || '',
         badgeColor: product?.badge_color || product?.badgeColor || 'purple',
         rating: product?.rating || '',
@@ -102,7 +103,8 @@ export default function ProductForm({ product, onSave, onClose }) {
       price: '',
       originalPrice: '',
       image: '',
-      category: 'IGNITE',
+      category_id: null,
+      category: '',
       badge: '',
       badgeColor: 'purple',
       rating: '',
@@ -124,6 +126,7 @@ export default function ProductForm({ product, onSave, onClose }) {
   const [selectedFlavors, setSelectedFlavors] = useState([]);
   const [calculatedBoxPrice, setCalculatedBoxPrice] = useState(0);
   const [isBoxProduct, setIsBoxProduct] = useState(product?.units_per_box > 0 || false);
+  const [availableCategories, setAvailableCategories] = useState([]);
 
   // Salvar rascunho no localStorage sempre que formData mudar (apenas para novos produtos)
   useEffect(() => {
@@ -138,7 +141,7 @@ export default function ProductForm({ product, onSave, onClose }) {
     }
   }, [formData, product?.id]);
 
-  // Carregar sabores disponíveis e sabores do produto
+  // Carregar sabores e categorias disponíveis
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -146,6 +149,11 @@ export default function ProductForm({ product, onSave, onClose }) {
         const flavors = await flavorService.getAll();
         console.log('Todos sabores carregados:', flavors);
         setAvailableFlavors(flavors || []);
+
+        // Carregar todas as categorias
+        const categories = await categoryService.getAll();
+        console.log('Todas categorias carregadas:', categories);
+        setAvailableCategories(categories || []);
 
         // Se está editando, carregar sabores do produto
         if (product?.id) {
@@ -155,8 +163,9 @@ export default function ProductForm({ product, onSave, onClose }) {
           setSelectedFlavors(flavorIds);
         }
       } catch (error) {
-        console.error('Erro ao carregar sabores:', error);
+        console.error('Erro ao carregar dados:', error);
         setAvailableFlavors([]);
+        setAvailableCategories([]);
       }
     };
 
@@ -185,14 +194,18 @@ export default function ProductForm({ product, onSave, onClose }) {
 
   // Aplicar template quando categoria mudar (apenas para novos produtos)
   const handleCategoryChange = (e) => {
-    const newCategory = e.target.value;
-    const template = CATEGORY_TEMPLATES[newCategory];
+    const newCategoryId = e.target.value;
+    // Encontrar a categoria selecionada
+    const selectedCategory = availableCategories.find(c => c.id === newCategoryId);
+    const categoryName = selectedCategory?.name?.toUpperCase() || '';
+    const template = CATEGORY_TEMPLATES[categoryName];
 
     // Só aplica template se for novo produto (não está editando)
     if (!product && template) {
       setFormData(prev => ({
         ...prev,
-        category: newCategory,
+        category_id: newCategoryId,
+        category: categoryName, // Manter para retrocompatibilidade
         badge: template.badge,
         rating: template.rating,
         reviews: template.reviews,
@@ -201,7 +214,11 @@ export default function ProductForm({ product, onSave, onClose }) {
         detailedDescription: template.detailedDescription
       }));
     } else {
-      setFormData(prev => ({ ...prev, category: newCategory }));
+      setFormData(prev => ({
+        ...prev,
+        category_id: newCategoryId,
+        category: categoryName // Manter para retrocompatibilidade
+      }));
     }
   };
 
@@ -228,7 +245,8 @@ export default function ProductForm({ product, onSave, onClose }) {
         price: parseFloat(formData.price) || 0,
         original_price: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
         image: formData.image || null,
-        category: formData.category,
+        category_id: formData.category_id || null,
+        category: formData.category, // Manter para retrocompatibilidade
         badge: formData.badge || null,
         badge_color: formData.badgeColor || 'purple',
         rating: formData.rating ? parseFloat(formData.rating) : null,
@@ -401,18 +419,18 @@ export default function ProductForm({ product, onSave, onClose }) {
                 Categoria * {!product && <span className="text-xs text-blue-600">(Auto-preenche campos)</span>}
               </label>
               <select
-                name="category"
-                value={formData.category}
+                name="category_id"
+                value={formData.category_id || ''}
                 onChange={handleCategoryChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                 required
               >
-                <option value="IGNITE">Ignite</option>
-                <option value="GEEK BAR">Geek Bar</option>
-                <option value="LOST MARY">Lost Mary</option>
-                <option value="ELF BAR">Elf Bar</option>
-                <option value="PODS">Pods</option>
-                <option value="ACESSÓRIOS">Acessórios</option>
+                <option value="">Selecione uma categoria...</option>
+                {availableCategories.filter(cat => cat.is_active).map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.icon || '📦'} {category.name}
+                  </option>
+                ))}
               </select>
               {!product && (
                 <p className="text-xs text-gray-500 mt-1">
@@ -523,8 +541,8 @@ export default function ProductForm({ product, onSave, onClose }) {
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, badgeColor: c.value }))}
                     className={`w-8 h-8 rounded-full border-2 transition-all ${formData.badgeColor === c.value
-                        ? 'border-gray-800 scale-110 ring-2 ring-offset-1 ring-gray-400'
-                        : 'border-gray-300 hover:scale-105'
+                      ? 'border-gray-800 scale-110 ring-2 ring-offset-1 ring-gray-400'
+                      : 'border-gray-300 hover:scale-105'
                       }`}
                     style={{ backgroundColor: c.color }}
                     title={c.value}
@@ -533,8 +551,8 @@ export default function ProductForm({ product, onSave, onClose }) {
 
                 {/* Cor personalizada */}
                 <label className={`relative w-8 h-8 rounded-full border-2 cursor-pointer overflow-hidden transition-all ${!['purple', 'red', 'gold', 'green', 'blue', 'pink'].includes(formData.badgeColor)
-                    ? 'border-gray-800 scale-110 ring-2 ring-offset-1 ring-gray-400'
-                    : 'border-gray-300 hover:scale-105'
+                  ? 'border-gray-800 scale-110 ring-2 ring-offset-1 ring-gray-400'
+                  : 'border-gray-300 hover:scale-105'
                   }`} title="Cor personalizada">
                   <input
                     type="color"
