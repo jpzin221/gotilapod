@@ -20,14 +20,47 @@ export default function Header({ storeInfo }) {
   const [localizacao, setLocalizacao] = useState(null);
   const [loadingLocation, setLoadingLocation] = useState(true);
   const [bannerVisible, setBannerVisible] = useState(!isBannerFechado());
+  const [distanciaAleatoria, setDistanciaAleatoria] = useState(null);
+
+  // Função para obter ou gerar distância aleatória baseada na localização
+  const obterDistanciaAleatoria = (cidade, estado) => {
+    const chaveLocalizacao = `${cidade}-${estado}`.toLowerCase();
+    const dadosSalvos = localStorage.getItem('gorilaPod_distancia');
+
+    if (dadosSalvos) {
+      const dados = JSON.parse(dadosSalvos);
+      // Se a localização for a mesma, retorna a distância salva
+      if (dados.localizacao === chaveLocalizacao) {
+        return dados.distancia;
+      }
+    }
+
+    // Gera nova distância aleatória entre 5km e 52km
+    const novaDistancia = Math.floor(Math.random() * (52 - 5 + 1)) + 5;
+
+    // Salva no localStorage
+    localStorage.setItem('gorilaPod_distancia', JSON.stringify({
+      localizacao: chaveLocalizacao,
+      distancia: novaDistancia
+    }));
+
+    return novaDistancia;
+  };
 
   useEffect(() => {
     const fetchLocation = async () => {
       try {
         const loc = await obterLocalizacaoPrecisa({ validacaoCruzada: true });
         setLocalizacao(loc);
+
+        // Define a distância aleatória baseada na localização
+        const distancia = obterDistanciaAleatoria(loc?.cidade || 'default', loc?.estado || 'BR');
+        setDistanciaAleatoria(distancia);
       } catch (error) {
         console.error('Erro ao buscar localização:', error);
+        // Em caso de erro, usa distância padrão
+        const distancia = obterDistanciaAleatoria('default', 'BR');
+        setDistanciaAleatoria(distancia);
       } finally {
         setLoadingLocation(false);
       }
@@ -87,21 +120,15 @@ export default function Header({ storeInfo }) {
                           ✅ {localizacao?.cidade || 'Sua região'}, {localizacao?.estado || 'BR'}
                         </div>
                         <div className="opacity-90 text-[9px] sm:text-[10px] truncate">
-                          {localizacao?.distanciaParaSede ? (
-                            <>
-                              {formatarDistancia(localizacao.distanciaParaSede)}
-                              <span className="hidden sm:inline"> de distância</span>
-                              {' • '}
-                              <span className="hidden sm:inline">
-                                Entrega disponível
-                              </span>
-                              <span className="sm:hidden">
-                                Disponível
-                              </span>
-                            </>
-                          ) : (
-                            'Entrega disponível para sua região'
-                          )}
+                          {distanciaAleatoria}km
+                          <span className="hidden sm:inline"> de distância</span>
+                          {' • '}
+                          <span className="hidden sm:inline">
+                            Entrega disponível
+                          </span>
+                          <span className="sm:hidden">
+                            Disponível
+                          </span>
                         </div>
                       </>
                     )}
@@ -137,7 +164,8 @@ export default function Header({ storeInfo }) {
             </div>
           </div>
         </div>
-      )}
+      )
+      }
 
       {/* Informações da loja - Compacto */}
       <div className="bg-white max-w-7xl mx-auto px-4 py-1.5 sm:py-3">
@@ -215,6 +243,6 @@ export default function Header({ storeInfo }) {
         mode="login"
         onSuccess={() => console.log('Login realizado!')}
       />
-    </header>
+    </header >
   );
 }

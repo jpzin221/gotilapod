@@ -31,6 +31,7 @@ function App() {
   const { get } = useSiteConfig();
   const [activeCategory, setActiveCategory] = useState('all');
   const [categories, setCategories] = useState([]);
+  const [allCategories, setAllCategories] = useState([]); // Para matching de nomes
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,10 +77,12 @@ function App() {
   const loadCategories = async () => {
     try {
       const data = await categoryService.getAll();
-      setCategories(data.filter(cat => cat.is_active));
+      setAllCategories(data || []); // Todas as categorias para matching de nomes
+      setCategories(data.filter(cat => cat.is_active)); // Apenas ativas para filtros
     } catch (err) {
       console.error('Error loading categories:', err);
       setCategories([]);
+      setAllCategories([]);
     }
   };
 
@@ -176,7 +179,8 @@ function App() {
   // Memoized: Produtos agrupados por categoria
   const groupedProducts = useMemo(() => {
     return filteredProducts.reduce((acc, product) => {
-      const category = categories.find(c => c.id === product.category_id);
+      // Usar allCategories para encontrar o nome (inclui inativas)
+      const category = allCategories.find(c => c.id === product.category_id);
       const categoryName = category?.name || 'Sem Categoria';
       if (!acc[categoryName]) {
         acc[categoryName] = [];
@@ -184,7 +188,17 @@ function App() {
       acc[categoryName].push(product);
       return acc;
     }, {});
-  }, [filteredProducts, categories]);
+  }, [filteredProducts, allCategories]);
+
+  // Ordenar categorias e esconder "Sem Categoria" no final (ou não exibir)
+  const orderedCategories = useMemo(() => {
+    const entries = Object.entries(groupedProducts);
+    // Separar "Sem Categoria" do resto
+    const semCategoria = entries.filter(([name]) => name === 'Sem Categoria');
+    const outras = entries.filter(([name]) => name !== 'Sem Categoria');
+    // Não exibir "Sem Categoria" no frontend público (apenas admin vê)
+    return outras;
+  }, [groupedProducts]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -252,8 +266,8 @@ function App() {
               />
 
               {/* Seções de Produtos por Categoria */}
-              {Object.keys(groupedProducts).length > 0 ? (
-                Object.entries(groupedProducts).map(([category, categoryProducts]) => (
+              {orderedCategories.length > 0 ? (
+                orderedCategories.map(([category, categoryProducts]) => (
                   <ProductSection
                     key={category}
                     title={category}
