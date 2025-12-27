@@ -65,6 +65,10 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
     const savedProduct = await onSave(productData);
     setShowProductForm(false);
     setEditingProduct(null);
+    // Atualizar lista de produtos após salvar
+    if (onRefresh) {
+      await onRefresh();
+    }
     return savedProduct; // Retornar produto salvo para o ProductForm poder salvar os sabores
   };
 
@@ -212,8 +216,8 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               className={`px-4 py-2 rounded-lg font-medium transition ${selectedCategory === cat
-                  ? 'bg-primary text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-primary text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
             >
               {cat === 'all' ? '📦 Todas' : cat}
@@ -276,8 +280,8 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
                         onDragEnter={(e) => handleDragEnter(e, product)}
                         onDrop={(e) => handleDrop(e, product)}
                         className={`p-4 transition relative cursor-move ${isOutOfStock
-                            ? 'bg-gray-100 opacity-60'
-                            : 'hover:bg-gray-50'
+                          ? 'bg-gray-100 opacity-60'
+                          : 'hover:bg-gray-50'
                           } ${isDragging ? 'opacity-50' : ''} ${isDragOver ? 'border-t-4 border-primary' : ''}`}
                       >
                         {/* Badge de Esgotado */}

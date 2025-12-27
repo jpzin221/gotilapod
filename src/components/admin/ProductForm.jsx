@@ -197,15 +197,20 @@ export default function ProductForm({ product, onSave, onClose }) {
     const newCategoryId = e.target.value;
     // Encontrar a categoria selecionada
     const selectedCategory = availableCategories.find(c => c.id === newCategoryId);
-    const categoryName = selectedCategory?.name?.toUpperCase() || '';
-    const template = CATEGORY_TEMPLATES[categoryName];
+    // Usar o nome exato da categoria (sem converter para maiúsculas)
+    const categoryName = selectedCategory?.name || '';
+    // Template usa nome em maiúsculas para matching
+    const templateKey = categoryName.toUpperCase();
+    const template = CATEGORY_TEMPLATES[templateKey];
+
+    console.log('📂 Categoria selecionada:', { id: newCategoryId, name: categoryName });
 
     // Só aplica template se for novo produto (não está editando)
     if (!product && template) {
       setFormData(prev => ({
         ...prev,
         category_id: newCategoryId,
-        category: categoryName, // Manter para retrocompatibilidade
+        category: categoryName, // Nome exato da categoria
         badge: template.badge,
         rating: template.rating,
         reviews: template.reviews,
@@ -217,7 +222,7 @@ export default function ProductForm({ product, onSave, onClose }) {
       setFormData(prev => ({
         ...prev,
         category_id: newCategoryId,
-        category: categoryName // Manter para retrocompatibilidade
+        category: categoryName // Nome exato da categoria
       }));
     }
   };
