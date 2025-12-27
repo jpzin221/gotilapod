@@ -270,10 +270,16 @@ export default function ProductForm({ product, onSave, onClose }) {
         productData.id = product.id;
       }
 
-      console.log('Salvando produto:', productData);
+      console.log('📦 Salvando produto:', productData);
+      console.log('📂 Category info:', {
+        category_id: productData.category_id,
+        category: productData.category,
+        formDataCategoryId: formData.category_id,
+        formDataCategory: formData.category
+      });
 
       const savedProduct = await onSave(productData);
-      console.log('Produto salvo com sucesso:', savedProduct);
+      console.log('✅ Produto salvo com sucesso:', savedProduct);
 
       // Atualizar sabores do produto
       if (savedProduct?.id) {
