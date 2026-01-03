@@ -75,6 +75,22 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
       const savedSession = localStorage.getItem('pixPaymentSession');
       if (!savedSession) {
         console.log('📝 Nenhuma sessão salva, criando nova cobrança PIX');
+
+        // 🎯 UTMFY - Disparar evento de início de checkout
+        try {
+          if (window.utmify) {
+            window.utmify.track('InitiateCheckout', {
+              value: pedido.valorTotal,
+              currency: 'BRL',
+              content_ids: pedido.itens?.map(item => item.id || item.nome) || [],
+              num_items: pedido.itens?.length || 0
+            });
+            console.log('✅ UTMFY: Evento InitiateCheckout disparado!');
+          }
+        } catch (e) {
+          console.warn('⚠️ UTMFY InitiateCheckout error:', e);
+        }
+
         createPixCharge();
       } else {
         console.log('♻️ Sessão PIX encontrada, não criando nova cobrança');
@@ -133,6 +149,26 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
             })
           });
           data = await response.json();
+        } else if (pixData.provider === 'poseidonpay') {
+          // Usar Netlify Function do Poseidon Pay
+          const functionsUrl = import.meta.env.PROD
+            ? '/.netlify/functions'
+            : 'http://localhost:8888/.netlify/functions';
+
+          const { paymentGatewayService } = await import('../lib/supabase');
+          const gateway = await paymentGatewayService.getByProvider('poseidonpay');
+
+          const response = await fetch(`${functionsUrl}/poseidonpay-status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              transactionId: pixData.txid,
+              identifier: pixData.identifier,
+              publicKey: gateway?.public_key,
+              secretKey: gateway?.api_secret
+            })
+          });
+          data = await response.json();
         } else {
           // Backend padrão
           const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
@@ -161,6 +197,40 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
     if (paymentStatus === 'paid' && pixData) {
       const timer = setTimeout(async () => {
         console.log('💰 Pagamento confirmado!');
+
+        // 🎯 UTMFY - Disparar evento de conversão (Purchase)
+        try {
+          if (window.utmify) {
+            window.utmify.track('purchase', {
+              value: pedido.valorTotal,
+              orderId: pedido.id || `pedido_${Date.now()}`,
+              currency: 'BRL'
+            });
+            console.log('✅ UTMFY: Evento de conversão disparado!', {
+              value: pedido.valorTotal,
+              orderId: pedido.id
+            });
+          } else {
+            console.warn('⚠️ UTMFY: Pixel não carregado, tentando método alternativo...');
+            // Fallback: Disparar evento via dataLayer (caso use GTM)
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+              event: 'purchase',
+              ecommerce: {
+                transaction_id: pedido.id || `pedido_${Date.now()}`,
+                value: pedido.valorTotal,
+                currency: 'BRL',
+                items: pedido.itens?.map(item => ({
+                  item_name: item.nome,
+                  quantity: item.quantidade,
+                  price: item.preco
+                })) || []
+              }
+            });
+          }
+        } catch (trackError) {
+          console.error('❌ Erro ao disparar evento UTMFY:', trackError);
+        }
         console.log('🔍 Verificando autenticação:', { isAuthenticated, pixData });
 
         // Gerar código único do pedido
@@ -459,6 +529,34 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
             pixName: gateway.pix_name,
             isManual: true
           };
+          break;
+
+        case 'poseidonpay':
+          // Usar Poseidon Pay
+          console.log('🔱 Usando Poseidon Pay...');
+          console.log('🔑 Credenciais:', {
+            publicKey: gateway.public_key ? '✓' : '✗',
+            secretKey: gateway.api_secret ? '✓' : '✗'
+          });
+          const poseidonPayService = await import('../services/poseidonpay-service');
+          data = await poseidonPayService.createPoseidonPayCharge({
+            amount: pedido.valorTotal,
+            customerName: pedido.nomeCliente,
+            customerDocument: pedido.cpfCliente,
+            customerEmail: '',
+            customerPhone: pedido.telefone || '',
+            externalId: `pedido_${Date.now()}_${pedido.id || ''}`,
+            description: `Pedido ${pedido.nomeCliente}`,
+            publicKey: gateway.public_key || '',
+            secretKey: gateway.api_secret || '',
+            callbackUrl: gateway.callback_url || '',
+            products: pedido.itens?.map(item => ({
+              id: item.id || String(Date.now()),
+              name: item.nome,
+              quantity: item.quantidade,
+              price: item.preco
+            }))
+          });
           break;
 
         default:

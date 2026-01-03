@@ -58,6 +58,16 @@ const PROVIDER_CONFIG = {
             client_secret: 'Secret Key',
             webhook_secret: 'Postback URL (opcional)'
         }
+    },
+    poseidonpay: {
+        name: 'Poseidon Pay',
+        color: 'bg-cyan-500',
+        fields: ['public_key', 'api_secret', 'callback_url'],
+        labels: {
+            public_key: 'x-public-key',
+            api_secret: 'x-secret-key',
+            callback_url: 'URL de Callback (Webhook)'
+        }
     }
 };
 
@@ -109,6 +119,7 @@ export default function GatewayManager() {
             webhook_secret: gateway.webhook_secret || '',
             client_id: gateway.client_id || '',
             client_secret: gateway.client_secret || '',
+            callback_url: gateway.callback_url || '',
             pix_key: gateway.pix_key || '',
             pix_key_type: gateway.pix_key_type || 'cpf',
             pix_name: gateway.pix_name || '',
@@ -130,6 +141,7 @@ export default function GatewayManager() {
                     webhook_secret: formData.webhook_secret || null,
                     client_id: formData.client_id || null,
                     client_secret: formData.client_secret || null,
+                    callback_url: formData.callback_url || null,
                     pix_key: formData.pix_key || null,
                     pix_key_type: formData.pix_key_type || null,
                     pix_name: formData.pix_name || null,
