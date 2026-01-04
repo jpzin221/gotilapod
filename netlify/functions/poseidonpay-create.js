@@ -179,26 +179,40 @@ exports.handler = async (event, context) => {
         console.log('👤 Cliente:', safeCustomerName);
 
         // Gerar identifier único
-        const identifier = externalId || `pedido_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const identifier = externalId || `pedido_${Date.now()}`;
+
+        // Validar CPF - obrigatório para Poseidon Pay
+        const cleanDocument = customerDocument?.replace(/\D/g, '') || '';
+        if (!cleanDocument || cleanDocument.length < 11) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({
+                    success: false,
+                    error: 'CPF é obrigatório e deve ter 11 dígitos'
+                })
+            };
+        }
 
         // Montar payload conforme documentação Poseidon Pay
+        // Campos obrigatórios: identifier, amount, client (name, email, phone, document)
         const payload = {
             identifier: identifier,
             amount: parsedAmount,
             client: {
                 name: safeCustomerName || 'Cliente',
-                email: safeEmail || 'cliente@email.com',
-                phone: safePhone || '',
-                document: customerDocument?.replace(/\D/g, '') || ''
-            },
-            callbackUrl: callbackUrl || process.env.POSEIDONPAY_CALLBACK_URL || '',
-            metadata: metadata || {
-                source: 'gorilapod',
-                description: safeDescription || `Pedido #${identifier}`
+                email: safeEmail || 'cliente@gorilapod.com.br',
+                phone: safePhone || '11999999999',
+                document: cleanDocument
             }
         };
 
-        // Adicionar produtos se fornecidos
+        // Adicionar callbackUrl apenas se definida (campo opcional)
+        if (callbackUrl || process.env.POSEIDONPAY_CALLBACK_URL) {
+            payload.callbackUrl = callbackUrl || process.env.POSEIDONPAY_CALLBACK_URL;
+        }
+
+        // Adicionar produtos se fornecidos (campo opcional)
         if (products && Array.isArray(products) && products.length > 0) {
             payload.products = products.map(p => ({
                 id: p.id || String(Date.now()),
