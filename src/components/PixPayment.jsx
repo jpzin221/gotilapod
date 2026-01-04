@@ -534,10 +534,7 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
         case 'poseidonpay':
           // Usar Poseidon Pay
           console.log('🔱 Usando Poseidon Pay...');
-          console.log('🔑 Credenciais:', {
-            publicKey: gateway.public_key ? '✓' : '✗',
-            secretKey: gateway.api_secret ? '✓' : '✗'
-          });
+          // Credenciais NÃO são enviadas pelo frontend - são buscadas do banco pelo backend
           const poseidonPayService = await import('../services/poseidonpay-service');
           data = await poseidonPayService.createPoseidonPayCharge({
             amount: pedido.valorTotal,
@@ -547,9 +544,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
             customerPhone: pedido.telefone || '',
             externalId: `pedido_${Date.now()}_${pedido.id || ''}`,
             description: `Pedido ${pedido.nomeCliente}`,
-            publicKey: gateway.public_key || '',
-            secretKey: gateway.api_secret || '',
-            callbackUrl: gateway.callback_url || '',
             products: pedido.itens?.map(item => ({
               id: item.id || String(Date.now()),
               name: item.nome,

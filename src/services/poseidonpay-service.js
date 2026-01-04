@@ -1,6 +1,9 @@
 /**
  * Poseidon Pay Service
  * Serviço para comunicação com as Netlify Functions do Poseidon Pay
+ * 
+ * SEGURANÇA: As credenciais NÃO são enviadas pelo frontend.
+ * Elas são buscadas diretamente do banco de dados pela função serverless.
  */
 
 /**
@@ -13,9 +16,6 @@
  * @param {string} params.customerPhone - Telefone do cliente
  * @param {string} params.externalId - ID externo do pedido
  * @param {string} params.description - Descrição do pagamento
- * @param {string} params.publicKey - x-public-key da Poseidon Pay
- * @param {string} params.secretKey - x-secret-key da Poseidon Pay
- * @param {string} params.callbackUrl - URL de callback para webhook
  * @param {Array} params.products - Lista de produtos
  * @returns {Promise<Object>} Dados da cobrança PIX
  */
@@ -28,10 +28,8 @@ export async function createPoseidonPayCharge(params) {
         customerPhone,
         externalId,
         description,
-        publicKey,
-        secretKey,
-        callbackUrl,
         products
+        // REMOVIDO: publicKey, secretKey, callbackUrl - nunca enviar credenciais do frontend!
     } = params;
 
     // Determinar URL da função (produção vs desenvolvimento)
@@ -58,10 +56,8 @@ export async function createPoseidonPayCharge(params) {
                 customerPhone,
                 externalId,
                 description,
-                publicKey,
-                secretKey,
-                callbackUrl,
                 products
+                // Credenciais são buscadas do banco de dados pelo backend
             })
         });
 

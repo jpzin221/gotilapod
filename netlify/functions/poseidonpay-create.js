@@ -129,13 +129,9 @@ exports.handler = async (event, context) => {
             externalId,
             description,
             callbackUrl,
-            // Credenciais Poseidon Pay
-            publicKey,
-            secretKey,
             // Produtos (opcional)
-            products,
-            // Metadados (opcional)
-            metadata
+            products
+            // REMOVIDO: publicKey e secretKey - nunca receber credenciais do frontend!
         } = body;
 
         // VALIDAÇÕES
@@ -149,12 +145,40 @@ exports.handler = async (event, context) => {
         }
 
         // Garantir que o valor tenha exatamente 2 casas decimais
-        // Poseidon Pay pode exigir formato específico
         parsedAmount = Math.round(parsedAmount * 100) / 100;
 
-        // Validar credenciais
-        const apiPublicKey = publicKey || process.env.POSEIDONPAY_PUBLIC_KEY;
-        const apiSecretKey = secretKey || process.env.POSEIDONPAY_SECRET_KEY;
+        // ============================================
+        // BUSCAR CREDENCIAIS DO BANCO DE DADOS (SEGURO)
+        // ============================================
+        let apiPublicKey = process.env.POSEIDONPAY_PUBLIC_KEY;
+        let apiSecretKey = process.env.POSEIDONPAY_SECRET_KEY;
+        let webhookUrl = process.env.POSEIDONPAY_CALLBACK_URL;
+
+        // Se não tem nas env vars, buscar do Supabase
+        if (!apiPublicKey || !apiSecretKey) {
+            const { createClient } = require('@supabase/supabase-js');
+
+            const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+            const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+
+            if (supabaseUrl && supabaseKey) {
+                const supabase = createClient(supabaseUrl, supabaseKey);
+
+                const { data: gateway, error } = await supabase
+                    .from('payment_gateways')
+                    .select('public_key, api_secret, callback_url')
+                    .eq('provider', 'poseidonpay')
+                    .eq('is_active', true)
+                    .single();
+
+                if (gateway && !error) {
+                    apiPublicKey = gateway.public_key;
+                    apiSecretKey = gateway.api_secret;
+                    webhookUrl = gateway.callback_url || webhookUrl;
+                    console.log('✅ Credenciais carregadas do banco de dados');
+                }
+            }
+        }
 
         if (!apiPublicKey || !apiSecretKey) {
             return {
@@ -162,7 +186,7 @@ exports.handler = async (event, context) => {
                 headers,
                 body: JSON.stringify({
                     success: false,
-                    error: 'Credenciais Poseidon Pay não configuradas. Configure x-public-key e x-secret-key.'
+                    error: 'Credenciais Poseidon Pay não configuradas. Configure no Admin > Pagamentos.'
                 })
             };
         }
@@ -212,9 +236,9 @@ exports.handler = async (event, context) => {
             }
         };
 
-        // Adicionar callbackUrl apenas se definida (campo opcional)
-        if (callbackUrl || process.env.POSEIDONPAY_CALLBACK_URL) {
-            payload.callbackUrl = callbackUrl || process.env.POSEIDONPAY_CALLBACK_URL;
+        // Adicionar callbackUrl do banco de dados (configurado no admin)
+        if (webhookUrl) {
+            payload.callbackUrl = webhookUrl;
         }
 
         // Adicionar produtos se fornecidos (campo opcional)
