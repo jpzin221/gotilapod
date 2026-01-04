@@ -139,7 +139,7 @@ exports.handler = async (event, context) => {
         } = body;
 
         // VALIDAÇÕES
-        const parsedAmount = parseFloat(amount);
+        let parsedAmount = parseFloat(amount);
         if (isNaN(parsedAmount) || parsedAmount <= 0 || parsedAmount > 100000) {
             return {
                 statusCode: 400,
@@ -147,6 +147,10 @@ exports.handler = async (event, context) => {
                 body: JSON.stringify({ success: false, error: 'Valor inválido. Deve ser entre R$0,01 e R$100.000' })
             };
         }
+
+        // Garantir que o valor tenha exatamente 2 casas decimais
+        // Poseidon Pay pode exigir formato específico
+        parsedAmount = Math.round(parsedAmount * 100) / 100;
 
         // Validar credenciais
         const apiPublicKey = publicKey || process.env.POSEIDONPAY_PUBLIC_KEY;
@@ -196,6 +200,7 @@ exports.handler = async (event, context) => {
 
         // Montar payload conforme documentação Poseidon Pay
         // Campos obrigatórios: identifier, amount, client (name, email, phone, document)
+        // IMPORTANTE: amount deve ser um número (float) com até 2 casas decimais
         const payload = {
             identifier: identifier,
             amount: parsedAmount,
