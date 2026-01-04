@@ -16,10 +16,14 @@ const QRCode = require('qrcode');
 // Lista de origens permitidas - usado para log, permite todas em produção
 const ALLOWED_ORIGINS = [
     'https://gorilapod.netlify.app',
+    'https://gorilapod.shop',
+    'https://www.gorilapod.shop',
     'https://gorilapod.com.br',
     'https://www.gorilapod.com.br',
     'http://localhost:5173',
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'http://localhost:8888',
+    'null' // Para file:// protocol (abrir HTML direto do sistema de arquivos)
 ];
 
 /**
@@ -27,6 +31,10 @@ const ALLOWED_ORIGINS = [
  * Permite qualquer origem para garantir funcionamento
  */
 function getAllowedOrigin(requestOrigin) {
+    // Se a origem é 'null' (file:// protocol), permitir explicitamente
+    if (requestOrigin === 'null') {
+        return 'null';
+    }
     // Retorna a origem da requisição ou '*' se não houver
     // Isso é seguro porque as funções fazem validação server-side
     return requestOrigin || '*';
@@ -194,30 +202,61 @@ exports.handler = async (event, context) => {
 
         // Obter token de acesso
         let accessToken;
+        let finalClientId = clientId;
+        let finalClientSecret = clientSecret;
 
         if (bearerToken) {
             // Compatibilidade: usar token direto se fornecido
             accessToken = bearerToken;
             console.log('🔑 Usando bearer token fornecido');
-        } else if (clientId && clientSecret) {
-            // Fluxo OAuth correto
-            accessToken = await getAccessToken(clientId, clientSecret);
+        } else if (finalClientId && finalClientSecret) {
+            // Fluxo OAuth com credenciais do frontend
+            console.log('🔑 Usando credenciais do frontend');
+            accessToken = await getAccessToken(finalClientId, finalClientSecret);
         } else {
             // Tentar usar variáveis de ambiente
             const envClientId = process.env.BSPAY_CLIENT_ID;
             const envClientSecret = process.env.BSPAY_CLIENT_SECRET;
 
             if (envClientId && envClientSecret) {
+                console.log('🔑 Usando credenciais do ENV');
                 accessToken = await getAccessToken(envClientId, envClientSecret);
             } else {
-                return {
-                    statusCode: 400,
-                    headers,
-                    body: JSON.stringify({
-                        success: false,
-                        error: 'Credenciais BSPay não configuradas. Forneça clientId/clientSecret ou configure BSPAY_CLIENT_ID e BSPAY_CLIENT_SECRET.'
-                    })
-                };
+                // Última opção: buscar do banco de dados
+                console.log('🔑 Buscando credenciais do banco de dados...');
+                try {
+                    const { createClient } = require('@supabase/supabase-js');
+                    const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+                    const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+
+                    if (supabaseUrl && supabaseKey) {
+                        const supabase = createClient(supabaseUrl, supabaseKey);
+                        const { data: gateway, error } = await supabase
+                            .from('payment_gateways')
+                            .select('client_id, client_secret')
+                            .eq('provider', 'bspay')
+                            .eq('is_active', true)
+                            .single();
+
+                        if (gateway && !error && gateway.client_id && gateway.client_secret) {
+                            console.log('✅ Credenciais BSPay carregadas do banco');
+                            accessToken = await getAccessToken(gateway.client_id, gateway.client_secret);
+                        }
+                    }
+                } catch (dbError) {
+                    console.error('❌ Erro ao buscar credenciais do banco:', dbError);
+                }
+
+                if (!accessToken) {
+                    return {
+                        statusCode: 400,
+                        headers,
+                        body: JSON.stringify({
+                            success: false,
+                            error: 'Credenciais BSPay não configuradas. Configure no Admin > Pagamentos.'
+                        })
+                    };
+                }
             }
         }
 

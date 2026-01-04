@@ -15,6 +15,8 @@ const fetch = require('node-fetch');
 // Lista de origens permitidas
 const ALLOWED_ORIGINS = [
     'https://gorilapod.netlify.app',
+    'https://gorilapod.shop',
+    'https://www.gorilapod.shop',
     'https://gorilapod.com.br',
     'https://www.gorilapod.com.br',
     'http://localhost:5173',
