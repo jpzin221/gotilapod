@@ -501,20 +501,14 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
         case 'bspay':
           // Usar BS Pay diretamente
           console.log('🟠 Usando BS Pay...');
-          console.log('🔑 Credenciais:', {
-            clientId: gateway.client_id ? '✓' : '✗',
-            clientSecret: gateway.client_secret ? '✓' : '✗'
-          });
+          // Credenciais NÃO são enviadas pelo frontend - são buscadas do banco pelo backend
           data = await bspayService.createBSPayCharge({
             amount: pedido.valorTotal,
             customerName: pedido.nomeCliente,
             customerDocument: pedido.cpfCliente,
             customerEmail: '',
             externalId: `pedido_${Date.now()}_${pedido.id || ''}`,
-            description: `Pedido ${pedido.nomeCliente}`,
-            clientId: gateway.client_id || '',
-            clientSecret: gateway.client_secret || '',
-            postbackUrl: gateway.webhook_secret || ''
+            description: `Pedido ${pedido.nomeCliente}`
           });
           break;
 

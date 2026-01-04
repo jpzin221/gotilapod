@@ -63,6 +63,22 @@ export function CartProvider({ children }) {
     setToastMessage(`✓ ${productName}${quantityText} adicionado ao carrinho!`);
     setShowToast(true);
 
+    // 🎯 UTMFY - Disparar evento AddToCart
+    try {
+      if (window.utmify) {
+        window.utmify.track('AddToCart', {
+          content_name: product.name,
+          content_ids: [product.id],
+          value: product.price * (product.quantity || 1),
+          currency: 'BRL',
+          quantity: product.quantity || 1
+        });
+        console.log('✅ UTMFY: Evento AddToCart disparado!', product.name);
+      }
+    } catch (e) {
+      console.warn('⚠️ UTMFY AddToCart error:', e);
+    }
+
     // Abrir carrinho automaticamente após 500ms
     setTimeout(() => {
       setIsCartOpen(true);

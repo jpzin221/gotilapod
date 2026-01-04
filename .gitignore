@@ -33,3 +33,6 @@ certificado-base64.txt
 *.njsproj
 *.sln
 *.sw?
+
+# Local Netlify folder
+.netlify

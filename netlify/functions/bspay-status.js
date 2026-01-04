@@ -16,13 +16,19 @@ const ALLOWED_ORIGINS = [
     'https://gorilapod.com.br',
     'https://www.gorilapod.com.br',
     'http://localhost:5173',
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'http://localhost:8888',
+    'null' // Para file:// protocol (abrir HTML direto do sistema de arquivos)
 ];
 
 /**
  * Retorna a origem permitida para CORS
  */
 function getAllowedOrigin(requestOrigin) {
+    // Se a origem é 'null' (file:// protocol), permitir explicitamente
+    if (requestOrigin === 'null') {
+        return 'null';
+    }
     return requestOrigin || '*';
 }
 

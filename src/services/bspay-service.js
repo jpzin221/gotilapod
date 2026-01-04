@@ -2,6 +2,9 @@
  * Serviço de integração com BS Pay
  * Usa função Netlify para evitar CORS e lidar com autenticação OAuth
  * 
+ * SEGURANÇA: Credenciais são buscadas do banco de dados pelo backend.
+ * Nunca enviar credenciais do frontend!
+ * 
  * Documentação BSPay: https://api.bspay.co/v2
  */
 
@@ -14,10 +17,6 @@
  * @param {string} params.customerEmail - Email do cliente
  * @param {string} params.externalId - ID único da transação no seu sistema
  * @param {string} params.description - Descrição do pagamento
- * @param {string} params.postbackUrl - URL do webhook para notificações
- * @param {string} params.clientId - Client ID da BSPay (opcional, usa env var se não fornecido)
- * @param {string} params.clientSecret - Client Secret da BSPay (opcional, usa env var se não fornecido)
- * @param {string} params.bearerToken - Token direto (deprecated, use clientId/clientSecret)
  */
 export async function createBSPayCharge({
     amount,
@@ -25,11 +24,8 @@ export async function createBSPayCharge({
     customerDocument,
     customerEmail = '',
     externalId,
-    description = '',
-    postbackUrl = '',
-    clientId = '',
-    clientSecret = '',
-    bearerToken = '' // Mantido para compatibilidade
+    description = ''
+    // REMOVIDO: clientId, clientSecret, bearerToken, postbackUrl - nunca enviar do frontend!
 }) {
     try {
         console.log('🔵 [BS Pay] Criando cobrança PIX via Netlify...');
@@ -39,12 +35,12 @@ export async function createBSPayCharge({
         // Em produção, usar Netlify Functions; em desenvolvimento, usar backend local
         const isProduction = import.meta.env.PROD;
         const netlifyFunctionsUrl = '/.netlify/functions/bspay-create';
-        const localBackendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+        const localBackendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8888';
 
         // Em produção, SEMPRE usar Netlify Functions
         const apiUrl = isProduction
             ? netlifyFunctionsUrl
-            : `${localBackendUrl}/api/pix/create`;
+            : `${localBackendUrl}/.netlify/functions/bspay-create`;
 
         console.log('🌐 API URL:', apiUrl);
 
@@ -59,13 +55,8 @@ export async function createBSPayCharge({
                 customerDocument,
                 customerEmail,
                 externalId: externalId || `pedido_${Date.now()}`,
-                description,
-                postbackUrl,
-                // Credenciais OAuth
-                clientId,
-                clientSecret,
-                // Compatibilidade
-                bearerToken
+                description
+                // Credenciais são buscadas do banco de dados pelo backend
             })
         });
 
@@ -89,6 +80,7 @@ export async function createBSPayCharge({
             imagemQrcode: data.imagemQrcode,
             expiresAt: data.expiresAt,
             status: data.status,
+            provider: 'bspay',
             raw: data.raw
         };
 

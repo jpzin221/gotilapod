@@ -16,6 +16,22 @@ export default function ProductModal({ product, isOpen, onClose }) {
       setSelectedQuantityOption('1');
       setCustomQuantity(6);
       setFlavorSelections({});
+
+      // 🎯 UTMFY - Disparar evento ViewContent (visualização de produto)
+      try {
+        if (window.utmify) {
+          window.utmify.track('ViewContent', {
+            content_name: product.name,
+            content_ids: [product.id],
+            content_type: 'product',
+            value: product.price,
+            currency: 'BRL'
+          });
+          console.log('✅ UTMFY: Evento ViewContent disparado!', product.name);
+        }
+      } catch (e) {
+        console.warn('⚠️ UTMFY ViewContent error:', e);
+      }
     }
   }, [isOpen, product?.id]);
 
