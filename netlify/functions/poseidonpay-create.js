@@ -154,6 +154,10 @@ exports.handler = async (event, context) => {
         let apiSecretKey = process.env.POSEIDONPAY_SECRET_KEY;
         let webhookUrl = process.env.POSEIDONPAY_CALLBACK_URL;
 
+        console.log('🔍 Buscando credenciais...');
+        console.log('📦 ENV POSEIDONPAY_PUBLIC_KEY:', apiPublicKey ? '✓' : '✗');
+        console.log('📦 ENV POSEIDONPAY_SECRET_KEY:', apiSecretKey ? '✓' : '✗');
+
         // Se não tem nas env vars, buscar do Supabase
         if (!apiPublicKey || !apiSecretKey) {
             const { createClient } = require('@supabase/supabase-js');
@@ -161,32 +165,50 @@ exports.handler = async (event, context) => {
             const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
             const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
+            console.log('🔗 Supabase URL:', supabaseUrl ? '✓' : '✗');
+            console.log('🔑 Supabase Key:', supabaseKey ? '✓' : '✗');
+
             if (supabaseUrl && supabaseKey) {
-                const supabase = createClient(supabaseUrl, supabaseKey);
+                try {
+                    const supabase = createClient(supabaseUrl, supabaseKey);
 
-                const { data: gateway, error } = await supabase
-                    .from('payment_gateways')
-                    .select('public_key, api_secret, callback_url')
-                    .eq('provider', 'poseidonpay')
-                    .eq('is_active', true)
-                    .single();
+                    console.log('📡 Consultando payment_gateways...');
 
-                if (gateway && !error) {
-                    apiPublicKey = gateway.public_key;
-                    apiSecretKey = gateway.api_secret;
-                    webhookUrl = gateway.callback_url || webhookUrl;
-                    console.log('✅ Credenciais carregadas do banco de dados');
+                    const { data: gateway, error } = await supabase
+                        .from('payment_gateways')
+                        .select('public_key, api_secret, callback_url')
+                        .eq('provider', 'poseidonpay')
+                        .eq('is_active', true)
+                        .single();
+
+                    if (error) {
+                        console.error('❌ Erro ao buscar gateway:', error);
+                    } else if (gateway) {
+                        apiPublicKey = gateway.public_key;
+                        apiSecretKey = gateway.api_secret;
+                        webhookUrl = gateway.callback_url || webhookUrl;
+                        console.log('✅ Credenciais carregadas do banco de dados');
+                        console.log('📦 Public Key:', apiPublicKey ? apiPublicKey.substring(0, 10) + '...' : '✗');
+                        console.log('📦 Secret Key:', apiSecretKey ? apiSecretKey.substring(0, 10) + '...' : '✗');
+                    } else {
+                        console.log('⚠️ Gateway poseidonpay não encontrado ou não está ativo');
+                    }
+                } catch (dbError) {
+                    console.error('❌ Erro ao conectar com Supabase:', dbError);
                 }
+            } else {
+                console.log('⚠️ Variáveis de ambiente do Supabase não configuradas');
             }
         }
 
         if (!apiPublicKey || !apiSecretKey) {
+            console.error('❌ Credenciais Poseidon Pay não encontradas!');
             return {
                 statusCode: 400,
                 headers,
                 body: JSON.stringify({
                     success: false,
-                    error: 'Credenciais Poseidon Pay não configuradas. Configure no Admin > Pagamentos.'
+                    error: 'Credenciais Poseidon Pay não configuradas. Verifique os logs do Netlify Functions.'
                 })
             };
         }
