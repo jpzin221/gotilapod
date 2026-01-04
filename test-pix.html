@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste PIX BSPay - Gorila Pod</title>
+    <title>Teste PIX - Gorila Pod</title>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <style>
         * {
@@ -50,12 +50,21 @@
 
         .badge {
             display: inline-block;
-            background: linear-gradient(135deg, #00d9ff, #00ff88);
-            color: #1a1a2e;
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .badge-bspay {
+            background: linear-gradient(135deg, #ff6b00, #ff9500);
+            color: #fff;
+        }
+
+        .badge-poseidon {
+            background: linear-gradient(135deg, #00d9ff, #0099ff);
+            color: #fff;
         }
 
         .form-group {
@@ -70,7 +79,8 @@
             font-weight: 500;
         }
 
-        input {
+        input,
+        select {
             width: 100%;
             padding: 14px 18px;
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -81,7 +91,8 @@
             transition: all 0.3s ease;
         }
 
-        input:focus {
+        input:focus,
+        select:focus {
             outline: none;
             border-color: #00d9ff;
             box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
@@ -89,6 +100,11 @@
 
         input::placeholder {
             color: rgba(255, 255, 255, 0.4);
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: #fff;
         }
 
         button {
@@ -154,7 +170,6 @@
             margin-bottom: 20px;
         }
 
-        .qr-container img,
         .qr-container canvas {
             max-width: 250px;
             border-radius: 12px;
@@ -252,33 +267,19 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
-        .endpoint-toggle {
+        .config-section {
             margin-bottom: 20px;
             padding: 15px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 12px;
         }
 
-        .endpoint-toggle label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
+        .config-section .form-group {
+            margin-bottom: 12px;
         }
 
-        .endpoint-toggle select {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            font-size: 14px;
-        }
-
-        .endpoint-toggle select option {
-            background: #1a1a2e;
-            color: #fff;
+        .config-section .form-group:last-child {
+            margin-bottom: 0;
         }
 
         .warning-box {
@@ -304,26 +305,42 @@
             padding: 12px;
             font-size: 14px;
         }
+
+        .gateway-info {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>🦍 Teste PIX <span class="badge">BSPay</span></h1>
+        <h1>🦍 Teste PIX <span class="badge badge-bspay" id="gatewayBadge">BSPay</span></h1>
         <p class="subtitle">Gerador de QR Code PIX Real - Receba na sua conta!</p>
 
-        <div class="endpoint-toggle">
-            <label>
-                <span>Servidor:</span>
+        <div class="config-section">
+            <div class="form-group">
+                <label>🔌 Gateway de Pagamento</label>
+                <select id="gateway" onchange="updateGatewayInfo()">
+                    <option value="bspay">🟠 BS Pay</option>
+                    <option value="poseidonpay">🔱 Poseidon Pay</option>
+                </select>
+                <p class="gateway-info" id="gatewayInfo">Credenciais buscadas do banco de dados automaticamente.</p>
+            </div>
+
+            <div class="form-group">
+                <label>🌐 Servidor</label>
                 <select id="endpoint">
-                    <option value="netlify" selected>☁️ Produção (gorilapod.netlify.app)</option>
+                    <option value="production">☁️ Produção (gorilapod.shop)</option>
+                    <option value="netlify">☁️ Netlify (gorilapod.netlify.app)</option>
                     <option value="local">🖥️ Local (localhost:8888)</option>
                 </select>
-            </label>
+            </div>
         </div>
 
-        <div class="warning-box">
-            <p>⚠️ <strong>PIX Real!</strong> Os pagamentos feitos aqui serão creditados na sua conta BSPay.</p>
+        <div class="warning-box" id="warningBox">
+            <p>⚠️ <strong>PIX Real!</strong> Os pagamentos feitos aqui serão creditados na sua conta.</p>
         </div>
 
         <form id="pixForm">
@@ -344,6 +361,11 @@
             </div>
 
             <div class="form-group">
+                <label for="telefone">📱 Telefone (para Poseidon Pay)</label>
+                <input type="text" id="telefone" placeholder="Ex: (11) 99999-9999">
+            </div>
+
+            <div class="form-group">
                 <label for="email">📧 Email (opcional)</label>
                 <input type="email" id="email" placeholder="Ex: cliente@email.com">
             </div>
@@ -355,7 +377,7 @@
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Gerando cobrança PIX na BSPay...</p>
+            <p id="loadingText">Gerando cobrança PIX...</p>
         </div>
 
         <div class="result" id="result">
@@ -374,6 +396,7 @@
             </div>
 
             <div class="info" id="infoBox">
+                <p><strong>Gateway:</strong> <span id="gatewayUsed"></span></p>
                 <p><strong>Transaction ID:</strong> <span id="txid"></span></p>
                 <p><strong>Valor:</strong> R$ <span id="valorInfo"></span></p>
                 <p><strong>Status:</strong> <span id="status"></span></p>
@@ -390,7 +413,30 @@
 
     <script>
         let currentTxid = null;
-        let currentEndpoint = 'netlify';
+        let currentGateway = 'bspay';
+        let currentIdentifier = null;
+
+        // Atualizar informações do gateway
+        function updateGatewayInfo() {
+            const gateway = document.getElementById('gateway').value;
+            const badge = document.getElementById('gatewayBadge');
+            const info = document.getElementById('gatewayInfo');
+            const telefoneField = document.getElementById('telefone').parentElement;
+
+            currentGateway = gateway;
+
+            if (gateway === 'bspay') {
+                badge.textContent = 'BSPay';
+                badge.className = 'badge badge-bspay';
+                info.textContent = 'Usa client_id e client_secret do banco de dados.';
+                telefoneField.style.display = 'none';
+            } else {
+                badge.textContent = 'Poseidon';
+                badge.className = 'badge badge-poseidon';
+                info.textContent = 'Usa public_key e api_secret do banco de dados.';
+                telefoneField.style.display = 'block';
+            }
+        }
 
         // Formatar CPF enquanto digita
         document.getElementById('cpf').addEventListener('input', function (e) {
@@ -408,6 +454,20 @@
             e.target.value = value;
         });
 
+        // Formatar telefone
+        document.getElementById('telefone').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.substring(0, 11);
+
+            if (value.length > 6) {
+                value = value.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+            } else if (value.length > 2) {
+                value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+            }
+
+            e.target.value = value;
+        });
+
         // Formatar valor
         document.getElementById('valor').addEventListener('blur', function (e) {
             const value = parseFloat(e.target.value);
@@ -415,6 +475,20 @@
                 e.target.value = value.toFixed(2);
             }
         });
+
+        // Obter URL base
+        function getBaseUrl() {
+            const endpoint = document.getElementById('endpoint').value;
+            switch (endpoint) {
+                case 'local':
+                    return 'http://localhost:8888/.netlify/functions';
+                case 'netlify':
+                    return 'https://gorilapod.netlify.app/.netlify/functions';
+                case 'production':
+                default:
+                    return 'https://gorilapod.shop/.netlify/functions';
+            }
+        }
 
         // Submeter formulário
         document.getElementById('pixForm').addEventListener('submit', async function (e) {
@@ -424,7 +498,8 @@
             const nome = document.getElementById('nome').value;
             const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
             const email = document.getElementById('email').value;
-            currentEndpoint = document.getElementById('endpoint').value;
+            const telefone = document.getElementById('telefone').value;
+            const gateway = document.getElementById('gateway').value;
 
             if (cpf.length !== 11) {
                 alert('CPF deve ter 11 dígitos!');
@@ -433,35 +508,62 @@
 
             // Mostrar loading
             document.getElementById('loading').classList.add('show');
+            document.getElementById('loadingText').textContent = `Gerando cobrança PIX via ${gateway === 'bspay' ? 'BS Pay' : 'Poseidon Pay'}...`;
             document.getElementById('result').classList.remove('show');
             document.getElementById('submitBtn').disabled = true;
 
             try {
-                const baseUrl = currentEndpoint === 'local'
-                    ? 'http://localhost:8888/.netlify/functions'
-                    : 'https://gorilapod.netlify.app/.netlify/functions';
+                const baseUrl = getBaseUrl();
+                const functionName = gateway === 'bspay' ? 'bspay-create' : 'poseidonpay-create';
+                const externalId = `teste_${Date.now()}`;
 
-                const response = await fetch(`${baseUrl}/bspay-create`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                let requestBody;
+
+                if (gateway === 'bspay') {
+                    requestBody = {
                         amount: valor,
                         customerName: nome,
                         customerDocument: cpf,
                         customerEmail: email,
-                        externalId: `teste_${Date.now()}`,
+                        externalId: externalId,
                         description: `Teste PIX - R$ ${valor.toFixed(2)}`
-                    })
+                    };
+                } else {
+                    requestBody = {
+                        amount: valor,
+                        customerName: nome,
+                        customerDocument: cpf,
+                        customerEmail: email,
+                        customerPhone: telefone,
+                        externalId: externalId,
+                        description: `Teste PIX - R$ ${valor.toFixed(2)}`,
+                        products: [{
+                            id: 'teste',
+                            name: 'Produto Teste',
+                            quantity: 1,
+                            price: valor
+                        }]
+                    };
+                }
+
+                console.log(`📤 Enviando para ${baseUrl}/${functionName}:`, requestBody);
+
+                const response = await fetch(`${baseUrl}/${functionName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
                 });
 
                 const data = await response.json();
-                console.log('Resposta BSPay:', data);
+                console.log('📥 Resposta:', data);
 
                 if (data.success) {
                     currentTxid = data.transactionId || data.txid;
-                    mostrarResultadoSucesso(data);
+                    currentIdentifier = data.identifier || externalId;
+                    currentGateway = gateway;
+                    mostrarResultadoSucesso(data, gateway);
                 } else {
                     mostrarResultadoErro(data.error || data.message || 'Erro desconhecido');
                 }
@@ -478,7 +580,7 @@
         /**
          * Mostrar resultado de sucesso
          */
-        async function mostrarResultadoSucesso(data) {
+        async function mostrarResultadoSucesso(data, gateway) {
             document.getElementById('resultTitle').textContent = '✅ PIX Gerado com Sucesso!';
             document.getElementById('result').classList.remove('error');
 
@@ -504,8 +606,9 @@
                 document.getElementById('pixCode').textContent = pixCode;
             }
 
-            document.getElementById('txid').textContent = data.transactionId || data.txid || '-';
-            document.getElementById('valorInfo').textContent = (data.amount || 0).toFixed(2);
+            document.getElementById('gatewayUsed').textContent = gateway === 'bspay' ? 'BS Pay' : 'Poseidon Pay';
+            document.getElementById('txid').textContent = data.transactionId || data.txid || data.identifier || '-';
+            document.getElementById('valorInfo').textContent = (data.amount || parseFloat(document.getElementById('valor').value)).toFixed(2);
             document.getElementById('status').textContent = data.status || 'Aguardando pagamento';
 
             // Formatar expiração
@@ -527,6 +630,7 @@
             document.getElementById('result').classList.add('error');
             document.getElementById('qrContainer').style.display = 'none';
             document.getElementById('pixCode').textContent = mensagem;
+            document.getElementById('gatewayUsed').textContent = '-';
             document.getElementById('txid').textContent = '-';
             document.getElementById('valorInfo').textContent = '-';
             document.getElementById('status').textContent = 'Falha';
@@ -538,24 +642,31 @@
          * Verificar status do pagamento
          */
         async function verificarStatus() {
-            if (!currentTxid) {
+            if (!currentTxid && !currentIdentifier) {
                 alert('Nenhuma cobrança para verificar!');
                 return;
             }
 
             try {
-                const baseUrl = currentEndpoint === 'local'
-                    ? 'http://localhost:8888/.netlify/functions'
-                    : 'https://gorilapod.netlify.app/.netlify/functions';
+                const baseUrl = getBaseUrl();
+                const functionName = currentGateway === 'bspay' ? 'bspay-status' : 'poseidonpay-status';
 
-                const response = await fetch(`${baseUrl}/bspay-status`, {
+                let requestBody;
+                if (currentGateway === 'bspay') {
+                    requestBody = { transactionId: currentTxid };
+                } else {
+                    requestBody = {
+                        transactionId: currentTxid,
+                        identifier: currentIdentifier
+                    };
+                }
+
+                const response = await fetch(`${baseUrl}/${functionName}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        transactionId: currentTxid
-                    })
+                    body: JSON.stringify(requestBody)
                 });
 
                 const data = await response.json();
@@ -594,6 +705,9 @@
                 alert('✅ Código PIX copiado!');
             });
         }
+
+        // Inicializar
+        updateGatewayInfo();
     </script>
 </body>
 
