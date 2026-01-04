@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste PIX - Gorila Pod</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .badge-bspay {
+            background: linear-gradient(135deg, #ff6b00, #ff9500);
+            color: #fff;
+        }
+
+        .badge-poseidon {
+            background: linear-gradient(135deg, #00d9ff, #0099ff);
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #00d9ff;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00d9ff 0%, #00ff88 100%);
+            border: none;
+            border-radius: 12px;
+            color: #1a1a2e;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 16px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result h3 {
+            color: #00ff88;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .qr-container canvas {
+            max-width: 250px;
+            border-radius: 12px;
+            background: #fff;
+            padding: 15px;
+        }
+
+        .pix-code {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .pix-code label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .pix-code-text {
+            color: #00d9ff;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 11px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 5px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            width: auto;
+            padding: 10px 20px;
+            font-size: 14px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa600 100%);
+        }
+
+        .info {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .info p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin: 5px 0;
+        }
+
+        .info strong {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .error {
+            background: rgba(255, 107, 107, 0.1);
+            border-color: rgba(255, 107, 107, 0.3);
+        }
+
+        .error h3 {
+            color: #ff6b6b;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00d9ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .config-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+        }
+
+        .config-section .form-group {
+            margin-bottom: 12px;
+        }
+
+        .config-section .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .warning-box {
+            background: rgba(255, 165, 0, 0.15);
+            border: 1px solid rgba(255, 165, 0, 0.4);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 20px;
+        }
+
+        .warning-box p {
+            color: #ffa600;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .status-check {
+            margin-top: 15px;
+        }
+
+        .status-check button {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        .gateway-info {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🦍 Teste PIX <span class="badge badge-bspay" id="gatewayBadge">BSPay</span></h1>
+        <p class="subtitle">Gerador de QR Code PIX Real - Receba na sua conta!</p>
+
+        <div class="config-section">
+            <div class="form-group">
+                <label>🔌 Gateway de Pagamento</label>
+                <select id="gateway" onchange="updateGatewayInfo()">
+                    <option value="bspay">🟠 BS Pay</option>
+                    <option value="poseidonpay">🔱 Poseidon Pay</option>
+                </select>
+                <p class="gateway-info" id="gatewayInfo">Credenciais buscadas do banco de dados automaticamente.</p>
+            </div>
+
+            <div class="form-group">
+                <label>🌐 Servidor</label>
+                <select id="endpoint">
+                    <option value="production">☁️ Produção (gorilapod.shop)</option>
+                    <option value="netlify">☁️ Netlify (gorilapod.netlify.app)</option>
+                    <option value="local">🖥️ Local (localhost:8888)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="warning-box" id="warningBox">
+            <p>⚠️ <strong>PIX Real!</strong> Os pagamentos feitos aqui serão creditados na sua conta.</p>
+        </div>
+
+        <form id="pixForm">
+            <div class="form-group">
+                <label for="valor">💰 Valor (R$)</label>
+                <input type="number" id="valor" placeholder="Ex: 1.00" step="0.01" min="0.01" max="100000" value="1.00"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="nome">👤 Nome do Pagador</label>
+                <input type="text" id="nome" placeholder="Ex: João da Silva" value="Cliente Teste" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cpf">📄 CPF do Pagador</label>
+                <input type="text" id="cpf" placeholder="Ex: 123.456.789-00" required>
+            </div>
+
+            <div class="form-group">
+                <label for="telefone">📱 Telefone (para Poseidon Pay)</label>
+                <input type="text" id="telefone" placeholder="Ex: (11) 99999-9999">
+            </div>
+
+            <div class="form-group">
+                <label for="email">📧 Email (opcional)</label>
+                <input type="email" id="email" placeholder="Ex: cliente@email.com">
+            </div>
+
+            <button type="submit" id="submitBtn">
+                ⚡ Gerar Cobrança PIX
+            </button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p id="loadingText">Gerando cobrança PIX...</p>
+        </div>
+
+        <div class="result" id="result">
+            <h3 id="resultTitle">✅ PIX Gerado com Sucesso!</h3>
+
+            <div class="qr-container" id="qrContainer">
+                <canvas id="qrCanvas"></canvas>
+            </div>
+
+            <div class="pix-code">
+                <label>Código PIX Copia e Cola:</label>
+                <div class="pix-code-text" id="pixCode"></div>
+                <button type="button" class="copy-btn" onclick="copyPixCode()">
+                    📋 Copiar Código
+                </button>
+            </div>
+
+            <div class="info" id="infoBox">
+                <p><strong>Gateway:</strong> <span id="gatewayUsed"></span></p>
+                <p><strong>Transaction ID:</strong> <span id="txid"></span></p>
+                <p><strong>Valor:</strong> R$ <span id="valorInfo"></span></p>
+                <p><strong>Status:</strong> <span id="status"></span></p>
+                <p><strong>Expira em:</strong> <span id="expira"></span></p>
+            </div>
+
+            <div class="status-check">
+                <button type="button" onclick="verificarStatus()">
+                    🔄 Verificar Status do Pagamento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTxid = null;
+        let currentGateway = 'bspay';
+        let currentIdentifier = null;
+
+        // Atualizar informações do gateway
+        function updateGatewayInfo() {
+            const gateway = document.getElementById('gateway').value;
+            const badge = document.getElementById('gatewayBadge');
+            const info = document.getElementById('gatewayInfo');
+            const telefoneField = document.getElementById('telefone').parentElement;
+
+            currentGateway = gateway;
+
+            if (gateway === 'bspay') {
+                badge.textContent = 'BSPay';
+                badge.className = 'badge badge-bspay';
+                info.textContent = 'Usa client_id e client_secret do banco de dados.';
+                telefoneField.style.display = 'none';
+            } else {
+                badge.textContent = 'Poseidon';
+                badge.className = 'badge badge-poseidon';
+                info.textContent = 'Usa public_key e api_secret do banco de dados.';
+                telefoneField.style.display = 'block';
+            }
+        }
+
+        // Formatar CPF enquanto digita
+        document.getElementById('cpf').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.substring(0, 11);
+
+            if (value.length > 9) {
+                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+            } else if (value.length > 6) {
+                value = value.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+            } else if (value.length > 3) {
+                value = value.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+            }
+
+            e.target.value = value;
+        });
+
+        // Formatar telefone
+        document.getElementById('telefone').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.substring(0, 11);
+
+            if (value.length > 6) {
+                value = value.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+            } else if (value.length > 2) {
+                value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+            }
+
+            e.target.value = value;
+        });
+
+        // Formatar valor
+        document.getElementById('valor').addEventListener('blur', function (e) {
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value)) {
+                e.target.value = value.toFixed(2);
+            }
+        });
+
+        // Obter URL base
+        function getBaseUrl() {
+            const endpoint = document.getElementById('endpoint').value;
+            switch (endpoint) {
+                case 'local':
+                    return 'http://localhost:8888/.netlify/functions';
+                case 'netlify':
+                    return 'https://gorilapod.netlify.app/.netlify/functions';
+                case 'production':
+                default:
+                    return 'https://gorilapod.shop/.netlify/functions';
+            }
+        }
+
+        // Submeter formulário
+        document.getElementById('pixForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const valor = parseFloat(document.getElementById('valor').value);
+            const nome = document.getElementById('nome').value;
+            const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
+            const email = document.getElementById('email').value;
+            const telefone = document.getElementById('telefone').value;
+            const gateway = document.getElementById('gateway').value;
+
+            if (cpf.length !== 11) {
+                alert('CPF deve ter 11 dígitos!');
+                return;
+            }
+
+            // Mostrar loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('loadingText').textContent = `Gerando cobrança PIX via ${gateway === 'bspay' ? 'BS Pay' : 'Poseidon Pay'}...`;
+            document.getElementById('result').classList.remove('show');
+            document.getElementById('submitBtn').disabled = true;
+
+            try {
+                const baseUrl = getBaseUrl();
+                const functionName = gateway === 'bspay' ? 'bspay-create' : 'poseidonpay-create';
+                const externalId = `teste_${Date.now()}`;
+
+                let requestBody;
+
+                if (gateway === 'bspay') {
+                    requestBody = {
+                        amount: valor,
+                        customerName: nome,
+                        customerDocument: cpf,
+                        customerEmail: email,
+                        externalId: externalId,
+                        description: `Teste PIX - R$ ${valor.toFixed(2)}`
+                    };
+                } else {
+                    requestBody = {
+                        amount: valor,
+                        customerName: nome,
+                        customerDocument: cpf,
+                        customerEmail: email,
+                        customerPhone: telefone,
+                        externalId: externalId,
+                        description: `Teste PIX - R$ ${valor.toFixed(2)}`,
+                        products: [{
+                            id: 'teste',
+                            name: 'Produto Teste',
+                            quantity: 1,
+                            price: valor
+                        }]
+                    };
+                }
+
+                console.log(`📤 Enviando para ${baseUrl}/${functionName}:`, requestBody);
+
+                const response = await fetch(`${baseUrl}/${functionName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+                console.log('📥 Resposta:', data);
+
+                if (data.success) {
+                    currentTxid = data.transactionId || data.txid;
+                    currentIdentifier = data.identifier || externalId;
+                    currentGateway = gateway;
+                    mostrarResultadoSucesso(data, gateway);
+                } else {
+                    mostrarResultadoErro(data.error || data.message || 'Erro desconhecido');
+                }
+
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarResultadoErro('Erro de conexão: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('submitBtn').disabled = false;
+            }
+        });
+
+        /**
+         * Mostrar resultado de sucesso
+         */
+        async function mostrarResultadoSucesso(data, gateway) {
+            document.getElementById('resultTitle').textContent = '✅ PIX Gerado com Sucesso!';
+            document.getElementById('result').classList.remove('error');
+
+            // Gerar QR Code a partir do código PIX
+            const pixCode = data.pixCopiaECola || data.qrcode;
+
+            if (pixCode) {
+                const canvas = document.getElementById('qrCanvas');
+                try {
+                    await QRCode.toCanvas(canvas, pixCode, {
+                        width: 250,
+                        margin: 2,
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        }
+                    });
+                    document.getElementById('qrContainer').style.display = 'block';
+                } catch (err) {
+                    console.error('Erro ao gerar QR Code:', err);
+                }
+
+                document.getElementById('pixCode').textContent = pixCode;
+            }
+
+            document.getElementById('gatewayUsed').textContent = gateway === 'bspay' ? 'BS Pay' : 'Poseidon Pay';
+            document.getElementById('txid').textContent = data.transactionId || data.txid || data.identifier || '-';
+            document.getElementById('valorInfo').textContent = (data.amount || parseFloat(document.getElementById('valor').value)).toFixed(2);
+            document.getElementById('status').textContent = data.status || 'Aguardando pagamento';
+
+            // Formatar expiração
+            if (data.expiresAt) {
+                const expDate = new Date(data.expiresAt);
+                document.getElementById('expira').textContent = expDate.toLocaleString('pt-BR');
+            } else {
+                document.getElementById('expira').textContent = '1 hora';
+            }
+
+            document.getElementById('result').classList.add('show');
+        }
+
+        /**
+         * Mostrar resultado de erro
+         */
+        function mostrarResultadoErro(mensagem) {
+            document.getElementById('resultTitle').textContent = '❌ Erro ao Gerar PIX';
+            document.getElementById('result').classList.add('error');
+            document.getElementById('qrContainer').style.display = 'none';
+            document.getElementById('pixCode').textContent = mensagem;
+            document.getElementById('gatewayUsed').textContent = '-';
+            document.getElementById('txid').textContent = '-';
+            document.getElementById('valorInfo').textContent = '-';
+            document.getElementById('status').textContent = 'Falha';
+            document.getElementById('expira').textContent = '-';
+            document.getElementById('result').classList.add('show');
+        }
+
+        /**
+         * Verificar status do pagamento
+         */
+        async function verificarStatus() {
+            if (!currentTxid && !currentIdentifier) {
+                alert('Nenhuma cobrança para verificar!');
+                return;
+            }
+
+            try {
+                const baseUrl = getBaseUrl();
+                const functionName = currentGateway === 'bspay' ? 'bspay-status' : 'poseidonpay-status';
+
+                let requestBody;
+                if (currentGateway === 'bspay') {
+                    requestBody = { transactionId: currentTxid };
+                } else {
+                    requestBody = {
+                        transactionId: currentTxid,
+                        identifier: currentIdentifier
+                    };
+                }
+
+                const response = await fetch(`${baseUrl}/${functionName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+                console.log('Status:', data);
+
+                if (data.success) {
+                    const status = data.status || 'Desconhecido';
+                    document.getElementById('status').textContent = status;
+
+                    if (status === 'paid' || status === 'PAID' || status === 'CONCLUIDA') {
+                        alert('🎉 Pagamento CONFIRMADO! O valor foi creditado na sua conta.');
+                        document.getElementById('status').style.color = '#00ff88';
+                    } else {
+                        alert(`Status atual: ${status}`);
+                    }
+                } else {
+                    alert('Erro ao verificar: ' + (data.error || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                alert('Erro de conexão: ' + error.message);
+            }
+        }
+
+        // Copiar código PIX
+        function copyPixCode() {
+            const pixCode = document.getElementById('pixCode').textContent;
+            navigator.clipboard.writeText(pixCode).then(() => {
+                alert('✅ Código PIX copiado!');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = pixCode;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ Código PIX copiado!');
+            });
+        }
+
+        // Inicializar
+        updateGatewayInfo();
+    </script>
+</body>
+
+</html>

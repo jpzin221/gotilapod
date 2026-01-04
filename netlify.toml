@@ -12,6 +12,15 @@
   # VITE_SUPABASE_ANON_KEY
 
 # Redirecionamento para SPA (Single Page Application)
+# IMPORTANTE: Rotas específicas primeiro, catch-all por último
+
+# Permitir acesso ao test-pix.html
+[[redirects]]
+  from = "/test-pix.html"
+  to = "/test-pix.html"
+  status = 200
+
+# Catch-all para SPA (todas as outras rotas)
 [[redirects]]
   from = "/*"
   to = "/index.html"
