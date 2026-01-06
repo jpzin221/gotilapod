@@ -155,16 +155,18 @@ exports.handler = async (event, context) => {
 
                     console.log('📡 Consultando payment_gateways...');
 
-                    const { data: gateway, error } = await supabase
+                    // Usar limit(1) em vez de single() para evitar erro com duplicatas
+                    const { data: gateways, error } = await supabase
                         .from('payment_gateways')
                         .select('api_key, callback_url')
                         .eq('provider', 'ryzenpay')
                         .eq('is_active', true)
-                        .single();
+                        .limit(1);
 
                     if (error) {
                         console.error('❌ Erro ao buscar gateway:', error);
-                    } else if (gateway) {
+                    } else if (gateways && gateways.length > 0) {
+                        const gateway = gateways[0];
                         apiKey = gateway.api_key;
                         webhookUrl = gateway.callback_url || webhookUrl;
                         console.log('✅ Credenciais carregadas do banco de dados');
