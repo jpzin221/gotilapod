@@ -68,6 +68,15 @@ const PROVIDER_CONFIG = {
             api_secret: 'x-secret-key',
             callback_url: 'URL de Callback (Webhook)'
         }
+    },
+    ryzenpay: {
+        name: 'Ryzen Pay',
+        color: 'bg-rose-500',
+        fields: ['api_key', 'callback_url'],
+        labels: {
+            api_key: 'API Key',
+            callback_url: 'URL de Notificação (Webhook)'
+        }
     }
 };
 
