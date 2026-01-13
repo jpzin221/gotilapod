@@ -184,6 +184,21 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
             })
           });
           data = await response.json();
+        } else if (pixData.provider === 'codexpay') {
+          // Usar Netlify Function do CodexPay
+          const functionsUrl = import.meta.env.PROD
+            ? '/.netlify/functions'
+            : 'http://localhost:8888/.netlify/functions';
+
+          const response = await fetch(`${functionsUrl}/codexpay-status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              transactionId: pixData.txid,
+              externalReference: pixData.externalReference
+            })
+          });
+          data = await response.json();
         } else {
           // Backend padrão
           const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
@@ -568,6 +583,20 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
           // Credenciais NÃO são enviadas pelo frontend - são buscadas do banco pelo backend
           const ryzenPayService = await import('../services/ryzenpay-service');
           data = await ryzenPayService.createRyzenPayCharge({
+            amount: pedido.valorTotal,
+            customerName: pedido.nomeCliente,
+            customerDocument: pedido.cpfCliente,
+            customerEmail: '',
+            externalId: `pedido_${Date.now()}_${pedido.id || ''}`
+          });
+          break;
+
+        case 'codexpay':
+          // Usar CodexPay
+          console.log('💚 Usando CodexPay...');
+          // Credenciais NÃO são enviadas pelo frontend - são buscadas do banco pelo backend
+          const codexPayService = await import('../services/codexpay-service');
+          data = await codexPayService.createCodexPayCharge({
             amount: pedido.valorTotal,
             customerName: pedido.nomeCliente,
             customerDocument: pedido.cpfCliente,

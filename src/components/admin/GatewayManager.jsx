@@ -77,6 +77,16 @@ const PROVIDER_CONFIG = {
             api_key: 'API Key',
             callback_url: 'URL de Notificação (Webhook)'
         }
+    },
+    codexpay: {
+        name: 'CodexPay',
+        color: 'bg-emerald-500',
+        fields: ['client_id', 'client_secret', 'callback_url'],
+        labels: {
+            client_id: 'Client ID',
+            client_secret: 'Client Secret',
+            callback_url: 'URL de Callback (Webhook)'
+        }
     }
 };
 

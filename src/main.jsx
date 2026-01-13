@@ -30,6 +30,7 @@ const Termos = lazy(() => import('./pages/Termos.jsx'));
 const Privacidade = lazy(() => import('./pages/Privacidade.jsx'));
 const Contato = lazy(() => import('./pages/Contato.jsx'));
 const BoladorPage = lazy(() => import('./pages/BoladorPage.jsx'));
+const ObrigadoCompra = lazy(() => import('./pages/ObrigadoCompra.jsx'));
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -52,6 +53,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <Route path="/privacidade" element={<Privacidade />} />
                 <Route path="/contato" element={<Contato />} />
                 <Route path="/produto/gorila-bolador" element={<BoladorPage />} />
+                <Route path="/obrigado-compra" element={<ObrigadoCompra />} />
               </Routes>
             </Suspense>
           </CartProvider>
