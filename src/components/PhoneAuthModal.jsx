@@ -5,31 +5,38 @@ import Portal from './Portal';
 
 export default function PhoneAuthModal({ isOpen, onClose, mode = 'login', onSuccess, prefilledPhone = '', prefilledName = '' }) {
   const { login, register, userExists } = usePhoneAuth();
-  
+
   // Se não vier preenchido, buscar do sessionStorage
   const getPedidoData = () => {
     if (prefilledPhone && prefilledName) {
       return { phone: prefilledPhone, nome: prefilledName };
     }
-    
+
     try {
       const lastPedido = sessionStorage.getItem('lastPedido');
       if (lastPedido) {
         const pedido = JSON.parse(lastPedido);
+        // Buscar telefone em todos os campos possíveis
+        const telefone = pedido.telefone || pedido.cliente_telefone || '';
+        // Buscar nome em todos os campos possíveis
+        const nome = pedido.nome_cliente || pedido.nomeCliente || pedido.cliente_nome || '';
+
+        console.log('📱 PhoneAuthModal - Dados recuperados:', { telefone, nome });
+
         return {
-          phone: pedido.telefone || '',
-          nome: pedido.nome_cliente || pedido.nomeCliente || ''
+          phone: telefone,
+          nome: nome
         };
       }
     } catch (error) {
       console.error('Erro ao carregar pedido:', error);
     }
-    
+
     return { phone: '', nome: '' };
   };
-  
+
   const pedidoData = getPedidoData();
-  
+
   const [phone, setPhone] = useState(pedidoData.phone);
   const [pin, setPin] = useState(['', '', '', '']);
   const [nome, setNome] = useState(pedidoData.nome);
@@ -133,7 +140,7 @@ export default function PhoneAuthModal({ isOpen, onClose, mode = 'login', onSucc
 
     try {
       let result;
-      
+
       if (mode === 'register') {
         console.log('📝 Registrando usuário...');
         result = await register(phone, pinString, nome);
@@ -164,7 +171,7 @@ export default function PhoneAuthModal({ isOpen, onClose, mode = 'login', onSucc
   return (
     <Portal>
       <div className="fixed inset-0 bg-black/60" style={{ zIndex: 999999 }} onClick={onClose} />
-      
+
       <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
         <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
           <button
@@ -182,10 +189,10 @@ export default function PhoneAuthModal({ isOpen, onClose, mode = 'login', onSucc
               {mode === 'register' ? 'Criar Sua Senha' : 'Acessar Conta'}
             </h2>
             <p className="text-sm text-gray-600 mt-2">
-              {mode === 'register' 
-                ? (prefilledPhone 
-                    ? 'Confirme seus dados e crie uma senha de 4 dígitos' 
-                    : 'Crie uma senha de 4 dígitos para acessar sua conta e acompanhar seus pedidos')
+              {mode === 'register'
+                ? (prefilledPhone
+                  ? 'Confirme seus dados e crie uma senha de 4 dígitos'
+                  : 'Crie uma senha de 4 dígitos para acessar sua conta e acompanhar seus pedidos')
                 : 'Entre com seu telefone e PIN'}
             </p>
           </div>
@@ -283,38 +290,38 @@ export default function PhoneAuthModal({ isOpen, onClose, mode = 'login', onSucc
 
               {/* PIN */}
               <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <Lock className="w-4 h-4 inline mr-1" />
-                PIN de 4 dígitos
-              </label>
-              <div className="flex gap-3 justify-center">
-                {pin.map((digit, index) => (
-                  <input
-                    key={index}
-                    id={`pin-${index}`}
-                    type="password"
-                    inputMode="numeric"
-                    maxLength="1"
-                    value={digit}
-                    onChange={(e) => handlePinChange(index, e.target.value)}
-                    onKeyDown={(e) => handlePinKeyDown(index, e)}
-                    className="w-14 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none"
-                  />
-                ))}
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <Lock className="w-4 h-4 inline mr-1" />
+                  PIN de 4 dígitos
+                </label>
+                <div className="flex gap-3 justify-center">
+                  {pin.map((digit, index) => (
+                    <input
+                      key={index}
+                      id={`pin-${index}`}
+                      type="password"
+                      inputMode="numeric"
+                      maxLength="1"
+                      value={digit}
+                      onChange={(e) => handlePinChange(index, e.target.value)}
+                      onKeyDown={(e) => handlePinKeyDown(index, e)}
+                      className="w-14 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none"
+                    />
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                  {mode === 'register'
+                    ? '🔐 Este PIN será sua senha para acessar o site e acompanhar seus pedidos'
+                    : 'Digite seu PIN de acesso'}
+                </p>
               </div>
-              <p className="text-xs text-gray-500 mt-2 text-center">
-                {mode === 'register' 
-                  ? '🔐 Este PIN será sua senha para acessar o site e acompanhar seus pedidos' 
-                  : 'Digite seu PIN de acesso'}
-              </p>
-            </div>
 
-            {/* Erro */}
-            {error && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-lg p-3 text-center">
-                <p className="text-sm text-red-700 font-semibold">{error}</p>
-              </div>
-            )}
+              {/* Erro */}
+              {error && (
+                <div className="bg-red-50 border-2 border-red-200 rounded-lg p-3 text-center">
+                  <p className="text-sm text-red-700 font-semibold">{error}</p>
+                </div>
+              )}
 
               {/* Botão */}
               <button

@@ -131,8 +131,8 @@ export default function Rastreamento() {
         const pedido = JSON.parse(lastPedidoStr);
         const pedidoFormatado = formatarPedido(pedido);
         console.log('📦 Pedido carregado do sessionStorage:', pedidoFormatado);
-        console.log('📱 Telefone:', pedidoFormatado?.telefone);
-        console.log('👤 Nome:', pedidoFormatado?.nome_cliente || pedidoFormatado?.nomeCliente);
+        console.log('📱 Telefone:', pedidoFormatado?.telefone || pedidoFormatado?.cliente_telefone);
+        console.log('👤 Nome:', pedidoFormatado?.nome_cliente || pedidoFormatado?.nomeCliente || pedidoFormatado?.cliente_nome);
         console.log('🏠 Endereço:', pedidoFormatado?.endereco_entrega);
         setPedidoData(pedidoFormatado);
       } catch (error) {
@@ -191,7 +191,8 @@ export default function Rastreamento() {
       const checkUserExists = async () => {
         try {
           const pedidoInfo = JSON.parse(lastPedidoStr);
-          const telefone = pedidoInfo.telefone;
+          // Buscar telefone em todos os campos possíveis
+          const telefone = pedidoInfo.telefone || pedidoInfo.cliente_telefone;
 
           console.log('🔍 Verificando usuário...');
           console.log('📦 Pedido Info completo:', JSON.stringify(pedidoInfo, null, 2));

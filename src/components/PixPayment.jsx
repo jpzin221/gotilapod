@@ -279,6 +279,8 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
           valor_total: pedido.valorTotal,
           cliente_nome: pedido.nomeCliente || user?.nome || 'Cliente',
           cliente_telefone: (pedido.telefone || user?.telefone)?.replace(/\D/g, ''),
+          // Alias para compatibilidade com PhoneAuthModal e Rastreamento
+          telefone: (pedido.telefone || user?.telefone)?.replace(/\D/g, ''),
           cliente_cpf: pedido.cpfCliente,
           endereco_entrega: pedido.endereco,
           itens: pedido.itens,
@@ -793,34 +795,49 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
               {/* QR Code Imagem */}
               <div className="bg-white p-2 sm:p-4 rounded-lg border border-gray-200 sm:border-2 mb-2 sm:mb-4 flex items-center justify-center">
-                {pixData.imagemQrcode ? (
-                  <img
-                    src={
-                      pixData.imagemQrcode.startsWith('data:image')
-                        ? pixData.imagemQrcode
-                        : `data:image/png;base64,${pixData.imagemQrcode}`
-                    }
-                    alt="QR Code PIX"
-                    className="w-48 h-48 sm:w-64 sm:h-64 object-contain"
-                    onLoad={() => {
-                      console.log('✅ QR Code carregado com sucesso!');
-                    }}
-                    onError={(e) => {
-                      console.error('❌ Erro ao carregar QR Code');
-                      console.error('Base64 length:', pixData.imagemQrcode?.length);
-                      console.error('Base64 start:', pixData.imagemQrcode?.substring(0, 50));
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <div className="w-64 h-64 flex items-center justify-center bg-gray-100 rounded">
-                    <p className="text-gray-500 text-sm">QR Code não disponível</p>
-                    <p className="text-xs text-gray-400 mt-2">
-                      {console.log('⚠️ pixData:', pixData)}
-                      Debug: Verifique o console
-                    </p>
-                  </div>
-                )}
+                {(() => {
+                  // Verificar se a imagem é válida (começa com data:image ou é base64 de imagem válida)
+                  const isValidBase64Image = pixData.imagemQrcode && (
+                    pixData.imagemQrcode.startsWith('data:image') ||
+                    // Base64 de imagem PNG começa com iVBOR, JPG com /9j/, etc
+                    /^(iVBOR|\/9j\/|R0lGOD)/.test(pixData.imagemQrcode)
+                  );
+
+                  if (isValidBase64Image) {
+                    return (
+                      <img
+                        src={
+                          pixData.imagemQrcode.startsWith('data:image')
+                            ? pixData.imagemQrcode
+                            : `data:image/png;base64,${pixData.imagemQrcode}`
+                        }
+                        alt="QR Code PIX"
+                        className="w-48 h-48 sm:w-64 sm:h-64 object-contain"
+                        onLoad={() => {
+                          console.log('✅ QR Code carregado com sucesso!');
+                        }}
+                        onError={(e) => {
+                          console.error('❌ Erro ao carregar QR Code');
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    );
+                  } else {
+                    // Se não tem imagem válida, mostrar mensagem para usar o código copia e cola
+                    console.log('⚠️ Imagem QR Code não disponível, usando código copia e cola');
+                    return (
+                      <div className="w-48 h-48 sm:w-64 sm:h-64 flex flex-col items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg border-2 border-dashed border-primary/30 p-4">
+                        <QrCode className="w-16 h-16 text-primary/50 mb-3" />
+                        <p className="text-sm text-gray-600 text-center font-medium">
+                          Use o código PIX abaixo
+                        </p>
+                        <p className="text-xs text-gray-500 text-center mt-1">
+                          Copie e cole no seu banco
+                        </p>
+                      </div>
+                    );
+                  }
+                })()}
               </div>
 
               {/* PIX Copia e Cola */}

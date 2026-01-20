@@ -12,6 +12,7 @@
  */
 
 const fetch = require('node-fetch');
+const QRCode = require('qrcode');
 
 // Cache do token JWT (em memória)
 let cachedToken = null;
@@ -367,6 +368,24 @@ exports.handler = async (event, context) => {
             // Não bloqueia o fluxo se falhar
         }
 
+        // Gerar imagem QR Code base64 a partir do código PIX copia e cola
+        let qrCodeBase64 = '';
+        try {
+            console.log('🖼️ Gerando imagem QR Code base64...');
+            qrCodeBase64 = await QRCode.toDataURL(qrCodeResponse.qrcode, {
+                width: 300,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff'
+                }
+            });
+            console.log('✅ QR Code base64 gerado com sucesso!');
+        } catch (qrError) {
+            console.error('⚠️ Erro ao gerar QR Code base64:', qrError);
+            // Continua mesmo sem imagem, o PIX copia e cola funciona
+        }
+
         // Retornar no formato esperado pelo PixPayment
         return {
             statusCode: 200,
@@ -381,7 +400,7 @@ exports.handler = async (event, context) => {
                 // PIX
                 pixCopiaECola: qrCodeResponse.qrcode,
                 qrcode: qrCodeResponse.qrcode,
-                imagemQrcode: qrCodeResponse.qrcode, // Base64 do QR Code
+                imagemQrcode: qrCodeBase64, // Imagem QR Code em base64
                 // Provider
                 provider: 'codexpay',
                 // Raw response

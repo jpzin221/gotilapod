@@ -185,6 +185,17 @@ export default function ObrigadoCompra() {
                         </span>
                     </a>
 
+                    {/* Botão de Rastreamento */}
+                    <button
+                        onClick={() => navigate('/rastreamento')}
+                        className="block w-full mt-4 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-xl text-center transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                    >
+                        <span className="flex items-center justify-center gap-3">
+                            <Package className="w-6 h-6" />
+                            Acompanhar meu pedido
+                        </span>
+                    </button>
+
                     {/* Voltar para loja */}
                     <button
                         onClick={() => navigate('/')}
