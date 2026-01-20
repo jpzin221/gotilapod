@@ -372,17 +372,27 @@ exports.handler = async (event, context) => {
         let qrCodeBase64 = '';
         try {
             console.log('🖼️ Gerando imagem QR Code base64...');
-            qrCodeBase64 = await QRCode.toDataURL(qrCodeResponse.qrcode, {
-                width: 300,
-                margin: 2,
-                color: {
-                    dark: '#000000',
-                    light: '#ffffff'
-                }
-            });
-            console.log('✅ QR Code base64 gerado com sucesso!');
+            console.log('📝 PIX Copia e Cola:', qrCodeResponse.qrcode?.substring(0, 50) + '...');
+            console.log('📦 QRCode library loaded:', typeof QRCode);
+
+            if (typeof QRCode === 'undefined' || !QRCode.toDataURL) {
+                console.error('❌ Biblioteca QRCode não carregada corretamente!');
+            } else {
+                qrCodeBase64 = await QRCode.toDataURL(qrCodeResponse.qrcode, {
+                    width: 300,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#ffffff'
+                    }
+                });
+                console.log('✅ QR Code base64 gerado com sucesso!');
+                console.log('📏 Base64 length:', qrCodeBase64?.length);
+                console.log('🔍 Base64 preview:', qrCodeBase64?.substring(0, 50));
+            }
         } catch (qrError) {
-            console.error('⚠️ Erro ao gerar QR Code base64:', qrError);
+            console.error('⚠️ Erro ao gerar QR Code base64:', qrError.message);
+            console.error('⚠️ Stack:', qrError.stack);
             // Continua mesmo sem imagem, o PIX copia e cola funciona
         }
 
