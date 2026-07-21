@@ -1,5 +1,8 @@
 # Configuração do Netlify para o projeto
 
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
+
 [build]
   # Comando de build
   command = "npm run build"
