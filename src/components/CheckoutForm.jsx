@@ -21,7 +21,6 @@ export default function CheckoutForm({ isOpen, onClose, onSubmit, total, cepData
   // Preencher com dados do usuário autenticado
   useEffect(() => {
     if (isAuthenticated && user && isOpen) {
-      console.log('✅ Preenchendo formulário com dados do usuário:', user);
       setFormData(prev => ({
         ...prev,
         nome: user.nome || prev.nome,

@@ -31,8 +31,6 @@ export function CartProvider({ children }) {
 
   // Adicionar item ao carrinho
   const addToCart = (product) => {
-    console.log('📥 CartContext recebeu produto:', product);
-
     setCartItems(prevItems => {
       const itemKey = getItemKey(product);
       const existingItem = prevItems.find(item => getItemKey(item) === itemKey);
@@ -53,7 +51,6 @@ export function CartProvider({ children }) {
         quantity: product.quantity || 1,
         cartItemKey: itemKey
       };
-      console.log('🆕 Novo item no carrinho:', newItem);
       return [...prevItems, newItem];
     });
 
@@ -73,7 +70,6 @@ export function CartProvider({ children }) {
           currency: 'BRL',
           quantity: product.quantity || 1
         });
-        console.log('✅ UTMFY: Evento AddToCart disparado!', product.name);
       }
     } catch (e) {
       console.warn('⚠️ UTMFY AddToCart error:', e);

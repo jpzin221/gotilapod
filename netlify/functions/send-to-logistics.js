@@ -38,11 +38,6 @@ exports.handler = async (event, context) => {
   try {
     const pedido = JSON.parse(event.body);
 
-    console.log('📦 Novo pedido recebido da loja para enviar à transportadora');
-    console.log('🆔 ID do Pedido:', pedido.numero_pedido);
-    console.log('👤 Cliente:', pedido.nome_cliente);
-    console.log('📍 Endereço:', pedido.endereco_entrega);
-
     // Validações
     if (!pedido.numero_pedido) {
       return {
@@ -101,7 +96,7 @@ exports.handler = async (event, context) => {
       telefone: pedido.telefone || null,
       
       // Endereço de Entrega
-      origem: 'POD EXPRESSS - Loja Virtual',
+      origem: 'GorilaPod - Loja Virtual',
       destino: `${pedido.endereco_entrega.cidade} - ${pedido.endereco_entrega.estado}`,
       endereco_completo: {
         cep: pedido.endereco_entrega.cep,
@@ -132,9 +127,6 @@ exports.handler = async (event, context) => {
       txid: pedido.txid || null
     };
 
-    console.log('📤 Enviando pedido para o sistema de logística...');
-    console.log('🔑 Código de rastreio gerado:', codigoRastreio);
-
     // Inserir no banco de dados da transportadora
     const { data, error } = await supabaseLogistics
       .from('pedidos')
@@ -158,9 +150,6 @@ exports.handler = async (event, context) => {
       };
     }
 
-    console.log('✅ Pedido registrado com sucesso na transportadora!');
-    console.log('📋 ID do registro:', data.id);
-
     // Criar histórico inicial
     await supabaseLogistics
       .from('historico_rastreamento')
@@ -168,7 +157,7 @@ exports.handler = async (event, context) => {
         pedido_id: data.id,
         status: 'pendente',
         descricao: 'Pedido recebido da loja online',
-        localizacao: 'POD EXPRESSS - Loja Virtual',
+        localizacao: 'GorilaPod - Loja Virtual',
         observacao: `Pedido ${pedido.numero_pedido} importado do e-commerce`,
         created_at: new Date().toISOString()
       }]);

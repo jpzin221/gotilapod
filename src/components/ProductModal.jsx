@@ -27,7 +27,6 @@ export default function ProductModal({ product, isOpen, onClose }) {
             value: product.price,
             currency: 'BRL'
           });
-          console.log('✅ UTMFY: Evento ViewContent disparado!', product.name);
         }
       } catch (e) {
         console.warn('⚠️ UTMFY ViewContent error:', e);
@@ -38,14 +37,6 @@ export default function ProductModal({ product, isOpen, onClose }) {
   if (!isOpen || !product) return null;
 
   const availableFlavors = product.flavors || [];
-
-  // DEBUG: Verificar sabores
-  console.log('🔍 DEBUG ProductModal:');
-  console.log('  Product ID:', product.id);
-  console.log('  Product Name:', product.name);
-  console.log('  Product.flavors:', product.flavors);
-  console.log('  availableFlavors:', availableFlavors);
-  console.log('  availableFlavors.length:', availableFlavors.length);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -123,14 +114,6 @@ export default function ProductModal({ product, isOpen, onClose }) {
           selectedFlavorsArray.push(flavor.flavor.name);
         }
       }
-    });
-
-    console.log('🛒 Adicionando ao carrinho:', {
-      name: product.name,
-      quantity: priceInfo.units,
-      selectedFlavors: selectedFlavorsArray,
-      unitPrice: product.price,
-      totalPrice: priceInfo.finalPrice
     });
 
     addToCart({

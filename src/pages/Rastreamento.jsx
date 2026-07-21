@@ -1,11 +1,13 @@
 import { Clock, CheckCircle, Package, TrendingUp, MapPin, Zap, ArrowRight, Home, Phone } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Instagram } from 'lucide-react';
 import Header from '../components/Header';
 import PhoneAuthModal from '../components/PhoneAuthModal';
 import { usePhoneAuth } from '../context/PhoneAuthContext';
 import { storeInfo } from '../data/products';
+import { supabase, siteConfigService } from '../lib/supabase';
+import { ORDER_STATUS, STATUS_LABELS } from '../lib/statusConstants';
 
 export default function Rastreamento() {
   const navigate = useNavigate();
@@ -21,6 +23,15 @@ export default function Rastreamento() {
   const [userHasPin, setUserHasPin] = useState(false); // Controla se usuário já tem PIN
   const [verificandoAcesso, setVerificandoAcesso] = useState(true);
   const [acessoNegado, setAcessoNegado] = useState(false);
+  const [dbSteps, setDbSteps] = useState(null);
+  const [dbStepsRaw, setDbStepsRaw] = useState(null);
+  const [dbEstimatedTime, setDbEstimatedTime] = useState(null);
+  const [dbDeliveryPerson, setDbDeliveryPerson] = useState(null);
+  const [dbOrderStatus, setDbOrderStatus] = useState(null);
+  const [retentionPixData, setRetentionPixData] = useState(null);
+  const [retentionStatus, setRetentionStatus] = useState('idle');
+  const [retentionError, setRetentionError] = useState('');
+  const [retentionCountdown, setRetentionCountdown] = useState(3600);
 
   // Scroll para o topo ao carregar a página
   useEffect(() => {
@@ -313,28 +324,7 @@ export default function Rastreamento() {
     }
   }, [currentStatus]);
 
-  // Após 8 segundos, marca "Pagamento aprovado" como concluído (verde)
-  useEffect(() => {
-    // Só executar o timer se ainda estiver no status 1
-    if (currentStatus !== 1) {
-      console.log('⏭️ Status já avançado, pulando timer');
-      return;
-    }
-
-    console.log('⏰ Timer iniciado - aguardando 8 segundos...');
-    console.log('📊 Status atual:', currentStatus);
-
-    const timer = setTimeout(() => {
-      console.log('✅ 8 segundos passados - Pagamento aprovado confirmado!');
-      console.log('🔄 Mudando status de', currentStatus, 'para 2');
-      setCurrentStatus(2); // Avança para "Preparando pedido"
-    }, 8000);
-
-    return () => {
-      console.log('🧹 Limpando timer');
-      clearTimeout(timer);
-    };
-  }, [currentStatus]);
+  // After 8 seconds, marks payment as approved (green) - now driven by DB polling
 
   // Log quando currentStatus mudar
   useEffect(() => {
@@ -343,6 +333,184 @@ export default function Rastreamento() {
     console.log('🎨 safeCurrentStatus:', safe);
     console.log('✅ isCompleted (index 1)?', currentStatus >= 1.5 ? 1 <= 1 : 1 < currentStatus);
   }, [currentStatus]);
+
+  // Fetch tracking steps from site_config
+  useEffect(() => {
+    const fetchSteps = async () => {
+      try {
+        const valor = await siteConfigService.get('fluxo_status_rastreamento');
+
+        if (valor) {
+          const parsed = typeof valor === 'string' ? JSON.parse(valor) : valor;
+          const etapasAtivas = Array.isArray(parsed) ? parsed.filter(e => e.ativo) : [];
+
+          if (etapasAtivas.length > 0) {
+            setDbStepsRaw(etapasAtivas);
+            const iconMap = { CheckCircle, Package, Clock, TrendingUp, Truck, MapPin, XCircle: ArrowRight };
+            const mappedSteps = etapasAtivas.map((etapa) => ({
+              id: etapa.ordem - 1,
+              label: etapa.titulo,
+              icon: iconMap[etapa.icone] || CheckCircle,
+              desc: etapa.descricao,
+              is_retention: etapa.is_retention || false,
+              pix_valor: etapa.pix_valor || '',
+              pix_descricao: etapa.pix_descricao || ''
+            }));
+            setDbSteps(mappedSteps);
+          }
+        }
+      } catch (err) {
+        console.warn('⚠️ Não foi possível carregar etapas de rastreamento:', err);
+      }
+    };
+
+    fetchSteps();
+  }, []);
+
+  // Poll actual order status from database
+  useEffect(() => {
+    if (!pedidoData?.id && !pedidoData?.numero_pedido) return;
+
+    const fetchOrderStatus = async () => {
+      try {
+        let query = supabase.from('pedidos').select('status, tempo_estimado, entregador, numero_pedido');
+        if (pedidoData.id) {
+          query = query.eq('id', pedidoData.id);
+        } else if (pedidoData.numero_pedido) {
+          query = query.eq('numero_pedido', pedidoData.numero_pedido);
+        }
+        const { data, error } = await query.maybeSingle();
+
+        if (error || !data) return;
+
+        setDbOrderStatus(data.status);
+        if (data.tempo_estimado) setDbEstimatedTime(data.tempo_estimado);
+        if (data.entregador) setDbDeliveryPerson(data.entregador);
+
+        // Map database status to step index
+        const statusToStep = {
+          [ORDER_STATUS.CONFIRMADO]: 1,
+          [ORDER_STATUS.PREPARANDO]: 2,
+          [ORDER_STATUS.GUARDANDO]: 3,
+          [ORDER_STATUS.AGUARDANDO_TRANSPORTADORA]: 4,
+          [ORDER_STATUS.PEDIDO_COLETADO]: 5,
+          [ORDER_STATUS.ENTREGADOR_INICIOU_ROTA]: 6,
+          [ORDER_STATUS.ENTREGADOR_SAIU]: 7,
+          [ORDER_STATUS.ENTREGADOR_INDO_LOCAL]: 8,
+          [ORDER_STATUS.ENTREGUE]: 9,
+          [ORDER_STATUS.CANCELADO]: 0,
+        };
+
+        const mappedStep = statusToStep[data.status];
+        if (mappedStep !== undefined) {
+          setCurrentStatus(mappedStep);
+          sessionStorage.setItem('rastreamentoStatus', mappedStep.toString());
+        }
+      } catch (err) {
+        console.warn('⚠️ Erro ao buscar status do pedido:', err);
+      }
+    };
+
+    fetchOrderStatus();
+    const interval = setInterval(fetchOrderStatus, 10000);
+    return () => clearInterval(interval);
+  }, [pedidoData?.id, pedidoData?.numero_pedido]);
+
+  // Criar PIX de retenção
+  const createRetentionPix = async () => {
+    if (!pedidoData || !dbSteps) return;
+    const currentStepData = dbSteps[safeCurrentStatus];
+    if (!currentStepData?.is_retention) return;
+
+    try {
+      setRetentionStatus('creating');
+      setRetentionError('');
+
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || '/.netlify/functions';
+      const response = await fetch(`${backendUrl}/retention-pay`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create',
+          amount: parseFloat(currentStepData.pix_valor || 0),
+          externalId: `retencao_${pedidoData.numero_pedido || pedidoData.id}_${Date.now()}`,
+          customerName: pedidoData.cliente_nome || pedidoData.nome_cliente || '',
+          customerDocument: pedidoData.cliente_cpf || pedidoData.cpf_cliente || ''
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setRetentionPixData(data);
+        setRetentionStatus('pending');
+        setRetentionCountdown(3600);
+      } else {
+        setRetentionStatus('error');
+        setRetentionError(data.error || 'Erro ao criar PIX');
+      }
+    } catch (err) {
+      setRetentionStatus('error');
+      setRetentionError('Erro de conexão ao criar PIX');
+    }
+  };
+
+  // Polling de status do PIX de retenção
+  useEffect(() => {
+    if (retentionStatus !== 'pending' || !retentionPixData?.transactionId) return;
+
+    const checkStatus = async () => {
+      try {
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || '/.netlify/functions';
+        const response = await fetch(`${backendUrl}/retention-pay`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'status',
+            transactionId: retentionPixData.transactionId
+          })
+        });
+
+        const data = await response.json();
+        if (data.success && data.status === 'CONCLUIDA') {
+          setRetentionStatus('paid');
+          // Avançar pedido para o próximo status
+          if (pedidoData?.id || pedidoData?.numero_pedido) {
+            try {
+              const nextStatus = ORDER_STATUS.PREPARANDO;
+              let updateQuery = supabase.from('pedidos').update({ status: nextStatus });
+              if (pedidoData.id) updateQuery = updateQuery.eq('id', pedidoData.id);
+              else updateQuery = updateQuery.eq('numero_pedido', pedidoData.numero_pedido);
+              await updateQuery;
+              // Atualizar status local
+              setCurrentStatus(2);
+              sessionStorage.setItem('rastreamentoStatus', '2');
+            } catch (e) {
+              console.warn('Erro ao atualizar status do pedido:', e);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Erro ao verificar status do PIX:', err);
+      }
+    };
+
+    const interval = setInterval(checkStatus, 3000);
+    // Countdown
+    const countdownInterval = setInterval(() => {
+      setRetentionCountdown(prev => {
+        if (prev <= 1) {
+          setRetentionStatus('expired');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(countdownInterval);
+    };
+  }, [retentionStatus, retentionPixData?.transactionId, pedidoData?.id, pedidoData?.numero_pedido]);
 
   // Callback de sucesso do registro
   const handleRegisterSuccess = async (userData) => {
@@ -402,15 +570,9 @@ export default function Rastreamento() {
 
     // Fechar modal
     setShowRegisterModal(false);
-
-    // Forçar recarregamento da página para atualizar estado de autenticação
-    console.log('🔄 Recarregando página para atualizar autenticação...');
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
   };
 
-  const steps = [
+  const steps = dbSteps || [
     { id: 0, label: 'Pedido recebido', icon: CheckCircle, desc: 'Recebemos seu pedido' },
     { id: 1, label: 'Pagamento aprovado', icon: TrendingUp, desc: 'Pagamento confirmado' },
     { id: 2, label: 'Preparando pedido', icon: Package, desc: 'Separando produtos' },
@@ -428,8 +590,8 @@ export default function Rastreamento() {
   const currentStep = steps[safeCurrentStatus] || steps[1]; // Fallback para step 1
   const progressPercent = (safeCurrentStatus / (steps.length - 1)) * 100;
   const orderId = pedidoData?.numero_pedido || pedidoData?.numeroPedido || '#XP-000000';
-  const estimatedTime = '40-50 minutos';
-  const deliveryPerson = '#ALE-302';
+  const estimatedTime = dbEstimatedTime || pedidoData?.tempo_estimado || '40-50 minutos';
+  const deliveryPerson = dbDeliveryPerson || pedidoData?.entregador || '#ALE-302';
 
   // Formatar valor total
   const formatPrice = (value) => {
@@ -681,6 +843,158 @@ export default function Rastreamento() {
             </div>
           </div>
         </div>
+
+        {/* Seção de Retenção - PIX */}
+        {dbSteps && dbSteps[safeCurrentStatus]?.is_retention && (
+          <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6 border-2 border-orange-300 mb-6 shadow-lg">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center flex-shrink-0 shadow-md">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-orange-800 mb-1">🔒 Pedido Retido - Ação Necessária</h3>
+                <p className="text-sm text-orange-700 mb-3">
+                  {dbSteps[safeCurrentStatus].pix_descricao || 'Uma taxa precisa ser paga para liberar a entrega do seu pedido.'}
+                </p>
+
+                {/* Valor */}
+                <div className="bg-white rounded-xl p-4 border border-orange-200 mb-3">
+                  <p className="text-xs text-gray-500 mb-1">Valor para liberação:</p>
+                  <p className="text-2xl font-bold text-orange-600">
+                    R$ {parseFloat(dbSteps[safeCurrentStatus].pix_valor || 0).toFixed(2).replace('.', ',')}
+                  </p>
+                </div>
+
+                {/* Estado: Idle - Botão para criar PIX */}
+                {retentionStatus === 'idle' && (
+                  <button
+                    onClick={createRetentionPix}
+                    className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Gerar PIX para Pagamento
+                  </button>
+                )}
+
+                {/* Estado: Creating */}
+                {retentionStatus === 'creating' && (
+                  <div className="flex items-center justify-center gap-3 py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500"></div>
+                    <span className="text-orange-700 font-medium">Gerando PIX...</span>
+                  </div>
+                )}
+
+                {/* Estado: Pending - Mostrar QR Code */}
+                {retentionStatus === 'pending' && retentionPixData && (
+                  <div className="space-y-3">
+                    {/* QR Code */}
+                    {retentionPixData.imagemQrcode && (
+                      <div className="bg-white rounded-xl p-4 border border-orange-200 flex flex-col items-center">
+                        <img
+                          src={retentionPixData.imagemQrcode}
+                          alt="QR Code PIX"
+                          className="w-48 h-48 object-contain mb-2"
+                        />
+                        <p className="text-xs text-gray-500">Escaneie com seu banco</p>
+                      </div>
+                    )}
+
+                    {/* PIX Copia e Cola */}
+                    {retentionPixData.pixCopiaECola && (
+                      <div className="bg-white rounded-xl p-3 border border-orange-200">
+                        <p className="text-xs text-gray-500 mb-2">Ou copie o código PIX:</p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            readOnly
+                            value={retentionPixData.pixCopiaECola}
+                            className="flex-1 text-xs bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-700 truncate"
+                          />
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(retentionPixData.pixCopiaECola);
+                              alert('Código PIX copiado!');
+                            }}
+                            className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg transition flex items-center gap-1"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                            Copiar
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Countdown + Status */}
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2 text-orange-700">
+                        <div className="animate-pulse w-2 h-2 bg-orange-500 rounded-full"></div>
+                        <span className="font-medium">Aguardando pagamento...</span>
+                      </div>
+                      <span className="text-orange-600 font-mono font-bold">
+                        {Math.floor(retentionCountdown / 60)}:{(retentionCountdown % 60).toString().padStart(2, '0')}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-orange-600 text-center">
+                      Após o pagamento, a entrega será liberada automaticamente.
+                    </p>
+                  </div>
+                )}
+
+                {/* Estado: Paid */}
+                {retentionStatus === 'paid' && (
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <p className="text-green-800 font-bold">Pagamento Confirmado!</p>
+                    <p className="text-green-600 text-sm">Sua entrega foi liberada.</p>
+                  </div>
+                )}
+
+                {/* Estado: Expired */}
+                {retentionStatus === 'expired' && (
+                  <div className="space-y-2">
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-center">
+                      <p className="text-red-800 font-medium">PIX Expirado</p>
+                      <p className="text-red-600 text-xs">Gere um novo PIX para continuar.</p>
+                    </div>
+                    <button
+                      onClick={() => { setRetentionStatus('idle'); setRetentionPixData(null); }}
+                      className="w-full px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition text-sm"
+                    >
+                      Gerar Novo PIX
+                    </button>
+                  </div>
+                )}
+
+                {/* Estado: Error */}
+                {retentionStatus === 'error' && (
+                  <div className="space-y-2">
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-center">
+                      <p className="text-red-800 font-medium">Erro ao gerar PIX</p>
+                      <p className="text-red-600 text-xs">{retentionError}</p>
+                    </div>
+                    <button
+                      onClick={() => { setRetentionStatus('idle'); setRetentionPixData(null); }}
+                      className="w-full px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition text-sm"
+                    >
+                      Tentar Novamente
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Informações do Pedido */}
         {pedidoData && (

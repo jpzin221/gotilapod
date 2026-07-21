@@ -99,13 +99,13 @@ export const products = [
 ];
 
 export const storeInfo = {
-  name: "Candidos Pods",
-  fantasyName: "Candidos Pods",
+  name: "GorilaPod",
+  fantasyName: "GorilaPod",
   legalName: "Casa de Fumos Candido LTDA",
   cnpj: "76.048.487/0001-44",
   stateRegistration: "10151750-08",
   activity: "Tabacaria",
-  logo: "/images/Fotos-site/LOGO.jpg",
+  logo: "/images/logo.webp",
   rating: 4.9,
   reviews: 1547,
   address: "Atendemos todo o Paraná",

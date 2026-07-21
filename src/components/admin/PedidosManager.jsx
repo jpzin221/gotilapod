@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Package, Clock, CheckCircle, XCircle, Truck, MapPin, Search, Filter, TrendingUp, Zap, ArrowRight } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { ORDER_STATUS, STATUS_LABELS, STATUS_COLORS } from '../../lib/statusConstants';
 
 export default function PedidosManager() {
   const [pedidos, setPedidos] = useState([]);
@@ -9,19 +10,19 @@ export default function PedidosManager() {
   const [busca, setBusca] = useState('');
 
   const statusOptions = [
-    { value: 'confirmado', label: 'Confirmado', color: 'blue' },
-    { value: 'preparando', label: 'Preparando', color: 'yellow' },
-    { value: 'guardando', label: 'Guardando', color: 'orange' },
-    { value: 'aguardando_transportadora', label: 'Aguardando Entregador da Transportadora', color: 'amber' },
-    { value: 'pedido_coletado', label: 'Pedido Coletado', color: 'lime' },
-    { value: 'entregador_iniciou_rota', label: 'Entregador Iniciou a Rota de Entrega', color: 'emerald' },
-    { value: 'entregador_saiu', label: 'Entregador Saiu com o Pedido', color: 'teal' },
-    { value: 'entregador_indo_localizacao', label: 'Entregador Indo em Direção à Sua Localização', color: 'cyan' },
-    { value: 'problema_entrega', label: 'Entregador Relatou Problema com a Entrega', color: 'orange' },
-    { value: 'nao_conseguiu_entregar', label: 'Entregador Não Conseguiu Entregar', color: 'red' },
-    { value: 'retornado_central', label: 'Pedido Retornado para a Central', color: 'pink' },
-    { value: 'entregue', label: 'Entregue', color: 'green' },
-    { value: 'cancelado', label: 'Cancelado', color: 'red' }
+    { value: ORDER_STATUS.CONFIRMADO, label: 'Confirmado', color: 'blue' },
+    { value: ORDER_STATUS.PREPARANDO, label: 'Preparando', color: 'yellow' },
+    { value: ORDER_STATUS.GUARDANDO, label: 'Guardando', color: 'orange' },
+    { value: ORDER_STATUS.AGUARDANDO_TRANSPORTADORA, label: 'Aguardando Entregador da Transportadora', color: 'amber' },
+    { value: ORDER_STATUS.PEDIDO_COLETADO, label: 'Pedido Coletado', color: 'lime' },
+    { value: ORDER_STATUS.ENTREGADOR_INICIOU_ROTA, label: 'Entregador Iniciou a Rota de Entrega', color: 'emerald' },
+    { value: ORDER_STATUS.ENTREGADOR_SAIU, label: 'Entregador Saiu com o Pedido', color: 'teal' },
+    { value: ORDER_STATUS.ENTREGADOR_INDO_LOCAL, label: 'Entregador Indo em Direção à Sua Localização', color: 'cyan' },
+    { value: ORDER_STATUS.PROBLEMA_ENTREGA, label: 'Entregador Relatou Problema com a Entrega', color: 'orange' },
+    { value: ORDER_STATUS.NAO_ENTREGUE, label: 'Entregador Não Conseguiu Entregar', color: 'red' },
+    { value: ORDER_STATUS.RETornado_CENTRAL, label: 'Pedido Retornado para a Central', color: 'pink' },
+    { value: ORDER_STATUS.ENTREGUE, label: 'Entregue', color: 'green' },
+    { value: ORDER_STATUS.CANCELADO, label: 'Cancelado', color: 'red' }
   ];
 
   useEffect(() => {
@@ -92,13 +93,11 @@ export default function PedidosManager() {
   };
 
   const getStatusColor = (status) => {
-    const statusObj = statusOptions.find(s => s.value === status);
-    return statusObj?.color || 'gray';
+    return statusOptions.find(s => s.value === status)?.color || 'gray';
   };
 
   const getStatusLabel = (status) => {
-    const statusObj = statusOptions.find(s => s.value === status);
-    return statusObj?.label || status;
+    return STATUS_LABELS[status] || status;
   };
 
   const pedidosFiltrados = pedidos.filter(pedido => {
@@ -125,19 +124,19 @@ export default function PedidosManager() {
   // Mini Timeline Component
   const MiniTimeline = ({ currentStatus }) => {
     const steps = [
-      { id: 0, label: 'Confirmado', icon: CheckCircle, status: 'confirmado' },
-      { id: 1, label: 'Preparando', icon: Package, status: 'preparando' },
-      { id: 2, label: 'Guardando', icon: Clock, status: 'guardando' },
-      { id: 3, label: 'Aguard. Transp.', icon: Clock, status: 'aguardando_transportadora' },
-      { id: 4, label: 'Coletado', icon: CheckCircle, status: 'pedido_coletado' },
-      { id: 5, label: 'Iniciou Rota', icon: TrendingUp, status: 'entregador_iniciou_rota' },
-      { id: 6, label: 'Saiu', icon: Truck, status: 'entregador_saiu' },
-      { id: 7, label: 'Indo p/ Você', icon: ArrowRight, status: 'entregador_indo_localizacao' },
-      { id: 8, label: 'Entregue', icon: CheckCircle, status: 'entregue' }
+      { id: 0, label: 'Confirmado', icon: CheckCircle, status: ORDER_STATUS.CONFIRMADO },
+      { id: 1, label: 'Preparando', icon: Package, status: ORDER_STATUS.PREPARANDO },
+      { id: 2, label: 'Guardando', icon: Clock, status: ORDER_STATUS.GUARDANDO },
+      { id: 3, label: 'Aguard. Transp.', icon: Clock, status: ORDER_STATUS.AGUARDANDO_TRANSPORTADORA },
+      { id: 4, label: 'Coletado', icon: CheckCircle, status: ORDER_STATUS.PEDIDO_COLETADO },
+      { id: 5, label: 'Iniciou Rota', icon: TrendingUp, status: ORDER_STATUS.ENTREGADOR_INICIOU_ROTA },
+      { id: 6, label: 'Saiu', icon: Truck, status: ORDER_STATUS.ENTREGADOR_SAIU },
+      { id: 7, label: 'Indo p/ Você', icon: ArrowRight, status: ORDER_STATUS.ENTREGADOR_INDO_LOCAL },
+      { id: 8, label: 'Entregue', icon: CheckCircle, status: ORDER_STATUS.ENTREGUE }
     ];
 
     // Status especiais (problemas)
-    const problemStatuses = ['problema_entrega', 'nao_conseguiu_entregar', 'retornado_central'];
+    const problemStatuses = [ORDER_STATUS.PROBLEMA_ENTREGA, ORDER_STATUS.NAO_ENTREGUE, ORDER_STATUS.RETornado_CENTRAL];
     const isProblem = problemStatuses.includes(currentStatus);
 
     let currentStepIndex = steps.findIndex(s => s.status === currentStatus);
@@ -201,9 +200,9 @@ export default function PedidosManager() {
             <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded-lg">
               <p className="text-xs text-orange-800 font-semibold flex items-center gap-1">
                 <XCircle className="w-3 h-3" />
-                {currentStatus === 'problema_entrega' && 'Problema relatado na entrega'}
-                {currentStatus === 'nao_conseguiu_entregar' && 'Não foi possível entregar'}
-                {currentStatus === 'retornado_central' && 'Pedido retornou para central'}
+                {currentStatus === ORDER_STATUS.PROBLEMA_ENTREGA && 'Problema relatado na entrega'}
+                {currentStatus === ORDER_STATUS.NAO_ENTREGUE && 'Não foi possível entregar'}
+                {currentStatus === ORDER_STATUS.RETornado_CENTRAL && 'Pedido retornou para central'}
               </p>
             </div>
           )}
@@ -322,8 +321,8 @@ export default function PedidosManager() {
                 {/* Status Atual */}
                 <div className="flex flex-col justify-center">
                   <p className="text-sm text-gray-600 mb-2">Status Atual:</p>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-${getStatusColor(pedido.status)}-100 text-${getStatusColor(pedido.status)}-800`}>
-                    {getStatusLabel(pedido.status)}
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${STATUS_COLORS[pedido.status] || 'bg-gray-100 text-gray-800'}`}>
+                    {STATUS_LABELS[pedido.status] || pedido.status}
                   </span>
                 </div>
 

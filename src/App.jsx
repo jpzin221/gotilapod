@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Bike, Instagram } from 'lucide-react';
+import { Instagram } from 'lucide-react';
+
 import Header from './components/Header';
 import ValueProposition from './components/ValueProposition';
 import HeroSection from './components/HeroSection';
@@ -54,7 +55,6 @@ function App() {
 
     // Recarregar produtos quando a janela volta ao foco (garante dados atualizados)
     const handleFocus = () => {
-      console.log('🔄 Janela voltou ao foco - recarregando produtos...');
       loadProducts();
     };
 
@@ -63,7 +63,7 @@ function App() {
     return () => {
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);;
+  }, []);
 
   const loadBusinessHours = async () => {
     try {
@@ -343,7 +343,7 @@ function App() {
                 <Link to="/privacidade" className="hover:text-primary transition">Privacidade</Link>
               </div>
               <p className="text-gray-500 text-xs">
-                © 2024 {storeInfo.legalName}. Todos os direitos reservados.
+                © {new Date().getFullYear()} {storeInfo.legalName}. Todos os direitos reservados.
               </p>
               <p className="text-gray-600 text-xs mt-2">
                 Imagens meramente ilustrativas. Preços e disponibilidade sujeitos a alteração.

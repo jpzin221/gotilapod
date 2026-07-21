@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { QrCode, Copy, CheckCircle, Clock, X, AlertCircle } from 'lucide-react';
 import Portal from './Portal';
 import { usePhoneAuth } from '../context/PhoneAuthContext';
-import { pedidoService, productService } from '../lib/supabase';
+import { pedidoService, productService, supabase } from '../lib/supabase';
 
 export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
   const navigate = useNavigate();
@@ -31,20 +31,17 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
         // Se a sessão tem menos de 1 hora E ainda está pendente, restaurar
         if (sessionAge < oneHour && session.paymentStatus === 'pending') {
-          console.log('🔄 Restaurando sessão PIX pendente...', session);
           setPixData(session.pixData);
           setPaymentStatus(session.paymentStatus);
           const remainingTime = Math.max(0, 3600 - Math.floor(sessionAge / 1000));
           setTimeLeft(remainingTime);
         } else if (session.paymentStatus === 'paid') {
           // Se já foi pago, limpar e não restaurar (permite novo pagamento)
-          console.log('✅ Sessão PIX já paga - limpando para permitir novo pagamento');
           localStorage.removeItem('pixPaymentSession');
           sessionStorage.removeItem('justCompletedPayment');
           sessionStorage.removeItem('lastPedido');
         } else {
           // Sessão expirada, limpar
-          console.log('⏰ Sessão PIX expirada, limpando...');
           localStorage.removeItem('pixPaymentSession');
         }
       } catch (error) {
@@ -63,19 +60,15 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
         timestamp: Date.now()
       };
       localStorage.setItem('pixPaymentSession', JSON.stringify(session));
-      console.log('💾 Sessão PIX salva:', session);
     }
   }, [pixData, paymentStatus]);
 
   // Criar cobrança PIX quando modal abre
   useEffect(() => {
     if (isOpen && pedido && !pixData) {
-      console.log('🎯 Modal PIX aberto, criando cobrança...', { isOpen, pedido, pixData });
       // Só criar nova cobrança se não tiver dados salvos
       const savedSession = localStorage.getItem('pixPaymentSession');
       if (!savedSession) {
-        console.log('📝 Nenhuma sessão salva, criando nova cobrança PIX');
-
         // 🎯 UTMFY - Disparar evento de início de checkout
         try {
           if (window.utmify) {
@@ -85,7 +78,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
               content_ids: pedido.itens?.map(item => item.id || item.nome) || [],
               num_items: pedido.itens?.length || 0
             });
-            console.log('✅ UTMFY: Evento InitiateCheckout disparado!');
           }
         } catch (e) {
           console.warn('⚠️ UTMFY InitiateCheckout error:', e);
@@ -93,7 +85,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
         createPixCharge();
       } else {
-        console.log('♻️ Sessão PIX encontrada, não criando nova cobrança');
       }
     }
 
@@ -209,9 +200,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
         if (data.success && data.status === 'CONCLUIDA') {
           setPaymentStatus('paid');
           clearInterval(checkInterval);
-
-          // Criar pedido no banco
-          await handlePaymentConfirmed();
         }
       } catch (error) {
         console.error('Erro ao verificar status:', error);
@@ -224,21 +212,15 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
   // Redirecionar quando pagamento for confirmado
   useEffect(() => {
     // PROTEÇÃO: Só redirecionar se pagamento foi REALMENTE confirmado
-    if (paymentStatus === 'paid' && pixData) {
-      const timer = setTimeout(async () => {
-        console.log('💰 Pagamento confirmado!');
-
-        // 🎯 UTMFY - Disparar evento de conversão (Purchase)
+      if (paymentStatus === 'paid' && pixData) {
+        const timer = setTimeout(async () => {
+          // 🎯 UTMFY - Disparar evento de conversão (Purchase)
         try {
           if (window.utmify) {
             window.utmify.track('purchase', {
               value: pedido.valorTotal,
               orderId: pedido.id || `pedido_${Date.now()}`,
               currency: 'BRL'
-            });
-            console.log('✅ UTMFY: Evento de conversão disparado!', {
-              value: pedido.valorTotal,
-              orderId: pedido.id
             });
           } else {
             console.warn('⚠️ UTMFY: Pixel não carregado, tentando método alternativo...');
@@ -258,22 +240,14 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
               }
             });
           }
-        } catch (trackError) {
-          console.error('❌ Erro ao disparar evento UTMFY:', trackError);
-        }
-        console.log('🔍 Verificando autenticação:', { isAuthenticated, pixData });
+          } catch (trackError) {
+            console.error('❌ Erro ao disparar evento UTMFY:', trackError);
+          }
 
-        // Gerar código único do pedido
-        const codigoPedido = pedidoService.generateOrderCode();
-        console.log('🎫 Código do pedido gerado:', codigoPedido);
+          // Gerar código único do pedido
+          const codigoPedido = pedidoService.generateOrderCode();
 
-        // Preparar dados completos do pedido - NOMES CORRETOS DAS COLUNAS
-        console.log('🔍 DEBUG - pedido recebido:', pedido);
-        console.log('🔍 DEBUG - pedido.nomeCliente:', pedido?.nomeCliente);
-        console.log('🔍 DEBUG - pedido.telefone:', pedido?.telefone);
-        console.log('🔍 DEBUG - user:', user);
-
-        const pedidoCompleto = {
+          const pedidoCompleto = {
           numero_pedido: codigoPedido,
           txid: pixData?.txid,
           valor_total: pedido.valorTotal,
@@ -292,21 +266,22 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
           usuario_id: isAuthenticated && user?.id ? user.id : null
         };
 
-        console.log('📦 Dados do pedido a serem salvos:');
-        console.log('👤 Nome:', pedidoCompleto.cliente_nome);
-        console.log('📱 Telefone (limpo):', pedidoCompleto.cliente_telefone);
-        console.log('📍 Endereço:', pedidoCompleto.endereco_entrega);
-        console.log('🆔 Usuario ID:', pedidoCompleto.usuario_id);
-        console.log('📦 Pedido completo:', pedidoCompleto);
-
         // Salvar pedido no banco de dados
         try {
-          console.log('💾 Salvando pedido no banco...');
           const pedidoSalvo = await pedidoService.create(pedidoCompleto);
-          console.log('✅ Pedido salvo com sucesso:', pedidoSalvo);
 
-          // Enviar pedido para a transportadora
-          console.log('🚚 Enviando pedido para a transportadora...');
+          // Insert initial status history
+          try {
+            await supabase.from('status_historico').insert([{
+              pedido_id: pedidoSalvo.id,
+              status: 'confirmado',
+              descricao: 'Pedido confirmado após pagamento',
+              created_at: new Date().toISOString()
+            }]);
+          } catch (statusError) {
+            console.warn('⚠️ Erro ao salvar histórico de status:', statusError);
+          }
+
           try {
             const functionsUrl = import.meta.env.PROD
               ? '/.netlify/functions'
@@ -334,9 +309,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
             const resultLogistics = await responseLogistics.json();
 
             if (resultLogistics.success) {
-              console.log('✅ Pedido enviado para transportadora com sucesso!');
-              console.log('📦 Código de rastreamento:', resultLogistics.data.codigo_rastreio);
-
               // Salvar código de rastreamento no sessionStorage
               const pedidoComRastreio = {
                 ...pedidoSalvo,
@@ -361,20 +333,12 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
             id: pedidoSalvo.id
           };
 
-          console.log('💾 Salvando no sessionStorage:', pedidoParaSalvar);
-          console.log('🆔 ID do pedido:', pedidoSalvo.id);
-
           sessionStorage.setItem('lastPedido', JSON.stringify(pedidoParaSalvar));
           // Limpar status anterior para novo pedido começar do zero
           sessionStorage.removeItem('rastreamentoStatus');
-          console.log('🗑️ Status de rastreamento anterior limpo');
 
           // Se já está autenticado, vincular pedido ao usuário NO BANCO
           if (isAuthenticated && user) {
-            console.log('✅ Usuário já cadastrado - vinculando pedido');
-            console.log('🔗 Vinculando pedido ID:', pedidoSalvo.id);
-            console.log('👤 Usuário ID:', user.id);
-
             try {
               // Vincular pedido ao usuário no banco
               const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
@@ -385,10 +349,8 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
               });
 
               const result = await response.json();
-              console.log('📊 Resultado da vinculação:', result);
 
               if (result.success) {
-                console.log('✅ Pedido vinculado ao usuário no banco!');
                 // Adicionar ao contexto local
                 await addPedido(pedidoSalvo);
               } else {
@@ -398,7 +360,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
               console.error('❌ Erro ao vincular pedido:', error);
             }
           } else {
-            console.log('📝 Usuário não cadastrado - redirecionando para criar conta na página de rastreamento');
           }
         } catch (error) {
           console.error('❌ Erro ao salvar pedido:', error);
@@ -406,20 +367,16 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
         }
 
         // SEMPRE salvar no sessionStorage ANTES de redirecionar (independente de sucesso/erro)
-        console.log('💾 Salvando dados no sessionStorage para acesso ao rastreamento...');
         sessionStorage.setItem('justCompletedPayment', 'true');
         sessionStorage.setItem('lastPedido', JSON.stringify(pedidoCompleto));
-        console.log('✅ Dados salvos no sessionStorage');
 
         // PRIMEIRO: Redirecionar para /rastreamento (modal abrirá lá se necessário)
-        console.log('🔄 Redirecionando para página de rastreamento...');
         onClose();
         navigate('/rastreamento');
 
         // DEPOIS: Deduzir estoque em background (não bloqueia o fluxo do usuário)
         setTimeout(async () => {
           try {
-            console.log('📦 Deduzindo estoque dos produtos em background...');
             for (const item of pedido.itens) {
               // Buscar o produto pelo nome para obter o ID
               const produtos = await productService.getAll();
@@ -427,9 +384,7 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
               if (produto) {
                 await productService.deductStock(produto.id, item.quantidade);
-                console.log(`✅ Estoque deduzido: ${item.nome} (-${item.quantidade})`);
               } else {
-                console.warn(`⚠️ Produto não encontrado: ${item.nome}`);
               }
             }
           } catch (error) {
@@ -449,8 +404,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
-      console.log('💰 Pagamento confirmado! Criando pedido no banco...');
-
       const response = await fetch(`${backendUrl}/api/pedidos/criar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -469,9 +422,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
       const data = await response.json();
 
       if (data.success) {
-        console.log('✅ Pedido criado:', data.pedido);
-        console.log('📋 Dados completos do pedido:', data);
-
         const pedidoData = {
           id: data.pedido.id,
           numeroPedido: data.pedido.numeroPedido,
@@ -481,10 +431,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
           cpfCliente: pedido.cpfCliente,
           endereco: pedido.endereco
         };
-
-        console.log('🎯 Salvando dados do pedido...');
-        console.log('📦 Pedido ID:', pedidoData.id);
-        console.log('📦 Número do Pedido:', pedidoData.numeroPedido);
 
         // Salvar no localStorage E sessionStorage
         const session = {
@@ -496,8 +442,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
         localStorage.setItem('pixPaymentSession', JSON.stringify(session));
         sessionStorage.setItem('lastPedido', JSON.stringify(pedidoData));
 
-        console.log('✅ Pedido salvo no localStorage e sessionStorage!');
-        console.log('✅ O redirecionamento será feito automaticamente...');
       } else {
         console.error('❌ Erro ao criar pedido:', data.error);
         alert('Pagamento confirmado, mas houve um erro ao registrar o pedido. Entre em contato conosco.');
@@ -524,16 +468,12 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
         throw new Error('Nenhum gateway de pagamento configurado. Configure em Admin > Pagamentos.');
       }
 
-      console.log('🔌 Gateway ativo:', gateway.provider, gateway.name);
-
       let data;
 
       // Roteamento por provider
       switch (gateway.provider) {
         case 'bspay':
           // Usar BS Pay diretamente
-          console.log('🟠 Usando BS Pay...');
-          // Credenciais NÃO são enviadas pelo frontend - são buscadas do banco pelo backend
           data = await bspayService.createBSPayCharge({
             amount: pedido.valorTotal,
             customerName: pedido.nomeCliente,
@@ -546,7 +486,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
         case 'pix_manual':
           // PIX Manual - gera dados localmente
-          console.log('🟣 Usando PIX Manual...');
           data = {
             success: true,
             txid: `manual_${Date.now()}`,
@@ -559,8 +498,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
         case 'poseidonpay':
           // Usar Poseidon Pay
-          console.log('🔱 Usando Poseidon Pay...');
-          // Credenciais NÃO são enviadas pelo frontend - são buscadas do banco pelo backend
           const poseidonPayService = await import('../services/poseidonpay-service');
           data = await poseidonPayService.createPoseidonPayCharge({
             amount: pedido.valorTotal,
@@ -581,8 +518,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
         case 'ryzenpay':
           // Usar Ryzen Pay
-          console.log('💎 Usando Ryzen Pay...');
-          // Credenciais NÃO são enviadas pelo frontend - são buscadas do banco pelo backend
           const ryzenPayService = await import('../services/ryzenpay-service');
           data = await ryzenPayService.createRyzenPayCharge({
             amount: pedido.valorTotal,
@@ -595,8 +530,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
         case 'codexpay':
           // Usar CodexPay
-          console.log('💚 Usando CodexPay...');
-          // Credenciais NÃO são enviadas pelo frontend - são buscadas do banco pelo backend
           const codexPayService = await import('../services/codexpay-service');
           data = await codexPayService.createCodexPayCharge({
             amount: pedido.valorTotal,
@@ -609,7 +542,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
         default:
           // Fallback para backend original
-          console.log('🔵 Usando backend padrão...');
           const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
           const response = await fetch(`${backendUrl}/api/pix/create-charge`, {
             method: 'POST',
@@ -628,15 +560,7 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
           data = await response.json();
       }
 
-      console.log('📦 Resposta do gateway:', data);
-
       if (data.success) {
-        console.log('✅ QR Code recebido:', {
-          txid: data.txid,
-          temImagem: !!data.imagemQrcode,
-          tamanhoImagem: data.imagemQrcode?.length,
-          provider: gateway.provider
-        });
         setPixData({ ...data, provider: gateway.provider });
       } else {
         throw new Error(data.error || 'Erro ao criar cobrança');
@@ -672,7 +596,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
             onClick={() => {
               // Limpar sessão PIX ao fechar modal (permite novo pagamento)
               if (paymentStatus !== 'paid') {
-                console.log('🗑️ Limpando sessão PIX ao fechar modal');
                 localStorage.removeItem('pixPaymentSession');
                 setPixData(null);
                 setPaymentStatus('pending');
@@ -703,7 +626,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={() => {
-                    console.log('🔙 Voltando para corrigir dados no formulário');
                     localStorage.removeItem('pixPaymentSession');
                     setPixData(null);
                     setPaymentStatus('pending');
@@ -760,7 +682,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
                       pago_em: new Date().toISOString()
                     };
                     sessionStorage.setItem('lastPedido', JSON.stringify(pedidoParaSalvar));
-                    console.log('💾 Dados salvos no sessionStorage ao clicar no botão');
                   }
                   onClose();
                   navigate('/rastreamento');
@@ -813,9 +734,7 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
                         }
                         alt="QR Code PIX"
                         className="w-48 h-48 sm:w-64 sm:h-64 object-contain"
-                        onLoad={() => {
-                          console.log('✅ QR Code carregado com sucesso!');
-                        }}
+                        onLoad={() => {}}
                         onError={(e) => {
                           console.error('❌ Erro ao carregar QR Code');
                           e.target.style.display = 'none';
@@ -824,7 +743,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
                     );
                   } else {
                     // Se não tem imagem válida, mostrar mensagem para usar o código copia e cola
-                    console.log('⚠️ Imagem QR Code não disponível, usando código copia e cola');
                     return (
                       <div className="w-48 h-48 sm:w-64 sm:h-64 flex flex-col items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg border-2 border-dashed border-primary/30 p-4">
                         <QrCode className="w-16 h-16 text-primary/50 mb-3" />

@@ -24,8 +24,6 @@ export function PhoneAuthProvider({ children }) {
   // Registrar novo usuário (após primeira compra)
   const register = async (phone, pin, nome) => {
     try {
-      console.log('📝 Registrando usuário:', phone);
-
       // Criar usuário via Supabase
       const newUser = await usuarioService.create({
         telefone: phone,
@@ -33,14 +31,11 @@ export function PhoneAuthProvider({ children }) {
         nome
       });
 
-      console.log('✅ Usuário criado:', newUser);
-
       // Salvar no localStorage para sessão
       localStorage.setItem('phoneAuthUser', JSON.stringify(newUser));
 
       setUser(newUser);
 
-      console.log('✅ Usuário registrado e logado com sucesso!');
       return { success: true, user: newUser };
     } catch (error) {
       console.error('❌ Erro ao registrar:', error);
@@ -51,8 +46,6 @@ export function PhoneAuthProvider({ children }) {
   // Login com telefone + PIN
   const login = async (phone, pin) => {
     try {
-      console.log('🔐 Tentando login:', phone);
-
       // Verificar PIN no Supabase
       const result = await usuarioService.verifyPin(phone, pin);
 
@@ -65,7 +58,6 @@ export function PhoneAuthProvider({ children }) {
 
       // Se não encontrou por ID, buscar por telefone (pedidos antigos não vinculados)
       if (pedidos.length === 0) {
-        console.log('🔍 Buscando pedidos por telefone...');
         pedidos = await pedidoService.getByTelefone(phone);
 
         // Vincular pedidos órfãos ao usuário
@@ -73,7 +65,6 @@ export function PhoneAuthProvider({ children }) {
           if (!pedido.usuario_id) {
             try {
               await pedidoService.vincularUsuario(pedido.id, result.user.id);
-              console.log('🔗 Pedido', pedido.id, 'vinculado ao usuário');
             } catch (err) {
               console.error('Erro ao vincular pedido:', err);
             }
@@ -87,8 +78,6 @@ export function PhoneAuthProvider({ children }) {
       localStorage.setItem('phoneAuthUser', JSON.stringify(userData));
       setUser(userData);
 
-      console.log('✅ Login realizado com sucesso!');
-      console.log('📦 Pedidos encontrados:', pedidos.length);
       return { success: true, user: userData };
     } catch (error) {
       console.error('❌ Erro ao fazer login:', error);
@@ -100,19 +89,15 @@ export function PhoneAuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem('phoneAuthUser');
     setUser(null);
-    console.log('👋 Logout realizado');
   };
 
   // Adicionar pedido ao usuário (pedido já existe no banco, apenas atualiza contexto)
   const addPedido = async (pedido) => {
     if (!user) {
-      console.warn('⚠️ Não há usuário logado para adicionar pedido');
       return;
     }
 
     try {
-      console.log('📦 Adicionando pedido ao contexto do usuário:', pedido);
-
       // Pedido já foi criado no banco, apenas adicionar ao contexto local
       const updatedUser = {
         ...user,
@@ -123,8 +108,6 @@ export function PhoneAuthProvider({ children }) {
       localStorage.setItem('phoneAuthUser', JSON.stringify(updatedUser));
 
       setUser(updatedUser);
-      console.log('✅ Pedido adicionado ao contexto do usuário');
-      console.log('📊 Total de pedidos:', updatedUser.pedidos.length);
     } catch (error) {
       console.error('❌ Erro ao adicionar pedido ao contexto:', error);
     }
@@ -133,11 +116,8 @@ export function PhoneAuthProvider({ children }) {
   // Verificar se usuário já existe
   const userExists = async (phone) => {
     try {
-      console.log('🔍 PhoneAuthContext: Verificando telefone:', phone);
       const user = await usuarioService.getByPhone(phone);
-      console.log('📊 PhoneAuthContext: Usuário encontrado:', user);
       const exists = !!user;
-      console.log('✅ PhoneAuthContext: Resultado exists:', exists);
       return exists;
     } catch (error) {
       console.error('❌ PhoneAuthContext: Erro ao verificar:', error);

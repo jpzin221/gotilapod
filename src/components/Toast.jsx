@@ -27,22 +27,7 @@ export default function Toast({ message, isVisible, onClose, duration = 3000 }) 
         </button>
       </div>
 
-      <style jsx>{`
-        @keyframes slide-in-right {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-        
-        .animate-slide-in-right {
-          animation: slide-in-right 0.3s ease-out;
-        }
-      `}</style>
+
     </div>
   );
 }

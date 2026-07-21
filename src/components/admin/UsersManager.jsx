@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Users, Phone, Package, Search, Eye, X, Edit2, Trash2, Calendar } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { ORDER_STATUS, STATUS_LABELS, STATUS_COLORS } from '../../lib/statusConstants';
 
 export default function UsersManager() {
     const [usuarios, setUsuarios] = useState([]);
@@ -52,7 +53,7 @@ export default function UsersManager() {
             const { data: pedidosPorTelefone } = await supabase
                 .from('pedidos')
                 .select('*')
-                .eq('telefone', usuario.telefone?.replace(/\D/g, ''))
+                .eq('cliente_telefone', usuario.telefone?.replace(/\D/g, ''))
                 .order('created_at', { ascending: false });
 
             // Combinar pedidos (removendo duplicatas)
@@ -122,13 +123,7 @@ export default function UsersManager() {
     };
 
     const getStatusColor = (status) => {
-        const cores = {
-            confirmado: 'blue',
-            preparando: 'yellow',
-            entregue: 'green',
-            cancelado: 'red'
-        };
-        return cores[status] || 'gray';
+        return STATUS_COLORS[status] || 'bg-gray-100 text-gray-800';
     };
 
     if (loading) {
@@ -275,8 +270,8 @@ export default function UsersManager() {
                                         <div key={pedido.id} className="border rounded-lg p-4 hover:bg-gray-50">
                                             <div className="flex items-center justify-between mb-2">
                                                 <span className="font-bold text-gray-800">{pedido.numero_pedido}</span>
-                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold bg-${getStatusColor(pedido.status)}-100 text-${getStatusColor(pedido.status)}-800`}>
-                                                    {pedido.status}
+                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[pedido.status] || 'bg-gray-100 text-gray-800'}`}>
+                                                    {STATUS_LABELS[pedido.status] || pedido.status}
                                                 </span>
                                             </div>
                                             <div className="text-sm text-gray-600 space-y-1">

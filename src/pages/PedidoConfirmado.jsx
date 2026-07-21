@@ -77,11 +77,8 @@ const PedidoConfirmado = () => {
           setPedido(session.pedidoCriado);
           setLoading(false);
 
-          // Limpar sessão PIX
+          // Limpar sessao PIX
           localStorage.removeItem('pixPaymentSession');
-
-          // Simular progresso das etapas (DEMO)
-          simulateProgress();
         } else {
           navigate('/');
         }
@@ -117,23 +114,6 @@ const PedidoConfirmado = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Simular progresso (DEMO - remover em produção)
-  const simulateProgress = () => {
-    const statusSequence = ['confirmado', 'preparando', 'guardando', 'motoboy_caminho', 'coleta', 'em_rota'];
-    let currentIndex = 0;
-
-    const interval = setInterval(() => {
-      currentIndex++;
-      if (currentIndex < statusSequence.length) {
-        setCurrentStatus(statusSequence[currentIndex]);
-      } else {
-        clearInterval(interval);
-      }
-    }, 5000); // Muda a cada 5 segundos
-
-    return () => clearInterval(interval);
   };
 
   const getEtapaIndex = (statusId) => {

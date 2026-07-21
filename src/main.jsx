@@ -45,7 +45,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/pedido-confirmado" element={<OrderSuccess />} />
                 <Route path="/pedido" element={<PedidoConfirmado />} />
-                <Route path="/pedidos" element={<PedidoConfirmado />} />
                 <Route path="/rastreamento" element={<Rastreamento />} />
                 <Route path="/meus-pedidos" element={<MeusPedidos />} />
                 <Route path="/sobre" element={<SobreNos />} />

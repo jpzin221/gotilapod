@@ -66,23 +66,7 @@ export default function Cart() {
       return;
     }
 
-    // CEP DE TESTE: 06768-100 (Frete Grátis)
-    if (cleanCep === '06768100') {
-      // Gerar tempo de entrega aleatório entre 15 e 60 minutos
-      const randomTime = Math.floor(Math.random() * (60 - 15 + 1)) + 15;
-      setDeliveryTime(randomTime);
-      setCepValid(true);
-      setCepData({
-        cep: '06768-100',
-        logradouro: 'Rua de Teste',
-        bairro: 'Bairro Teste',
-        localidade: 'Taboão da Serra',
-        uf: 'SP',
-        frete_gratis: true // Flag especial para frete grátis
-      });
-      console.log(`🎉 CEP DE TESTE: Frete Grátis! Entrega em ${randomTime} min`);
-      return;
-    }
+
 
     try {
       setValidatingCep(true);
@@ -97,12 +81,10 @@ export default function Cart() {
           data = await response.json();
           if (!data.erro) {
             success = true;
-            console.log('✅ CEP validado via ViaCEP');
           }
         }
-      } catch (viaCepError) {
-        console.log('⚠️ ViaCEP indisponível, tentando BrasilAPI...');
-      }
+        } catch (viaCepError) {
+        }
 
       // Fallback para BrasilAPI se ViaCEP falhar
       if (!success) {
@@ -119,7 +101,6 @@ export default function Cart() {
               uf: brasilData.state
             };
             success = true;
-            console.log('✅ CEP validado via BrasilAPI');
           }
         } catch (brasilError) {
           console.error('❌ BrasilAPI também falhou:', brasilError);
@@ -135,7 +116,6 @@ export default function Cart() {
         // Gerar frete aleatório entre R$ 8,00 e R$ 13,50
         const randomShipping = (Math.random() * (13.50 - 8.00) + 8.00).toFixed(2);
         setCalculatedShipping(parseFloat(randomShipping));
-        console.log(`✅ CEP válido! Entrega em ${randomTime} min`);
       } else {
         setCepValid(false);
         setCepData(null);
@@ -421,20 +401,6 @@ export default function Cart() {
             )}
           </div>
 
-          <style jsx>{`
-        @keyframes slide-in {
-          from {
-            transform: translateX(100%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-        
-        .animate-slide-in {
-          animation: slide-in 0.3s ease-out;
-        }
-      `}</style>
         </Portal>
       )}
 

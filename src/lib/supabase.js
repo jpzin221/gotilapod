@@ -53,9 +53,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 export const productService = {
   // Listar todos os produtos com sabores
   async getAll() {
-    const timestamp = new Date().getTime();
-    console.log(`📦 Buscando produtos do banco... [${timestamp}]`);
-
     const { data, error } = await supabase
       .from('products')
       .select(`
@@ -73,9 +70,6 @@ export const productService = {
       console.error('❌ Erro ao buscar produtos:', error);
       throw error;
     }
-
-    console.log('✅ Produtos carregados:', data?.length || 0);
-    console.log('  Timestamp:', new Date(timestamp).toLocaleTimeString());
 
     return data;
   },
@@ -130,8 +124,6 @@ export const productService = {
 
   // Deduzir estoque após compra
   async deductStock(productId, quantity) {
-    console.log(`📉 Deduzindo ${quantity} unidades do produto ${productId}`);
-
     // Buscar produto atual
     const { data: product, error: fetchError } = await supabase
       .from('products')
@@ -159,7 +151,6 @@ export const productService = {
       throw error;
     }
 
-    console.log(`✅ Estoque atualizado: ${product.stock_quantity} → ${newStock}`);
     return data;
   }
 };
@@ -540,8 +531,6 @@ export const imageUploadService = {
       const fileName = `${sanitizedName}-${Date.now()}.${fileExt}`;
       const filePath = `products/${fileName}`;
 
-      console.log('📤 Upload:', { originalName: productName, sanitizedPath: filePath });
-
       // Upload para Supabase Storage
       const { data, error } = await supabase.storage
         .from('product-images')
@@ -557,7 +546,6 @@ export const imageUploadService = {
         .from('product-images')
         .getPublicUrl(filePath);
 
-      console.log('✅ Upload OK:', publicUrl);
       return publicUrl;
     } catch (error) {
       console.error('❌ Erro ao fazer upload da imagem:', error);
@@ -796,8 +784,6 @@ export const testimonialService = {
 export const usuarioService = {
   // ...
   async getByPhone(telefone) {
-    console.log('🔍 Buscando usuário:', telefone);
-
     const { data, error } = await supabase
       .from('usuarios')
       .select('*')
@@ -809,14 +795,11 @@ export const usuarioService = {
       throw error;
     }
 
-    console.log(data ? '✅ Usuário encontrado' : '❌ Usuário não encontrado');
     return data;
   },
 
   // Criar novo usuário com PIN
   async create(userData) {
-    console.log('📝 Criando usuário:', userData.telefone);
-
     const { data, error } = await supabase
       .from('usuarios')
       .insert([{
@@ -834,7 +817,6 @@ export const usuarioService = {
       throw error;
     }
 
-    console.log('✅ Usuário criado:', data.id);
     return data;
   },
 
@@ -847,7 +829,14 @@ export const usuarioService = {
         return { success: false, error: 'Usuário não encontrado' };
       }
 
-      if (user.pin_hash !== pin) {
+      // Hash do PIN para comparação
+      const encoder = new TextEncoder();
+      const data = encoder.encode(pin);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const pinHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      if (user.pin_hash !== pinHash) {
         return { success: false, error: 'PIN incorreto' };
       }
 
@@ -870,9 +859,6 @@ export const pedidoService = {
 
   // Criar pedido
   async create(pedidoData) {
-    console.log('📦 Criando pedido no banco...');
-    console.log('📦 Dados recebidos:', JSON.stringify(pedidoData, null, 2));
-
     // Gerar código único se não existir
     if (!pedidoData.numero_pedido) {
       pedidoData.numero_pedido = this.generateOrderCode();
@@ -894,8 +880,6 @@ export const pedidoService = {
         throw error;
       }
 
-      console.log('✅ Pedido criado com sucesso:', data.numero_pedido);
-      console.log('✅ ID do pedido:', data.id);
       return data;
     } catch (err) {
       console.error('❌ ERRO CRÍTICO ao criar pedido:', err);
@@ -905,8 +889,6 @@ export const pedidoService = {
 
   // Buscar pedidos do usuário
   async getByUsuario(usuarioId) {
-    console.log('📋 Buscando pedidos do usuário:', usuarioId);
-
     const { data, error } = await supabase
       .from('pedidos')
       .select('*')
@@ -918,14 +900,11 @@ export const pedidoService = {
       throw error;
     }
 
-    console.log('✅ Pedidos encontrados:', data?.length || 0);
     return data || [];
   },
 
   // Buscar pedidos por telefone (fallback quando não há usuario_id)
   async getByTelefone(telefone) {
-    console.log('📋 Buscando pedidos por telefone:', telefone);
-
     // Limpar telefone (remover tudo exceto números)
     const telefoneLimpo = telefone.replace(/\D/g, '');
 
@@ -940,14 +919,11 @@ export const pedidoService = {
       throw error;
     }
 
-    console.log('✅ Pedidos encontrados por telefone:', data?.length || 0);
     return data || [];
   },
 
   // Vincular pedido a um usuário
   async vincularUsuario(pedidoId, usuarioId) {
-    console.log('🔗 Vinculando pedido', pedidoId, 'ao usuário', usuarioId);
-
     const { data, error } = await supabase
       .from('pedidos')
       .update({ usuario_id: usuarioId })
@@ -960,7 +936,6 @@ export const pedidoService = {
       throw error;
     }
 
-    console.log('✅ Pedido vinculado com sucesso!');
     return data;
   }
 };

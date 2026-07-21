@@ -1,4 +1,10 @@
 const { createClient } = require('@supabase/supabase-js');
+const crypto = require('crypto');
+
+// Função para hashear PIN
+function hashPin(pin) {
+    return crypto.createHash('sha256').update(pin).digest('hex');
+}
 
 // Headers CORS
 const headers = {
@@ -82,13 +88,13 @@ exports.handler = async (event) => {
             };
         }
 
-        // Criar novo usuário
+        // Criar novo usuário (com PIN hasheado)
         const { data: newUser, error } = await supabase
             .from('usuarios')
             .insert([{
                 nome,
                 telefone,
-                pin_hash: pin, // Em produção, usar hash real
+                pin_hash: hashPin(pin),
                 created_at: new Date().toISOString()
             }])
             .select()
