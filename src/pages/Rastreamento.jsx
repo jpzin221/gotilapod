@@ -426,7 +426,7 @@ export default function Rastreamento() {
       setRetentionStatus('creating');
       setRetentionError('');
 
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || '/.netlify/functions';
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || '/api';
       const response = await fetch(`${backendUrl}/retention-pay`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -460,7 +460,7 @@ export default function Rastreamento() {
 
     const checkStatus = async () => {
       try {
-        const backendUrl = import.meta.env.VITE_BACKEND_URL || '/.netlify/functions';
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || '/api';
         const response = await fetch(`${backendUrl}/retention-pay`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

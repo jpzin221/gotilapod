@@ -1,23 +1,12 @@
 /**
- * Serviço Unificado para Funções Serverless do Netlify
- * 
- * Este arquivo centraliza todas as chamadas para as funções serverless,
- * mantendo as credenciais seguras no backend.
- * 
- * Funções disponíveis:
- * - createPixCharge: Gerar cobrança PIX
- * - checkPixStatus: Verificar status do pagamento
- * - getProducts: Carregar produtos do Supabase
+ * Serviço Unificado para Funções Serverless (Vercel API Routes)
  */
 
-// Base URL das funções serverless
 const getFunctionsUrl = () => {
-  // Em produção no Netlify, usar URL relativa
   if (window.location.hostname !== 'localhost') {
-    return '/.netlify/functions';
+    return '/api';
   }
-  // Em desenvolvimento local, usar backend local
-  return 'http://localhost:8888/.netlify/functions';
+  return 'http://localhost:3000/api';
 };
 
 const FUNCTIONS_URL = getFunctionsUrl();
@@ -29,10 +18,10 @@ const FUNCTIONS_URL = getFunctionsUrl();
  */
 export const createPixCharge = async (pedido) => {
   try {
-    console.log('📤 Criando cobrança PIX via Netlify Function...');
-    console.log('🎯 URL:', `${FUNCTIONS_URL}/pix-create`);
+    console.log('📤 Criando cobrança PIX via API...');
+    console.log('🎯 URL:', `${FUNCTIONS_URL}/pix/create`);
     
-    const response = await fetch(`${FUNCTIONS_URL}/pix-create`, {
+    const response = await fetch(`${FUNCTIONS_URL}/pix/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -83,7 +72,7 @@ export const checkPixStatus = async (txid) => {
   try {
     console.log('🔍 Verificando status do PIX:', txid);
     
-    const response = await fetch(`${FUNCTIONS_URL}/pix-status?txid=${txid}`, {
+    const response = await fetch(`${FUNCTIONS_URL}/pix/status?txid=${txid}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -124,9 +113,9 @@ export const checkPixStatus = async (txid) => {
  */
 export const getProducts = async () => {
   try {
-    console.log('📦 Carregando produtos via Netlify Function...');
+    console.log('📦 Carregando produtos via API...');
     
-    const response = await fetch(`${FUNCTIONS_URL}/products-get`, {
+    const response = await fetch(`${FUNCTIONS_URL}/products/get`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -160,7 +149,7 @@ export const getProducts = async () => {
  */
 export const checkFunctionsAvailable = async () => {
   try {
-    const response = await fetch(`${FUNCTIONS_URL}/products-get`, {
+    const response = await fetch(`${FUNCTIONS_URL}/products/get`, {
       method: 'GET'
     });
     return response.ok;

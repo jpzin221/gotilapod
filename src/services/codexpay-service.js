@@ -28,8 +28,8 @@ export async function createCodexPayCharge(params) {
 
     // Determinar URL da função (produção vs desenvolvimento)
     const functionsUrl = import.meta.env.PROD
-        ? '/.netlify/functions'
-        : 'http://localhost:8888/.netlify/functions';
+        ? '/api'
+        : 'http://localhost:3000/api';
 
     console.log('💚 [CodexPay Service] Criando cobrança...');
     console.log('💰 Valor:', amount);
@@ -81,8 +81,8 @@ export async function checkCodexPayStatus(params) {
     } = params;
 
     const functionsUrl = import.meta.env.PROD
-        ? '/.netlify/functions'
-        : 'http://localhost:8888/.netlify/functions';
+        ? '/api'
+        : 'http://localhost:3000/api';
 
     console.log('💚 [CodexPay Service] Verificando status...');
     console.log('🔍 Transaction ID:', transactionId);

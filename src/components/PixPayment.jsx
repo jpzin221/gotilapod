@@ -124,12 +124,12 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
         // Roteamento por provider
         if (pixData.provider === 'codexpay') {
-          // Usar Netlify Function do CodexPay
+          // Usar API route do CodexPay
           const functionsUrl = import.meta.env.PROD
-            ? '/.netlify/functions'
-            : 'http://localhost:8888/.netlify/functions';
+            ? '/api'
+            : 'http://localhost:3000/api';
 
-          const response = await fetch(`${functionsUrl}/codexpay-status`, {
+          const response = await fetch(`${functionsUrl}/codexpay/status`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -232,8 +232,8 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
           try {
             const functionsUrl = import.meta.env.PROD
-              ? '/.netlify/functions'
-              : 'http://localhost:8888/.netlify/functions';
+              ? '/api'
+              : 'http://localhost:3000/api';
 
             const responseLogistics = await fetch(`${functionsUrl}/send-to-logistics`, {
               method: 'POST',
