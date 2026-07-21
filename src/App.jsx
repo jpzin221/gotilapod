@@ -21,7 +21,6 @@ import FloatingCartButton from './components/FloatingCartButton';
 import WhatsAppButton from './components/WhatsAppButton';
 import InstagramButton from './components/InstagramButton';
 import SocialProofNotification from './components/SocialProofNotification';
-import BoladorSection from './components/BoladorSection';
 import { useCart } from './context/CartContext';
 import { useSiteConfig } from './context/SiteConfigContext';
 import { storeInfo } from './data/products';
@@ -247,20 +246,15 @@ function App() {
             </div>
           ) : (
             <>
-              {/* Seção Gorila Bolador - Premium (sempre no topo) */}
-              <BoladorSection
-                products={products.filter(p => p.is_bolador === true)}
-              />
-
               {/* Seção de Promoções (Produtos em Destaque) */}
               <FeaturedProducts
-                products={filteredProducts.filter(p => !p.is_bolador)}
+                products={filteredProducts}
                 onProductClick={handleProductClick}
               />
 
               {/* Seção de Promoções de Fim de Ano */}
               <PromotionsSection
-                products={promotionProducts.filter(p => !p.is_bolador)}
+                products={promotionProducts}
                 onProductClick={handleProductClick}
                 activeCategory={activeCategory}
               />

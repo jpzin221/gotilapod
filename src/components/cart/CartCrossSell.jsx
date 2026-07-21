@@ -94,7 +94,7 @@ export default function CartCrossSell() {
             id: suggestion.id,
             name: suggestion.name,
             price: suggestion.price,
-            image: suggestion.image_url || '/images/placeholder.webp',
+            image: suggestion.image || suggestion.image_url || '/images/placeholder.webp',
             description: suggestion.description,
             quantity: 1,
             selectedFlavors: selectedFlavor ? [selectedFlavor] : undefined
@@ -115,7 +115,7 @@ export default function CartCrossSell() {
             <div className="flex items-center gap-2">
                 {/* Imagem mini */}
                 <img
-                    src={suggestion.image_url || '/images/placeholder.webp'}
+                    src={suggestion.image || suggestion.image_url || '/images/placeholder.webp'}
                     alt={suggestion.name}
                     className="w-10 h-10 rounded object-cover flex-shrink-0"
                 />

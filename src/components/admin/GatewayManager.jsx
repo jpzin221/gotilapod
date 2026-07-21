@@ -49,35 +49,6 @@ const PROVIDER_CONFIG = {
             api_key: 'X-PicPay-Token'
         }
     },
-    bspay: {
-        name: 'BS Pay',
-        color: 'bg-orange-500',
-        fields: ['client_id', 'client_secret', 'webhook_secret'],
-        labels: {
-            client_id: 'Client ID',
-            client_secret: 'Secret Key',
-            webhook_secret: 'Postback URL (opcional)'
-        }
-    },
-    poseidonpay: {
-        name: 'Poseidon Pay',
-        color: 'bg-cyan-500',
-        fields: ['public_key', 'api_secret', 'callback_url'],
-        labels: {
-            public_key: 'x-public-key',
-            api_secret: 'x-secret-key',
-            callback_url: 'URL de Callback (Webhook)'
-        }
-    },
-    ryzenpay: {
-        name: 'Ryzen Pay',
-        color: 'bg-rose-500',
-        fields: ['api_key', 'callback_url'],
-        labels: {
-            api_key: 'API Key',
-            callback_url: 'URL de Notificação (Webhook)'
-        }
-    },
     codexpay: {
         name: 'CodexPay',
         color: 'bg-emerald-500',

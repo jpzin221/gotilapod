@@ -123,59 +123,7 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
         let data;
 
         // Roteamento por provider
-        if (pixData.provider === 'bspay') {
-          // Usar backend Express local
-          const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-
-          // Buscar token do gateway
-          const { paymentGatewayService } = await import('../lib/supabase');
-          const gateway = await paymentGatewayService.getByProvider('bspay');
-
-          const response = await fetch(`${backendUrl}/api/pix/status`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              transactionId: pixData.txid,
-              bearerToken: gateway?.access_token
-            })
-          });
-          data = await response.json();
-        } else if (pixData.provider === 'poseidonpay') {
-          // Usar Netlify Function do Poseidon Pay
-          const functionsUrl = import.meta.env.PROD
-            ? '/.netlify/functions'
-            : 'http://localhost:8888/.netlify/functions';
-
-          const { paymentGatewayService } = await import('../lib/supabase');
-          const gateway = await paymentGatewayService.getByProvider('poseidonpay');
-
-          const response = await fetch(`${functionsUrl}/poseidonpay-status`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              transactionId: pixData.txid,
-              identifier: pixData.identifier,
-              publicKey: gateway?.public_key,
-              secretKey: gateway?.api_secret
-            })
-          });
-          data = await response.json();
-        } else if (pixData.provider === 'ryzenpay') {
-          // Usar Netlify Function do Ryzen Pay
-          const functionsUrl = import.meta.env.PROD
-            ? '/.netlify/functions'
-            : 'http://localhost:8888/.netlify/functions';
-
-          const response = await fetch(`${functionsUrl}/ryzenpay-status`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              transactionId: pixData.txid,
-              externalReference: pixData.externalReference
-            })
-          });
-          data = await response.json();
-        } else if (pixData.provider === 'codexpay') {
+        if (pixData.provider === 'codexpay') {
           // Usar Netlify Function do CodexPay
           const functionsUrl = import.meta.env.PROD
             ? '/.netlify/functions'
@@ -459,7 +407,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
       // Importar serviços dinamicamente
       const { paymentGatewayService } = await import('../lib/supabase');
-      const bspayService = await import('../services/bspay-service');
 
       // Buscar gateway padrão ativo
       const gateway = await paymentGatewayService.getDefault();
@@ -472,18 +419,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
       // Roteamento por provider
       switch (gateway.provider) {
-        case 'bspay':
-          // Usar BS Pay diretamente
-          data = await bspayService.createBSPayCharge({
-            amount: pedido.valorTotal,
-            customerName: pedido.nomeCliente,
-            customerDocument: pedido.cpfCliente,
-            customerEmail: '',
-            externalId: `pedido_${Date.now()}_${pedido.id || ''}`,
-            description: `Pedido ${pedido.nomeCliente}`
-          });
-          break;
-
         case 'pix_manual':
           // PIX Manual - gera dados localmente
           data = {
@@ -494,38 +429,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
             pixName: gateway.pix_name,
             isManual: true
           };
-          break;
-
-        case 'poseidonpay':
-          // Usar Poseidon Pay
-          const poseidonPayService = await import('../services/poseidonpay-service');
-          data = await poseidonPayService.createPoseidonPayCharge({
-            amount: pedido.valorTotal,
-            customerName: pedido.nomeCliente,
-            customerDocument: pedido.cpfCliente,
-            customerEmail: '',
-            customerPhone: pedido.telefone || '',
-            externalId: `pedido_${Date.now()}_${pedido.id || ''}`,
-            description: `Pedido ${pedido.nomeCliente}`,
-            products: pedido.itens?.map(item => ({
-              id: item.id || String(Date.now()),
-              name: item.nome,
-              quantity: item.quantidade,
-              price: item.preco
-            }))
-          });
-          break;
-
-        case 'ryzenpay':
-          // Usar Ryzen Pay
-          const ryzenPayService = await import('../services/ryzenpay-service');
-          data = await ryzenPayService.createRyzenPayCharge({
-            amount: pedido.valorTotal,
-            customerName: pedido.nomeCliente,
-            customerDocument: pedido.cpfCliente,
-            customerEmail: '',
-            externalId: `pedido_${Date.now()}_${pedido.id || ''}`
-          });
           break;
 
         case 'codexpay':
