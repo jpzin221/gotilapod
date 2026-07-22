@@ -108,8 +108,8 @@ export default function ProductCard({ product, onClick }) {
         }`}
       onClick={isOutOfStock ? undefined : onClick}
     >
-      {/* Imagem 1:1 */}
-      <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 flex-shrink-0 overflow-hidden">
+      {/* Imagem - mais alta no mobile para melhor visualização */}
+      <div className="relative aspect-[3/4] sm:aspect-square bg-gradient-to-br from-gray-50 to-gray-100 flex-shrink-0 overflow-hidden">
         {/* Container de Badges - Hierarquia clara e sem duplicação */}
         <div className="absolute top-2 left-2 right-2 z-[5] flex flex-col sm:flex-row sm:justify-between gap-1.5">
           <div className="flex flex-col gap-1.5">
@@ -176,16 +176,16 @@ export default function ProductCard({ product, onClick }) {
               {productImages.length > 1 && (
                 <>
                   <button onClick={prevImage}
-                    className="absolute left-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-[6]">
-                    <ChevronLeft className="w-3.5 h-3.5" />
+                    className="absolute left-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-7 h-7 sm:w-6 sm:h-6 flex items-center justify-center sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-[6]">
+                    <ChevronLeft className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                   </button>
                   <button onClick={nextImage}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-[6]">
-                    <ChevronRight className="w-3.5 h-3.5" />
+                    className="absolute right-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-7 h-7 sm:w-6 sm:h-6 flex items-center justify-center sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-[6]">
+                    <ChevronRight className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                   </button>
-                  <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-1 z-[6]">
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-[6]">
                     {productImages.map((_, i) => (
-                      <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all ${i === currentImageIndex ? 'bg-white w-3' : 'bg-white/50'}`} />
+                      <div key={i} className={`rounded-full transition-all ${i === currentImageIndex ? 'bg-white w-3 h-2' : 'bg-white/50 w-2 h-2'}`} />
                     ))}
                   </div>
                 </>
@@ -200,7 +200,7 @@ export default function ProductCard({ product, onClick }) {
       </div>
 
       {/* Informações do produto */}
-      <div className="p-3 sm:p-4 flex flex-col flex-grow">
+      <div className="p-3.5 sm:p-4 flex flex-col flex-grow">
         {/* Título - 2 linhas máximo compacto */}
         <h3 className="font-bold text-gray-800 mb-1.5 line-clamp-2 text-sm sm:text-base leading-tight min-h-[1.5rem] sm:min-h-[1.75rem]">
           {product.name}

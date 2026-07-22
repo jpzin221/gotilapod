@@ -36,7 +36,7 @@ export default function FeaturedProducts({ products, onProductClick }) {
       </div>
 
       {/* Grid de Produtos em Destaque */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 px-2 sm:px-4 auto-rows-fr">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-4 px-3 sm:px-4 auto-rows-fr">
         {featuredProducts.map((product) => (
           <ProductCard 
             key={product.id} 
