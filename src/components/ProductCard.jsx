@@ -1,6 +1,6 @@
-import { Star, Plus, ChevronDown } from 'lucide-react';
+import { Star, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { promotionBannerService } from '../lib/supabase';
 import QuickAddModal from './QuickAddModal';
 
@@ -9,6 +9,21 @@ export default function ProductCard({ product, onClick }) {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [promotionBadgeText, setPromotionBadgeText] = useState('🎁 OFERTA NATAL');
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const productImages = (product.images && Array.isArray(product.images) && product.images.length > 0)
+    ? product.images
+    : (product.image_url ? [product.image_url] : []);
+
+  const nextImage = useCallback((e) => {
+    e.stopPropagation();
+    setCurrentImageIndex(prev => (prev + 1) % productImages.length);
+  }, [productImages.length]);
+
+  const prevImage = useCallback((e) => {
+    e.stopPropagation();
+    setCurrentImageIndex(prev => (prev - 1 + productImages.length) % productImages.length);
+  }, [productImages.length]);
 
   // Buscar texto do badge de promoção
   useEffect(() => {
@@ -149,11 +164,39 @@ export default function ProductCard({ product, onClick }) {
           </div>
         )}
 
-        <img
-          src={product.image_url}
-          alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+        {/* Carousel de Imagens */}
+        <div className="relative w-full h-full">
+          {productImages.length > 0 ? (
+            <>
+              <img
+                src={productImages[currentImageIndex]}
+                alt={product.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              {productImages.length > 1 && (
+                <>
+                  <button onClick={prevImage}
+                    className="absolute left-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-[6]">
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                  </button>
+                  <button onClick={nextImage}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-[6]">
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                  <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-1 z-[6]">
+                    {productImages.map((_, i) => (
+                      <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all ${i === currentImageIndex ? 'bg-white w-3' : 'bg-white/50'}`} />
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gray-100">
+              <Star className="w-8 h-8 text-gray-300" />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Informações do produto */}

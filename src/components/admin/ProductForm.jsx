@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Save, Loader2, Upload, Image as ImageIcon, ChevronDown } from 'lucide-react';
+import { X, Save, Loader2, Upload, Image as ImageIcon, ChevronDown, Plus, GripVertical } from 'lucide-react';
 import { flavorService, productFlavorService, imageUploadService, categoryService } from '../../lib/supabase';
 
 const CATEGORY_TEMPLATES = {
@@ -54,6 +54,7 @@ export default function ProductForm({ product, onSave, onClose }) {
 
   const getInitialFormData = () => {
     if (product?.id) {
+      const imgs = product?.images || (product?.image_url ? [product.image_url] : []);
       return {
         name: product?.name || '', description: product?.description || '',
         detailedDescription: product?.detailed_description || product?.detailedDescription || '',
@@ -79,6 +80,12 @@ export default function ProductForm({ product, onSave, onClose }) {
   };
 
   const [formData, setFormData] = useState(getInitialFormData);
+  const [productImages, setProductImages] = useState(() => {
+    if (product?.images && Array.isArray(product.images)) return product.images;
+    if (product?.image_url) return [product.image_url];
+    return [];
+  });
+  const [newImageUrl, setNewImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [availableFlavors, setAvailableFlavors] = useState([]);
@@ -145,12 +152,14 @@ export default function ProductForm({ product, onSave, onClose }) {
     setError('');
     setLoading(true);
     try {
+      const allImages = productImages.length > 0 ? productImages : (formData.image ? [formData.image] : []);
       const productData = {
         name: formData.name, description: formData.description,
         detailed_description: formData.detailedDescription || null,
         price: parseFloat(formData.price) || 0,
         original_price: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
-        image_url: formData.image || null,
+        image_url: allImages[0] || null,
+        images: allImages.length > 0 ? allImages : null,
         category_id: formData.category_id ? parseInt(formData.category_id) : null,
         category: formData.category, badge: formData.badge || null,
         badge_color: formData.badgeColor || 'purple',
@@ -172,6 +181,25 @@ export default function ProductForm({ product, onSave, onClose }) {
     } catch (err) {
       setError(`Erro ao salvar: ${err.message || 'Tente novamente'}`);
     } finally { setLoading(false); }
+  };
+
+  const addImageFromUrl = () => {
+    if (newImageUrl && newImageUrl.trim()) {
+      setProductImages(prev => [...prev, newImageUrl.trim()]);
+      setNewImageUrl('');
+    }
+  };
+
+  const removeImage = (index) => {
+    setProductImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const moveImage = (from, to) => {
+    if (to < 0 || to >= productImages.length) return;
+    const updated = [...productImages];
+    const [moved] = updated.splice(from, 1);
+    updated.splice(to, 0, moved);
+    setProductImages(updated);
   };
 
   const sections = [
@@ -315,32 +343,79 @@ export default function ProductForm({ product, onSave, onClose }) {
 
           {activeSection === 'details' && (
             <div className="space-y-4">
+              {/* Multiple Images Gallery */}
               <div>
-                <FieldLabel>Imagem do Produto</FieldLabel>
-                {formData.image && (
-                  <div className="mb-3 relative inline-block">
-                    <img src={formData.image} alt="Preview" className="w-24 h-24 object-cover rounded-lg border border-gray-700" />
-                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, image: '' }))}
-                      className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition">
-                      <X className="w-3 h-3" />
-                    </button>
+                <FieldLabel>Imagens do Produto ({productImages.length} {productImages.length === 1 ? 'foto' : 'fotos'})</FieldLabel>
+
+                {/* Image Grid */}
+                {productImages.length > 0 && (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-3">
+                    {productImages.map((img, index) => (
+                      <div key={index} className="relative group aspect-square">
+                        <img src={img} alt={`Foto ${index + 1}`} className="w-full h-full object-cover rounded-lg border border-gray-700" />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-1">
+                          {index > 0 && (
+                            <button type="button" onClick={() => moveImage(index, index - 1)}
+                              className="bg-gray-700 hover:bg-gray-600 text-white rounded-full p-1.5 transition">
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                            </button>
+                          )}
+                          {index < productImages.length - 1 && (
+                            <button type="button" onClick={() => moveImage(index, index + 1)}
+                              className="bg-gray-700 hover:bg-gray-600 text-white rounded-full p-1.5 transition">
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                            </button>
+                          )}
+                          <button type="button" onClick={() => removeImage(index)}
+                            className="bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 transition">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                        {index === 0 && (
+                          <span className="absolute top-1 left-1 bg-primary text-white text-[9px] px-1.5 py-0.5 rounded font-bold">PRINCIPAL</span>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
-                <div className="flex gap-2">
-                  <label className="flex-1 cursor-pointer">
-                    <div className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-800 border border-gray-700 border-dashed rounded-lg hover:bg-gray-700 transition">
-                      <Upload className="w-4 h-4 text-gray-400" />
-                      <span className="text-xs text-gray-400">{formData.image ? 'Trocar' : 'Upload'}</span>
-                    </div>
-                    <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        try { const url = await imageUploadService.uploadProductImage(file, formData.name || 'produto'); setFormData(prev => ({ ...prev, image: url })); }
-                        catch (err) { alert('Erro: ' + err.message); }
-                      }
-                    }} />
-                  </label>
-                  <Input type="url" name="image" value={formData.image} onChange={handleChange} placeholder="Ou cole a URL" className="flex-1" />
+
+                {/* Add Image Controls */}
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <label className="flex-1 cursor-pointer">
+                      <div className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-800 border border-gray-700 border-dashed rounded-lg hover:bg-gray-700 transition min-h-[44px]">
+                        <Upload className="w-4 h-4 text-gray-400" />
+                        <span className="text-xs text-gray-400">Upload Foto</span>
+                      </div>
+                      <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          try {
+                            const url = await imageUploadService.uploadProductImage(file, formData.name || 'produto');
+                            setProductImages(prev => [...prev, url]);
+                          } catch (err) { alert('Erro: ' + err.message); }
+                        }
+                      }} />
+                    </label>
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      type="url"
+                      value={newImageUrl}
+                      onChange={(e) => setNewImageUrl(e.target.value)}
+                      placeholder="Cole a URL de uma imagem"
+                      className="flex-1"
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addImageFromUrl(); } }}
+                    />
+                    <button type="button" onClick={addImageFromUrl}
+                      className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition text-sm min-h-[44px] flex items-center gap-1">
+                      <Plus className="w-4 h-4" />
+                      <span className="hidden sm:inline">Adicionar</span>
+                    </button>
+                  </div>
+                  {productImages.length > 1 && (
+                    <p className="text-[10px] text-gray-500">Arraste as setas para reordenar. A primeira foto aparece como principal.</p>
+                  )}
                 </div>
               </div>
 

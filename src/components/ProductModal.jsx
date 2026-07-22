@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, ShoppingCart, Star, Package, Cloud, Eye } from 'lucide-react';
+import { X, ShoppingCart, Star, Package, Cloud, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import Portal from './Portal';
 import ImageModal from './ImageModal';
@@ -10,6 +10,11 @@ export default function ProductModal({ product, isOpen, onClose }) {
   const [customQuantity, setCustomQuantity] = useState(6);
   const [flavorSelections, setFlavorSelections] = useState({});
   const [showImageModal, setShowImageModal] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const productImages = (product?.images && Array.isArray(product.images) && product.images.length > 0)
+    ? product.images
+    : (product?.image_url ? [product.image_url] : []);
 
   useEffect(() => {
     if (isOpen && product) {
@@ -146,16 +151,30 @@ export default function ProductModal({ product, isOpen, onClose }) {
         >
           {/* Header com imagem */}
           <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-2 sm:p-3 flex items-center justify-center flex-shrink-0">
-            <div
-              className="w-24 h-24 sm:w-32 sm:h-32 cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={() => setShowImageModal(true)}
-              title="Clique para ampliar"
-            >
-              <img
-                src={product.image_url}
-                alt={product.name}
-                className="w-full h-full object-contain"
-              />
+            <div className="relative">
+              <div
+                className="w-28 h-28 sm:w-36 sm:h-36 cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => setShowImageModal(true)}
+                title="Clique para ampliar"
+              >
+                <img
+                  src={productImages[currentImageIndex] || product.image_url}
+                  alt={product.name}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              {productImages.length > 1 && (
+                <>
+                  <button onClick={() => setCurrentImageIndex(prev => (prev - 1 + productImages.length) % productImages.length)}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-white/80 hover:bg-white rounded-full p-1 shadow-md transition">
+                    <ChevronLeft className="w-4 h-4 text-gray-600" />
+                  </button>
+                  <button onClick={() => setCurrentImageIndex(prev => (prev + 1) % productImages.length)}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 bg-white/80 hover:bg-white rounded-full p-1 shadow-md transition">
+                    <ChevronRight className="w-4 h-4 text-gray-600" />
+                  </button>
+                </>
+              )}
             </div>
             <button
               onClick={onClose}
@@ -164,6 +183,18 @@ export default function ProductModal({ product, isOpen, onClose }) {
               <X className="w-5 h-5 sm:w-7 sm:h-7 text-gray-600" />
             </button>
           </div>
+
+          {/* Thumbnails */}
+          {productImages.length > 1 && (
+            <div className="flex gap-1.5 px-3 py-2 overflow-x-auto bg-white border-b border-gray-100">
+              {productImages.map((img, i) => (
+                <button key={i} onClick={() => setCurrentImageIndex(i)}
+                  className={`flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden border-2 transition ${i === currentImageIndex ? 'border-primary' : 'border-gray-200 opacity-60 hover:opacity-100'}`}>
+                  <img src={img} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Informações do produto */}
           <div className="p-2 sm:p-3 bg-white flex-shrink-0">
@@ -569,7 +600,7 @@ export default function ProductModal({ product, isOpen, onClose }) {
       {/* Modal de Visualização de Imagem */}
       {showImageModal && (
         <ImageModal
-          imageUrl={product.image_url}
+          imageUrl={productImages[currentImageIndex] || product.image_url}
           imageName={product.name}
           onClose={() => setShowImageModal(false)}
         />

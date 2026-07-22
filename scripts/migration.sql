@@ -13,10 +13,10 @@ ALTER TABLE products ADD COLUMN IF NOT EXISTS low_stock_threshold integer DEFAUL
 ALTER TABLE products ADD COLUMN IF NOT EXISTS box_price numeric;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS box_discount_percent numeric;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS detailed_description text;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS images jsonb;
 
--- Verificar se a coluna image existe (o código usa image_url)
--- Se image_url não existir, criar a partir de uma coluna image se houver
--- (O código já foi atualizado para usar image_url)
+-- Migrar dados existentes: copiar image_url para o array images
+UPDATE products SET images = jsonb_build_array(image_url) WHERE image_url IS NOT NULL AND images IS NULL;
 
 -- Garantir que a tabela flavors tenha a coluna emoji
 ALTER TABLE flavors ADD COLUMN IF NOT EXISTS emoji text DEFAULT '';
