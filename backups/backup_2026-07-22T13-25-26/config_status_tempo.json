@@ -1,0 +1,62 @@
+[
+  {
+    "id": "8cb40890-6f90-4db8-bb9d-fe98a64bce1d",
+    "status_atual": "confirmado",
+    "proximo_status": "preparando",
+    "minutos_espera": 5,
+    "ativo": true,
+    "display_order": 1,
+    "descricao": null,
+    "created_at": "2026-07-22T02:31:12.252186+00:00"
+  },
+  {
+    "id": "438478d6-3e64-40bb-8e29-2ecd73f2b19c",
+    "status_atual": "preparando",
+    "proximo_status": "guardando",
+    "minutos_espera": 10,
+    "ativo": true,
+    "display_order": 1,
+    "descricao": null,
+    "created_at": "2026-07-22T02:31:12.252186+00:00"
+  },
+  {
+    "id": "d1bdd074-0f93-4b27-a4da-c7f146cf613e",
+    "status_atual": "guardando",
+    "proximo_status": "motoboy_caminho",
+    "minutos_espera": 5,
+    "ativo": true,
+    "display_order": 1,
+    "descricao": null,
+    "created_at": "2026-07-22T02:31:12.252186+00:00"
+  },
+  {
+    "id": "7891737b-3a3a-4a5d-846b-b593da86fc41",
+    "status_atual": "motoboy_caminho",
+    "proximo_status": "coleta",
+    "minutos_espera": 10,
+    "ativo": true,
+    "display_order": 1,
+    "descricao": null,
+    "created_at": "2026-07-22T02:31:12.252186+00:00"
+  },
+  {
+    "id": "65c502c7-becb-48c8-89bf-d3e79564a402",
+    "status_atual": "coleta",
+    "proximo_status": "em_rota",
+    "minutos_espera": 5,
+    "ativo": true,
+    "display_order": 1,
+    "descricao": null,
+    "created_at": "2026-07-22T02:31:12.252186+00:00"
+  },
+  {
+    "id": "146ce387-35ef-4253-a5b2-02aaf51451f4",
+    "status_atual": "em_rota",
+    "proximo_status": "entregue",
+    "minutos_espera": 30,
+    "ativo": true,
+    "display_order": 1,
+    "descricao": null,
+    "created_at": "2026-07-22T02:31:12.252186+00:00"
+  }
+]

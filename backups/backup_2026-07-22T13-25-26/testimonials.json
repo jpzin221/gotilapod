@@ -1,0 +1,50 @@
+[
+  {
+    "id": "3bb1a887-e088-46f2-813a-5f8bd175e407",
+    "nome": "Maria Silva",
+    "telefone": null,
+    "email": null,
+    "depoimento": "Produto excelente! Chegou rapido e bem embalado.",
+    "avaliacao": 5,
+    "imagens": null,
+    "pedido_id": null,
+    "aprovado": true,
+    "aprovado_por": null,
+    "aprovado_em": "2026-07-22T02:31:12.252186+00:00",
+    "visivel": true,
+    "created_at": "2026-07-22T02:31:12.252186+00:00",
+    "updated_at": "2026-07-22T02:31:12.252186+00:00"
+  },
+  {
+    "id": "9869e5a1-5f9b-4b56-b48a-6446a88bf8ac",
+    "nome": "Joao Santos",
+    "telefone": null,
+    "email": null,
+    "depoimento": "Melhor loja de pods! Atendimento nota 10.",
+    "avaliacao": 5,
+    "imagens": null,
+    "pedido_id": null,
+    "aprovado": true,
+    "aprovado_por": null,
+    "aprovado_em": "2026-07-22T02:31:12.252186+00:00",
+    "visivel": true,
+    "created_at": "2026-07-22T02:31:12.252186+00:00",
+    "updated_at": "2026-07-22T02:31:12.252186+00:00"
+  },
+  {
+    "id": "59d6c375-0e4b-47dc-833e-f64dcfb18f32",
+    "nome": "Ana Costa",
+    "telefone": null,
+    "email": null,
+    "depoimento": "Adorei! Os sabores sao maravilhosos.",
+    "avaliacao": 5,
+    "imagens": null,
+    "pedido_id": null,
+    "aprovado": true,
+    "aprovado_por": null,
+    "aprovado_em": "2026-07-22T02:31:12.252186+00:00",
+    "visivel": true,
+    "created_at": "2026-07-22T02:31:12.252186+00:00",
+    "updated_at": "2026-07-22T02:31:12.252186+00:00"
+  }
+]

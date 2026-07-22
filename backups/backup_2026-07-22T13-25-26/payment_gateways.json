@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "CodexPay",
+    "provider": "codexpay",
+    "description": "Gateway PIX via CodexPay",
+    "is_active": true,
+    "is_default": true,
+    "client_id": null,
+    "client_secret": null,
+    "webhook_secret": null,
+    "api_key": null,
+    "api_secret": null,
+    "access_token": null,
+    "public_key": null,
+    "callback_url": null,
+    "pix_key": null,
+    "pix_key_type": null,
+    "pix_name": null,
+    "sandbox_mode": false,
+    "fee_percent": 0,
+    "min_amount": 1,
+    "max_amount": 50000,
+    "logo_url": null,
+    "config": {},
+    "created_at": "2026-07-22T02:31:12.252186+00:00",
+    "updated_at": "2026-07-22T02:31:12.252186+00:00"
+  }
+]

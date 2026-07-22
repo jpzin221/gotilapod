@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "business_hours": {
+      "friday": {
+        "open": "09:00",
+        "close": "18:00",
+        "closed": false
+      },
+      "monday": {
+        "open": "09:00",
+        "close": "18:00",
+        "closed": false
+      },
+      "sunday": {
+        "open": "09:00",
+        "close": "14:00",
+        "closed": true
+      },
+      "tuesday": {
+        "open": "09:00",
+        "close": "18:00",
+        "closed": false
+      },
+      "saturday": {
+        "open": "09:00",
+        "close": "14:00",
+        "closed": false
+      },
+      "thursday": {
+        "open": "09:00",
+        "close": "18:00",
+        "closed": false
+      },
+      "wednesday": {
+        "open": "09:00",
+        "close": "18:00",
+        "closed": false
+      }
+    },
+    "delivery_radius_km": 50,
+    "nearby_cities_radius_km": 100,
+    "show_distance_banner": true,
+    "sede_latitude": -25.4284,
+    "sede_longitude": -49.2733,
+    "sede_cidade": "Curitiba",
+    "sede_estado": "PR",
+    "created_at": "2026-07-22T02:31:12.252186+00:00",
+    "updated_at": "2026-07-22T02:31:12.252186+00:00"
+  }
+]

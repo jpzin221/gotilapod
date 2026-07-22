@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-07-22T13:25:27.459Z",
+  "tables": {
+    "products": 0,
+    "categories": 2,
+    "flavors": 0,
+    "product_flavors": 0,
+    "pedidos": 0,
+    "usuarios": 0,
+    "store_settings": 1,
+    "physical_stores": 0,
+    "carousel_slides": 0,
+    "testimonials": 3,
+    "promotion_banner_settings": 1,
+    "payment_gateways": 1,
+    "site_config": 26,
+    "config_status_tempo": 6,
+    "pedido_trajeto_personalizado": 0,
+    "order_timings": 0,
+    "status_historico": 0
+  },
+  "totalRecords": 40
+}

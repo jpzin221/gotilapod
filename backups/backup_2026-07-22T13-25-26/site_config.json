@@ -1,0 +1,262 @@
+[
+  {
+    "id": 1,
+    "key": "site_name",
+    "value": "GotilaPod",
+    "type": "text",
+    "category": "brand",
+    "label": "Nome do Site",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 2,
+    "key": "site_slogan",
+    "value": "Vaporizadores e Pods de Qualidade",
+    "type": "text",
+    "category": "brand",
+    "label": "Slogan do Site",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 3,
+    "key": "logo_url",
+    "value": "",
+    "type": "image",
+    "category": "brand",
+    "label": "Logo da Loja",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 4,
+    "key": "whatsapp",
+    "value": "",
+    "type": "text",
+    "category": "contact",
+    "label": "Numero WhatsApp",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 5,
+    "key": "whatsapp_message",
+    "value": "Ola! Vim pelo site e gostaria de mais informacoes.",
+    "type": "text",
+    "category": "contact",
+    "label": "Mensagem Padrao WhatsApp",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 6,
+    "key": "whatsapp_visible",
+    "value": "true",
+    "type": "boolean",
+    "category": "contact",
+    "label": "Botao WhatsApp Visivel",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 7,
+    "key": "instagram",
+    "value": "",
+    "type": "text",
+    "category": "contact",
+    "label": "Usuario Instagram",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 8,
+    "key": "primary_color",
+    "value": "#22c55e",
+    "type": "color",
+    "category": "appearance",
+    "label": "Cor Primaria",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 9,
+    "key": "secondary_color",
+    "value": "#16a34a",
+    "type": "color",
+    "category": "appearance",
+    "label": "Cor Secundaria",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 10,
+    "key": "accent_color",
+    "value": "#f59e0b",
+    "type": "color",
+    "category": "appearance",
+    "label": "Cor de Destaque",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 11,
+    "key": "text_color",
+    "value": "#1f2937",
+    "type": "color",
+    "category": "appearance",
+    "label": "Cor do Texto",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 12,
+    "key": "background_color",
+    "value": "#f9fafb",
+    "type": "color",
+    "category": "appearance",
+    "label": "Cor de Fundo",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 13,
+    "key": "font_family",
+    "value": "Inter",
+    "type": "text",
+    "category": "appearance",
+    "label": "Familia de Fonte",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 14,
+    "key": "border_radius",
+    "value": "8",
+    "type": "text",
+    "category": "appearance",
+    "label": "Raio da Borda (px)",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 15,
+    "key": "meta_title",
+    "value": "GotilaPod - Vaporizadores e Pods de Qualidade",
+    "type": "text",
+    "category": "seo",
+    "label": "Titulo SEO",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 16,
+    "key": "meta_description",
+    "value": "Loja especializada em pods e vaporizadores de alta qualidade.",
+    "type": "textarea",
+    "category": "seo",
+    "label": "Descricao SEO",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 17,
+    "key": "meta_keywords",
+    "value": "pods, vaporizadores, vape, gotilha",
+    "type": "text",
+    "category": "seo",
+    "label": "Palavras-chave SEO",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 18,
+    "key": "favicon_url",
+    "value": "",
+    "type": "image",
+    "category": "seo",
+    "label": "Favicon",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 19,
+    "key": "og_image_url",
+    "value": "",
+    "type": "image",
+    "category": "seo",
+    "label": "Imagem Open Graph",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 20,
+    "key": "maintenance_mode",
+    "value": "false",
+    "type": "boolean",
+    "category": "general",
+    "label": "Modo Manutencao",
+    "created_at": "2026-07-22T12:49:26.417816+00:00",
+    "updated_at": "2026-07-22T12:49:26.417816+00:00"
+  },
+  {
+    "id": 21,
+    "key": "about_us",
+    "value": "Somos uma loja especializada em vaporizadores e pods de alta qualidade.",
+    "type": "textarea",
+    "category": "institutional",
+    "label": "Sobre Nos",
+    "created_at": "2026-07-22T13:01:38.15681+00:00",
+    "updated_at": "2026-07-22T13:01:38.15681+00:00"
+  },
+  {
+    "id": 22,
+    "key": "mission",
+    "value": "Oferecer produtos de qualidade com atendimento personalizado.",
+    "type": "textarea",
+    "category": "institutional",
+    "label": "Missao",
+    "created_at": "2026-07-22T13:01:38.15681+00:00",
+    "updated_at": "2026-07-22T13:01:38.15681+00:00"
+  },
+  {
+    "id": 23,
+    "key": "values",
+    "value": "Qualidade, Confianca, Agilidade no Atendimento.",
+    "type": "textarea",
+    "category": "institutional",
+    "label": "Valores",
+    "created_at": "2026-07-22T13:01:38.15681+00:00",
+    "updated_at": "2026-07-22T13:01:38.15681+00:00"
+  },
+  {
+    "id": 24,
+    "key": "banner_text",
+    "value": "Confira nossas ofertas!",
+    "type": "text",
+    "category": "content",
+    "label": "Texto do Banner",
+    "created_at": "2026-07-22T13:01:38.15681+00:00",
+    "updated_at": "2026-07-22T13:01:38.15681+00:00"
+  },
+  {
+    "id": 25,
+    "key": "cta_text",
+    "value": "Compre Agora",
+    "type": "text",
+    "category": "content",
+    "label": "Texto do Botao CTA",
+    "created_at": "2026-07-22T13:01:38.15681+00:00",
+    "updated_at": "2026-07-22T13:01:38.15681+00:00"
+  },
+  {
+    "id": 26,
+    "key": "about_page_text",
+    "value": "Conheca nossa historia e nossos valores.",
+    "type": "textarea",
+    "category": "content",
+    "label": "Texto Pagina Sobre",
+    "created_at": "2026-07-22T13:01:38.15681+00:00",
+    "updated_at": "2026-07-22T13:01:38.15681+00:00"
+  }
+]

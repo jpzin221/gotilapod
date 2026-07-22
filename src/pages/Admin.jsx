@@ -23,69 +23,249 @@ import SiteConfigManager from '../components/admin/SiteConfigManager';
 import UsersManager from '../components/admin/UsersManager';
 
 function DashboardTab({ stats, dark }) {
+  const [animatedValues, setAnimatedValues] = useState({});
+
+  useEffect(() => {
+    const targets = {
+      pedidosHoje: stats.pedidosHoje,
+      receitaHoje: stats.receitaHoje,
+      pedidosPendentes: stats.pedidosPendentes,
+      pedidosEntregues: stats.pedidosEntregues,
+      totalUsuarios: stats.totalUsuarios,
+      totalProdutos: stats.totalProdutos,
+    };
+    const duration = 800;
+    const steps = 30;
+    const interval = duration / steps;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      const progress = Math.min(step / steps, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = {};
+      for (const key in targets) {
+        current[key] = targets[key] * eased;
+      }
+      setAnimatedValues(current);
+      if (step >= steps) clearInterval(timer);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [stats.pedidosHoje, stats.receitaHoje, stats.pedidosPendentes, stats.pedidosEntregues, stats.totalUsuarios, stats.totalProdutos]);
+
+  const formatCurrency = (v) => `R$ ${v.toFixed(2)}`;
+  const formatInt = (v) => Math.round(v);
+
   const cards = [
-    { label: 'Pedidos Hoje', value: stats.pedidosHoje, icon: ShoppingCart, bg: 'bg-blue-500/10 dark:bg-blue-500/20', iconColor: 'text-blue-500' },
-    { label: 'Receita Hoje', value: `R$ ${stats.receitaHoje.toFixed(2)}`, icon: DollarSign, bg: 'bg-emerald-500/10 dark:bg-emerald-500/20', iconColor: 'text-emerald-500' },
-    { label: 'Pendentes', value: stats.pedidosPendentes, icon: AlertCircle, bg: 'bg-orange-500/10 dark:bg-orange-500/20', iconColor: 'text-orange-500' },
-    { label: 'Entregues', value: stats.pedidosEntregues, icon: PackageCheck, bg: 'bg-green-500/10 dark:bg-green-500/20', iconColor: 'text-green-500' },
-    { label: 'Clientes', value: stats.totalUsuarios, icon: UserCheck, bg: 'bg-purple-500/10 dark:bg-purple-500/20', iconColor: 'text-purple-500' },
-    { label: 'Produtos', value: stats.totalProdutos, icon: Package, bg: 'bg-indigo-500/10 dark:bg-indigo-500/20', iconColor: 'text-indigo-500' },
+    {
+      label: 'Pedidos Hoje',
+      value: formatInt(animatedValues.pedidosHoje || 0),
+      icon: ShoppingCart,
+      gradient: 'from-blue-600 to-blue-500',
+      glow: 'shadow-blue-500/20',
+      trend: null,
+    },
+    {
+      label: 'Receita Hoje',
+      value: formatCurrency(animatedValues.receitaHoje || 0),
+      icon: DollarSign,
+      gradient: 'from-emerald-600 to-emerald-500',
+      glow: 'shadow-emerald-500/20',
+      trend: null,
+    },
+    {
+      label: 'Pendentes',
+      value: formatInt(animatedValues.pedidosPendentes || 0),
+      icon: AlertCircle,
+      gradient: 'from-orange-500 to-amber-500',
+      glow: 'shadow-orange-500/20',
+      trend: null,
+    },
+    {
+      label: 'Entregues',
+      value: formatInt(animatedValues.pedidosEntregues || 0),
+      icon: PackageCheck,
+      gradient: 'from-green-500 to-emerald-500',
+      glow: 'shadow-green-500/20',
+      trend: null,
+    },
+    {
+      label: 'Clientes',
+      value: formatInt(animatedValues.totalUsuarios || 0),
+      icon: UserCheck,
+      gradient: 'from-purple-600 to-violet-500',
+      glow: 'shadow-purple-500/20',
+      trend: null,
+    },
+    {
+      label: 'Produtos',
+      value: formatInt(animatedValues.totalProdutos || 0),
+      icon: Package,
+      gradient: 'from-indigo-600 to-blue-500',
+      glow: 'shadow-indigo-500/20',
+      trend: null,
+    },
   ];
+
+  const statusColors = {
+    confirmado: { bg: 'bg-blue-500/15', text: 'text-blue-400', dot: 'bg-blue-500' },
+    pendente: { bg: 'bg-amber-500/15', text: 'text-amber-400', dot: 'bg-amber-500' },
+    saiu_entrega: { bg: 'bg-cyan-500/15', text: 'text-cyan-400', dot: 'bg-cyan-500' },
+    entregue: { bg: 'bg-green-500/15', text: 'text-green-400', dot: 'bg-green-500' },
+    cancelado: { bg: 'bg-red-500/15', text: 'text-red-400', dot: 'bg-red-500' },
+  };
+
+  const getStatusStyle = (status) => statusColors[status] || { bg: 'bg-gray-500/15', text: 'text-gray-400', dot: 'bg-gray-500' };
+
+  const pedidosPendentesCount = stats.pedidosPendentes;
+  const pedidosEntreguesCount = stats.pedidosEntregues;
+  const totalRecent = stats.recentPedidos.length;
+  const entreguePercent = totalRecent > 0 ? Math.round((pedidosEntreguesCount / (pedidosPendentesCount + pedidosEntreguesCount || 1)) * 100) : 0;
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Visao geral da sua loja</p>
+      {/* Welcome Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border border-gray-700/50 p-6 sm:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(99,102,241,0.15),transparent_50%)]" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-primary/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="relative">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-1">
+            Bem-vindo ao Painel
+          </h2>
+          <p className="text-gray-400 text-sm sm:text-base">
+            Aqui esta o resumo da sua loja. Dados atualizados em tempo real.
+          </p>
+        </div>
       </div>
 
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {cards.map((card) => (
-          <div key={card.label} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition">
-            <div className="flex items-center justify-between">
+        {cards.map((card, idx) => (
+          <div
+            key={card.label}
+            className={`group relative overflow-hidden rounded-2xl bg-gray-800/80 border border-gray-700/50 p-5 hover:border-gray-600/50 transition-all duration-300 hover:shadow-lg ${card.glow}`}
+            style={{ animationDelay: `${idx * 80}ms` }}
+          >
+            <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-[0.04] group-hover:opacity-[0.08] transition-opacity duration-300`} />
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-white/[0.02] to-transparent rounded-full -translate-y-8 translate-x-8" />
+            <div className="relative flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{card.label}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{card.value}</p>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">{card.label}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white mt-2 tabular-nums">{card.value}</p>
               </div>
-              <div className={`${card.bg} p-3 rounded-xl`}>
-                <card.icon className={`w-6 h-6 ${card.iconColor}`} />
+              <div className={`bg-gradient-to-br ${card.gradient} p-3 rounded-xl shadow-lg`}>
+                <card.icon className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {stats.recentPedidos.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Pedidos Recentes</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
-                  <th className="pb-3 font-medium">Pedido</th>
-                  <th className="pb-3 font-medium">Cliente</th>
-                  <th className="pb-3 font-medium">Valor</th>
-                  <th className="pb-3 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stats.recentPedidos.map((p) => (
-                  <tr key={p.id} className="border-b border-gray-50 dark:border-gray-700/50 last:border-0">
-                    <td className="py-3 font-mono text-xs text-gray-900 dark:text-gray-300">{p.numero_pedido}</td>
-                    <td className="py-3 text-gray-900 dark:text-gray-300">{p.cliente_nome || 'N/A'}</td>
-                    <td className="py-3 font-medium text-gray-900 dark:text-gray-300">R$ {(p.valor_total || 0).toFixed(2)}</td>
-                    <td className="py-3">
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 capitalize">
-                        {p.status || 'confirmado'}
-                      </span>
-                    </td>
+      {/* Bottom Row: Pedidos + Resumo */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Pedidos Recentes */}
+        <div className="lg:col-span-2 bg-gray-800/80 rounded-2xl border border-gray-700/50 overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-700/50 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <h3 className="font-semibold text-white text-sm">Pedidos Recentes</h3>
+            </div>
+            <span className="text-xs text-gray-500">{stats.recentPedidos.length} registros</span>
+          </div>
+          {stats.recentPedidos.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-gray-500 border-b border-gray-700/30">
+                    <th className="px-5 py-3 font-medium text-xs uppercase tracking-wider">Pedido</th>
+                    <th className="px-5 py-3 font-medium text-xs uppercase tracking-wider">Cliente</th>
+                    <th className="px-5 py-3 font-medium text-xs uppercase tracking-wider">Valor</th>
+                    <th className="px-5 py-3 font-medium text-xs uppercase tracking-wider">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {stats.recentPedidos.map((p) => {
+                    const st = getStatusStyle(p.status || 'confirmado');
+                    return (
+                      <tr key={p.id} className="border-b border-gray-700/20 last:border-0 hover:bg-white/[0.02] transition-colors">
+                        <td className="px-5 py-3.5 font-mono text-xs text-gray-300">{p.numero_pedido}</td>
+                        <td className="px-5 py-3.5 text-gray-300">{p.cliente_nome || 'N/A'}</td>
+                        <td className="px-5 py-3.5 font-semibold text-white">R$ {(p.valor_total || 0).toFixed(2)}</td>
+                        <td className="px-5 py-3.5">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${st.bg} ${st.text}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
+                            {p.status || 'confirmado'}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="px-5 py-12 text-center">
+              <ShoppingCart className="w-10 h-10 text-gray-700 mx-auto mb-3" />
+              <p className="text-gray-500 text-sm">Nenhum pedido recente</p>
+            </div>
+          )}
+        </div>
+
+        {/* Resumo Rápido */}
+        <div className="bg-gray-800/80 rounded-2xl border border-gray-700/50 p-5 flex flex-col gap-4">
+          <h3 className="font-semibold text-white text-sm">Resumo Rapido</h3>
+
+          {/* Progress bar */}
+          <div>
+            <div className="flex justify-between text-xs text-gray-400 mb-2">
+              <span>Taxa de Entrega</span>
+              <span className="font-semibold text-white">{entreguePercent}%</span>
+            </div>
+            <div className="h-2.5 bg-gray-700/50 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full transition-all duration-1000 ease-out"
+                style={{ width: `${entreguePercent}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Mini stats */}
+          <div className="space-y-3 mt-1">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-gray-700/30 border border-gray-700/30">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-orange-500/15 flex items-center justify-center">
+                  <AlertCircle className="w-4 h-4 text-orange-400" />
+                </div>
+                <span className="text-xs text-gray-400">Aguardando</span>
+              </div>
+              <span className="text-sm font-bold text-orange-400">{stats.pedidosPendentes}</span>
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-xl bg-gray-700/30 border border-gray-700/30">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-green-500/15 flex items-center justify-center">
+                  <PackageCheck className="w-4 h-4 text-green-400" />
+                </div>
+                <span className="text-xs text-gray-400">Finalizados</span>
+              </div>
+              <span className="text-sm font-bold text-green-400">{stats.pedidosEntregues}</span>
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-xl bg-gray-700/30 border border-gray-700/30">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/15 flex items-center justify-center">
+                  <UserCheck className="w-4 h-4 text-purple-400" />
+                </div>
+                <span className="text-xs text-gray-400">Clientes</span>
+              </div>
+              <span className="text-sm font-bold text-purple-400">{stats.totalUsuarios}</span>
+            </div>
+          </div>
+
+          {/* Receita destaque */}
+          <div className="mt-auto p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20">
+            <p className="text-xs text-emerald-400 font-medium mb-1">Receita Hoje</p>
+            <p className="text-2xl font-bold text-emerald-400">R$ {stats.receitaHoje.toFixed(2)}</p>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
