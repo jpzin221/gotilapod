@@ -355,10 +355,10 @@ export default function HeroSection({ businessHours, storeLocation, deliveryRadi
                   - Mobile: proporção 16:9 para banners widescreen
                   - Desktop: proporção mais larga para telas grandes
               */}
-              <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[5/2] lg:aspect-[21/8] flex items-center justify-center overflow-hidden">
+              <div className="relative w-full aspect-[4/5] sm:aspect-[2/1] md:aspect-[5/2] lg:aspect-[21/8] flex items-center justify-center overflow-hidden">
                 <picture className="absolute inset-0 w-full h-full">
                   <source
-                    media="(min-width: 768px)"
+                    media="(min-width: 640px)"
                     srcSet={slide.imageDesktop}
                   />
                   <img
