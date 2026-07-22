@@ -149,38 +149,38 @@ export default function ProductModal({ product, isOpen, onClose }) {
           className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-[95vw] sm:w-[85vw] max-w-lg max-h-[92vh] overflow-hidden pointer-events-auto animate-modal-in flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header com imagem */}
-          <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-2 sm:p-3 flex items-center justify-center flex-shrink-0">
-            <div className="relative">
+          {/* Header com imagem - ocupar largura total no mobile */}
+          <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center flex-shrink-0">
+            <div className="relative w-full">
               <div
-                className="w-28 h-28 sm:w-36 sm:h-36 cursor-pointer hover:opacity-80 transition-opacity"
+                className="w-full aspect-square sm:aspect-[4/3] max-h-[40vh] cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center p-4 sm:p-6"
                 onClick={() => setShowImageModal(true)}
                 title="Clique para ampliar"
               >
                 <img
                   src={productImages[currentImageIndex] || product.image_url}
                   alt={product.name}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain drop-shadow-lg"
                 />
               </div>
               {productImages.length > 1 && (
                 <>
                   <button onClick={() => setCurrentImageIndex(prev => (prev - 1 + productImages.length) % productImages.length)}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-white/80 hover:bg-white rounded-full p-1 shadow-md transition">
-                    <ChevronLeft className="w-4 h-4 text-gray-600" />
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition">
+                    <ChevronLeft className="w-5 h-5 text-gray-600" />
                   </button>
                   <button onClick={() => setCurrentImageIndex(prev => (prev + 1) % productImages.length)}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 bg-white/80 hover:bg-white rounded-full p-1 shadow-md transition">
-                    <ChevronRight className="w-4 h-4 text-gray-600" />
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition">
+                    <ChevronRight className="w-5 h-5 text-gray-600" />
                   </button>
                 </>
               )}
             </div>
             <button
               onClick={onClose}
-              className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white hover:bg-gray-100 rounded-full p-1.5 sm:p-2 shadow-lg transition-all hover:scale-110"
+              className="absolute top-3 right-3 bg-white hover:bg-gray-100 rounded-full p-2 shadow-lg transition-all hover:scale-110"
             >
-              <X className="w-5 h-5 sm:w-7 sm:h-7 text-gray-600" />
+              <X className="w-6 h-6 text-gray-600" />
             </button>
           </div>
 
