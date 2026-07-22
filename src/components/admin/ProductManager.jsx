@@ -148,18 +148,18 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
       )}
 
       {/* Header */}
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 sm:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <Package className="w-6 h-6 text-primary" />
+            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+              <Package className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               Produtos
-              <span className="text-sm font-normal text-gray-400 ml-2">{products.length} itens</span>
+              <span className="text-xs sm:text-sm font-normal text-gray-400 ml-1">{products.length} itens</span>
             </h2>
           </div>
           <button
             onClick={handleCreate}
-            className="flex items-center gap-2 bg-primary hover:bg-primary/80 text-white px-5 py-2.5 rounded-lg transition font-medium text-sm"
+            className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/80 text-white px-4 py-3 sm:py-2.5 rounded-lg transition font-medium text-sm min-h-[44px]"
           >
             <Plus className="w-4 h-4" />
             Novo Produto
@@ -167,23 +167,23 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
         </div>
 
         {/* Busca + Filtros */}
-        <div className="mt-4 flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
+        <div className="mt-3 sm:mt-4 space-y-3">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
             <input
               type="text"
               placeholder="Buscar produto..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              className="w-full pl-10 pr-4 py-3 sm:py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent outline-none min-h-[44px]"
             />
           </div>
-          <div className="flex gap-1.5 overflow-x-auto pb-1">
+          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-thin">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition
+                className={`px-3 py-2.5 sm:py-2 rounded-lg text-xs font-medium whitespace-nowrap transition min-h-[40px]
                   ${selectedCategory === cat
                     ? 'bg-primary text-white'
                     : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300'
@@ -200,11 +200,11 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
       {/* Lista */}
       <div className="space-y-3">
         {searchedCategories.length === 0 ? (
-          <div className="bg-gray-900 rounded-xl border border-gray-800 p-12 text-center">
-            <Package className="w-12 h-12 text-gray-700 mx-auto mb-3" />
-            <p className="text-gray-500">{searchTerm ? 'Nenhum produto encontrado' : 'Nenhum produto cadastrado'}</p>
+          <div className="bg-gray-900 rounded-xl border border-gray-800 p-8 sm:p-12 text-center">
+            <Package className="w-10 h-10 sm:w-12 sm:h-12 text-gray-700 mx-auto mb-3" />
+            <p className="text-gray-500 text-sm">{searchTerm ? 'Nenhum produto encontrado' : 'Nenhum produto cadastrado'}</p>
             {!searchTerm && (
-              <button onClick={handleCreate} className="mt-3 text-primary hover:text-primary/80 text-sm font-medium">
+              <button onClick={handleCreate} className="mt-3 text-primary hover:text-primary/80 text-sm font-medium min-h-[44px] inline-flex items-center">
                 Criar primeiro produto
               </button>
             )}
@@ -214,7 +214,7 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
             <div key={category} className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
               <button
                 onClick={() => toggleCategory(category)}
-                className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-800/50 transition"
+                className="w-full flex items-center justify-between px-4 sm:px-5 py-3.5 hover:bg-gray-800/50 transition min-h-[48px]"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -248,12 +248,66 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
                         onDragOver={handleDragOver}
                         onDragEnter={(e) => handleDragEnter(e, product)}
                         onDrop={(e) => handleDrop(e, product)}
-                        className={`px-5 py-3 border-t border-gray-800/50 transition cursor-move
+                        className={`px-4 sm:px-5 py-3 border-t border-gray-800/50 transition cursor-move
                           ${isOutOfStock ? 'opacity-50' : 'hover:bg-gray-800/30'}
                           ${isDragging ? 'opacity-30' : ''}
                           ${isDragOver ? 'border-t-2 border-primary' : ''}`}
                       >
-                        <div className="flex items-center gap-4">
+                        {/* Mobile layout */}
+                        <div className="sm:hidden">
+                          <div className="flex items-start gap-3">
+                            <GripVertical className="w-4 h-4 text-gray-600 flex-shrink-0 mt-1 cursor-grab active:cursor-grabbing" />
+                            {product.image_url ? (
+                              <img
+                                src={product.image_url}
+                                alt={product.name}
+                                className={`w-16 h-16 object-cover rounded-lg flex-shrink-0 ${isOutOfStock ? 'grayscale' : ''}`}
+                              />
+                            ) : (
+                              <div className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Package className="w-6 h-6 text-gray-600" />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h4 className="font-semibold text-white text-sm truncate">{product.name}</h4>
+                                {isOutOfStock && (
+                                  <span className="text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded font-medium">SEM ESTOQUE</span>
+                                )}
+                                {product.badge && (
+                                  <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-medium">{product.badge}</span>
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-500 truncate mt-0.5">{product.description}</p>
+                              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                                <span className="text-sm font-bold text-emerald-400">R$ {(product.price || 0).toFixed(2)}</span>
+                                {product.original_price && (
+                                  <span className="text-xs text-gray-600 line-through">R$ {product.original_price.toFixed(2)}</span>
+                                )}
+                                <span className="text-xs text-gray-600">Est: {product.stock_quantity || 0}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 mt-2 ml-7">
+                            <button
+                              onClick={() => handleEdit(product)}
+                              className="flex-1 flex items-center justify-center gap-1.5 p-2.5 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition text-xs font-medium min-h-[40px]"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                              Editar
+                            </button>
+                            <button
+                              onClick={() => onDelete(product.id)}
+                              className="flex-1 flex items-center justify-center gap-1.5 p-2.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition text-xs font-medium min-h-[40px]"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              Deletar
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Desktop layout */}
+                        <div className="hidden sm:flex items-center gap-4">
                           <GripVertical className="w-4 h-4 text-gray-600 flex-shrink-0 cursor-grab active:cursor-grabbing" />
 
                           {product.image_url ? (

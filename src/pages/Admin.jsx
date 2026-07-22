@@ -6,7 +6,7 @@ import {
   LogOut, Loader2, Settings, Home, Image, Package, MessageSquare,
   ShoppingBag, Route, TrendingUp, Clock, Tag, Sparkles, CreditCard, Users,
   FolderTree, LayoutDashboard, ChevronLeft, ChevronRight,
-  DollarSign, ShoppingCart, UserCheck, PackageCheck, AlertCircle, Moon, Sun
+  DollarSign, ShoppingCart, UserCheck, PackageCheck, AlertCircle, Moon, Sun, X
 } from 'lucide-react';
 import ProductManager from '../components/admin/ProductManager';
 import CategoryManager from '../components/admin/CategoryManager';
@@ -298,6 +298,7 @@ export default function Admin() {
   const [error, setError] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem('admin-dark-mode');
     return saved !== null ? JSON.parse(saved) : true;
@@ -460,29 +461,39 @@ export default function Admin() {
     <div className="min-h-screen bg-gray-950 flex text-gray-900 dark:text-gray-100">
       {/* Mobile overlay */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={() => setMobileMenuOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black/70 z-40 lg:hidden transition-opacity"
+          onClick={() => setMobileMenuOpen(false)}
+          onTouchStart={(e) => setTouchStart(e.touches[0].clientX)}
+          onTouchEnd={(e) => {
+            if (touchStart && e.changedTouches[0].clientX - touchStart > 80) {
+              setMobileMenuOpen(false);
+            }
+            setTouchStart(null);
+          }}
+        />
       )}
 
       {/* Sidebar */}
       <aside className={`fixed lg:sticky top-0 left-0 z-50 h-screen bg-gray-900 border-r border-gray-800 transition-all duration-300 flex flex-col
-        ${sidebarOpen ? 'w-60' : 'w-[70px]'}
+        ${mobileMenuOpen ? 'w-72 translate-x-0' : sidebarOpen ? 'w-60 lg:translate-x-0' : 'w-[70px] lg:translate-x-0'}
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
 
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-800">
-          {sidebarOpen && (
+        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-800 flex-shrink-0">
+          {sidebarOpen || mobileMenuOpen ? (
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                 <span className="text-white font-bold text-sm">A</span>
               </div>
               <span className="font-bold text-white text-lg truncate">Admin</span>
             </div>
-          )}
+          ) : <div />}
           <button onClick={() => {
-            if (window.innerWidth < 1024) setMobileMenuOpen(false);
+            if (mobileMenuOpen) setMobileMenuOpen(false);
             else setSidebarOpen(!sidebarOpen);
-          }} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-400">
-            {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          }} className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 min-w-[36px] min-h-[36px] flex items-center justify-center">
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           </button>
         </div>
 
@@ -495,33 +506,33 @@ export default function Admin() {
                 setActiveTab(item.id);
                 setMobileMenuOpen(false);
               }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 transition text-sm
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg mb-0.5 transition text-sm min-h-[44px]
                 ${activeTab === item.id
                   ? 'bg-primary/20 text-primary font-semibold'
                   : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
                 }`}
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />
-              {sidebarOpen && <span className="truncate">{item.label}</span>}
+              {(sidebarOpen || mobileMenuOpen) && <span className="truncate">{item.label}</span>}
             </button>
           ))}
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-gray-800 p-2 space-y-1">
+        <div className="border-t border-gray-800 p-2 space-y-1 flex-shrink-0">
           <button
-            onClick={() => navigate('/')}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-gray-200 text-sm"
+            onClick={() => { navigate('/'); setMobileMenuOpen(false); }}
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-gray-200 text-sm min-h-[44px]"
           >
             <Home className="w-5 h-5 flex-shrink-0" />
-            {sidebarOpen && <span>Ver Loja</span>}
+            {(sidebarOpen || mobileMenuOpen) && <span>Ver Loja</span>}
           </button>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 text-sm"
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 text-sm min-h-[44px]"
           >
             <LogOut className="w-5 h-5 flex-shrink-0" />
-            {sidebarOpen && <span>Sair</span>}
+            {(sidebarOpen || mobileMenuOpen) && <span>Sair</span>}
           </button>
         </div>
       </aside>
@@ -529,21 +540,21 @@ export default function Admin() {
       {/* Main content */}
       <div className="flex-1 min-w-0 bg-gray-950">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-gray-900/80 backdrop-blur-xl border-b border-gray-800 h-16 flex items-center px-4 sm:px-6 gap-4">
+        <header className="sticky top-0 z-30 bg-gray-900/80 backdrop-blur-xl border-b border-gray-800 h-14 sm:h-16 flex items-center px-3 sm:px-6 gap-3">
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-800 text-gray-400"
+            className="lg:hidden p-2.5 rounded-lg hover:bg-gray-800 text-gray-400 min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <div className="flex-1">
-            <p className="text-sm text-gray-400">{user?.email}</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-gray-400 truncate">{user?.email}</p>
           </div>
           <button
             onClick={() => setDark(!dark)}
-            className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-yellow-400 transition"
+            className="p-2.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-yellow-400 transition min-w-[44px] min-h-[44px] flex items-center justify-center"
             title={dark ? 'Modo claro' : 'Modo escuro'}
           >
             {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -551,7 +562,7 @@ export default function Admin() {
         </header>
 
         {/* Page content */}
-        <main className="p-4 sm:p-6">
+        <main className="p-3 sm:p-6">
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
               <p className="text-red-400">{error}</p>

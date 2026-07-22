@@ -24,7 +24,7 @@ function Input({ className = '', ...props }) {
   return (
     <input
       {...props}
-      className={`w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${className}`}
+      className={`w-full px-3 py-3 sm:py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition min-h-[44px] ${className}`}
     />
   );
 }
@@ -33,7 +33,7 @@ function Select({ className = '', children, ...props }) {
   return (
     <select
       {...props}
-      className={`w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition appearance-none ${className}`}
+      className={`w-full px-3 py-3 sm:py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition appearance-none min-h-[44px] ${className}`}
     >
       {children}
     </select>
@@ -44,7 +44,7 @@ function Textarea({ className = '', ...props }) {
   return (
     <textarea
       {...props}
-      className={`w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition resize-none ${className}`}
+      className={`w-full px-3 py-3 sm:py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition resize-none min-h-[44px] ${className}`}
     />
   );
 }
@@ -182,26 +182,26 @@ export default function ProductForm({ product, onSave, onClose }) {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-gray-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col border border-gray-800" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center sm:p-4" onClick={onClose}>
+      <div className="bg-gray-900 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-3xl max-h-[95vh] sm:max-h-[90vh] flex flex-col border border-gray-800" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-800 flex-shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-white">{product ? 'Editar Produto' : 'Novo Produto'}</h2>
+            <h2 className="text-base sm:text-lg font-bold text-white">{product ? 'Editar Produto' : 'Novo Produto'}</h2>
             {!product?.id && <p className="text-xs text-gray-500 mt-0.5">Salvamento automatico ativado</p>}
           </div>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition">
+          <button onClick={onClose} className="p-2.5 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition min-w-[44px] min-h-[44px] flex items-center justify-center">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Section tabs */}
-        <div className="flex gap-1 px-6 pt-3 border-b border-gray-800">
+        <div className="flex gap-1 px-3 sm:px-6 pt-2 sm:pt-3 border-b border-gray-800 overflow-x-auto scrollbar-thin flex-shrink-0">
           {sections.map((s) => (
             <button
               key={s.id}
               onClick={() => setActiveSection(s.id)}
-              className={`px-4 py-2 text-xs font-medium rounded-t-lg transition
+              className={`px-3 sm:px-4 py-2.5 sm:py-2 text-xs font-medium rounded-t-lg transition whitespace-nowrap min-h-[40px]
                 ${activeSection === s.id ? 'bg-gray-800 text-white border-b-2 border-primary' : 'text-gray-500 hover:text-gray-300'}`}
             >
               {s.label}
@@ -210,7 +210,7 @@ export default function ProductForm({ product, onSave, onClose }) {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5">
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-sm text-red-400">{error}</div>
           )}
@@ -404,13 +404,13 @@ export default function ProductForm({ product, onSave, onClose }) {
         </form>
 
         {/* Footer */}
-        <div className="flex gap-3 px-6 py-4 border-t border-gray-800">
+        <div className="flex gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-800 flex-shrink-0">
           <button type="button" onClick={onClose}
-            className="flex-1 px-4 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition text-sm font-medium">
+            className="flex-1 px-4 py-3 sm:py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition text-sm font-medium min-h-[44px]">
             Cancelar
           </button>
           <button type="submit" form="product-form" onClick={handleSubmit} disabled={loading}
-            className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary/80 text-white px-4 py-2.5 rounded-lg transition text-sm font-medium disabled:opacity-50">
+            className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary/80 text-white px-4 py-3 sm:py-2.5 rounded-lg transition text-sm font-medium disabled:opacity-50 min-h-[44px]">
             {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : <><Save className="w-4 h-4" /> Salvar</>}
           </button>
         </div>

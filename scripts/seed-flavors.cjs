@@ -4,89 +4,392 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const FLAVORS = [
-  // 🍓 Frutados e Cítricos
-  { name: 'Melancia', emoji: '🍉', category: 'Frutados' },
-  { name: 'Manga', emoji: '🥭', category: 'Frutados' },
-  { name: 'Uva', emoji: '🍇', category: 'Frutados' },
-  { name: 'Morangos com Banana', emoji: '🍓🍌', category: 'Frutados' },
-  { name: 'Limão com Menta', emoji: '🍋🌿', category: 'Frutados' },
-  { name: 'Maçã Verde com Pêssego', emoji: '🍏🍑', category: 'Frutados' },
-  { name: 'Cereja com Limão', emoji: '🍒🍋', category: 'Frutados' },
-  { name: 'Kiwi com Maracujá e Goiaba', emoji: '🥝 Passion Fruit', category: 'Frutados' },
-
-  // ❄️ Menta e Ice
-  { name: 'Cool Mint', emoji: '❄️', category: 'Menta' },
-  { name: 'Mirtilo com Menta', emoji: '🫐🌿', category: 'Menta' },
-  { name: 'Berry Blast', emoji: '🫐🍓', category: 'Menta' },
-
-  // 🍰 Sobremesas e Doces
-  { name: 'Algodão Doce', emoji: '🍭', category: 'Doces' },
-  { name: 'Vanilla Custard', emoji: '🍦', category: 'Doces' },
-  { name: 'Sorvete de Morango', emoji: '🍨', category: 'Doces' },
-  { name: 'Cheesecake de Morango', emoji: '🍰', category: 'Doces' },
-
-  // 🍹 Bebidas e Exóticos
-  { name: 'Pink Lemonade', emoji: '🍹', category: 'Exoticos' },
-  { name: 'Energy Drink', emoji: '⚡', category: 'Exoticos' },
+  { name: 'Açai Berry', emoji: '🫐' },
+  { name: 'Aloe Grape', emoji: '🌿🍇' },
+  { name: 'Aloe Vera Grape', emoji: '🌿🍇' },
+  { name: 'American Patriot', emoji: '🇺🇸' },
+  { name: 'Apple Cantaloupe', emoji: '🍈' },
+  { name: 'Apple Cataloupe', emoji: '🍈' },
+  { name: 'Apple Champagne', emoji: '🍏🥂' },
+  { name: 'Apple Grape', emoji: '🍏🍇' },
+  { name: 'Apple ice', emoji: '🍏🧊' },
+  { name: 'Apple Mix', emoji: '🍏' },
+  { name: 'Apple Peach', emoji: '🍏🍑' },
+  { name: 'Apple Surge', emoji: '🍏⚡' },
+  { name: 'Arctic Air', emoji: '❄️' },
+  { name: 'Avocado Cream', emoji: '🥑' },
+  { name: 'Banana Coconut', emoji: '🍌🥥' },
+  { name: 'Banana Cream', emoji: '🍌🍦' },
+  { name: 'Banana Frost', emoji: '🍌❄️' },
+  { name: 'Banana Ice', emoji: '🍌🧊' },
+  { name: 'Berries', emoji: '🫐' },
+  { name: 'Berries Ice', emoji: '🫐🧊' },
+  { name: 'Berries Sensation', emoji: '🫐✨' },
+  { name: 'Berries Watermelon Ice + Double Apple Ice', emoji: '🫐🍉🍏🧊' },
+  { name: 'Berry Blue', emoji: '🫐' },
+  { name: 'Berry Mix', emoji: '🫐🍓' },
+  { name: 'Black Lemonade', emoji: '🍋🖤' },
+  { name: 'Black Mint Ice', emoji: '🌿🖤🧊' },
+  { name: 'Black Strawnana', emoji: '🍓🍌🖤' },
+  { name: 'BlackBerry', emoji: '🫐' },
+  { name: 'Blackcurrant', emoji: '🫐' },
+  { name: 'Blood Orange', emoji: '🍊' },
+  { name: 'Blosson Mint', emoji: '🌸🌿' },
+  { name: 'Blue Cotton Candy', emoji: '🩵🍬' },
+  { name: 'Blue Dream', emoji: '💙' },
+  { name: 'Blue Ice', emoji: '💙🧊' },
+  { name: 'Blue Raspberry', emoji: '🫐' },
+  { name: 'Blue Raspberry Ice', emoji: '🫐🧊' },
+  { name: 'Blue Razz', emoji: '💙' },
+  { name: 'Blue Razz Ice', emoji: '💙🧊' },
+  { name: 'Blue Razz Lemon', emoji: '💙🍋' },
+  { name: 'Blue Razz Lemonade', emoji: '💙🍋' },
+  { name: 'Blueberry', emoji: '🫐' },
+  { name: 'Blueberry Duo Ice', emoji: '🫐🧊' },
+  { name: 'Blueberry Ice', emoji: '🫐🧊' },
+  { name: 'Blueberry Lemon Ice', emoji: '🫐🍋🧊' },
+  { name: 'Blueberry PB Cloud', emoji: '🫐☁️' },
+  { name: 'Blueberry Raspberry', emoji: '🫐🍓' },
+  { name: 'Blueberry raspberry cherry', emoji: '🫐🍓🍒' },
+  { name: 'Blueberry Raspberry Ice', emoji: '🫐🍓🧊' },
+  { name: 'Blueberry Raspberry Pomegranate', emoji: '🫐🍓🫒' },
+  { name: 'Brain Freeze Ice', emoji: '🧠🧊' },
+  { name: 'Bubbamelon Ice', emoji: '🍉🧊' },
+  { name: 'Bubble Gum', emoji: '🫧' },
+  { name: 'Bubble Gum Ice + Fresh Mint + Strawberry Banana Ice', emoji: '🫧🌿🍓🍌🧊' },
+  { name: 'Bubblegum', emoji: '🫧' },
+  { name: 'Buble gum', emoji: '🫧' },
+  { name: 'Caffe Latte Ice', emoji: '☕🧊' },
+  { name: 'California Cherry', emoji: '🍒🌴' },
+  { name: 'Cantaloupe Apple', emoji: '🍈🍏' },
+  { name: 'Cappuccino', emoji: '☕' },
+  { name: 'Cherry Banana Duo', emoji: '🍒🍌' },
+  { name: 'Cherry Cola', emoji: '🍒🥤' },
+  { name: 'Cherry Dream', emoji: '🍒💭' },
+  { name: 'Cherry Grape Lemonade', emoji: '🍒🍇🍋' },
+  { name: 'Cherry Ice', emoji: '🍒🧊' },
+  { name: 'Cherry Lemon Ice', emoji: '🍒🍋🧊' },
+  { name: 'Cherry Lemon Peach Ice', emoji: '🍒🍋🍑🧊' },
+  { name: 'Cherry Menthol', emoji: '🍒🌿' },
+  { name: 'Cherry Peach Lemonade', emoji: '🍒🍑🍋' },
+  { name: 'Chocolate Cookie', emoji: '🍫🍪' },
+  { name: 'Cigar Cream Tobacco', emoji: '🚬' },
+  { name: 'Coconut Melon', emoji: '🥥🍈' },
+  { name: 'Coffe Latte', emoji: '☕' },
+  { name: 'Coffee', emoji: '☕' },
+  { name: 'Coffee Hazelnut', emoji: '☕🌰' },
+  { name: 'Cola', emoji: '🥤' },
+  { name: 'Cola Ice', emoji: '🥤🧊' },
+  { name: 'Cola Lemon', emoji: '🥤🍋' },
+  { name: 'Cool Menthol', emoji: '❄️🌿' },
+  { name: 'Cool Mint', emoji: '❄️🌿' },
+  { name: 'Cotton Candy', emoji: '🍬' },
+  { name: 'Cranberry Coconut', emoji: '🍒🥥' },
+  { name: 'Cranberry Grape', emoji: '🍒🍇' },
+  { name: 'Cranberry Kiwi', emoji: '🍒🥝' },
+  { name: 'Cranberry Lemonade', emoji: '🍒🍋' },
+  { name: 'Cranberry soda', emoji: '🍒🥤' },
+  { name: 'Crystal Juice', emoji: '💎' },
+  { name: 'Cucumber Ice', emoji: '🥒🧊' },
+  { name: 'Double Apple', emoji: '🍏🍏' },
+  { name: 'Double Melon Ice + Blue Raspberry Ice + Brain Freeze', emoji: '🍈🍈💙🧊' },
+  { name: 'Double Melon Ice + Brain Freeze', emoji: '🍈🍈🧊' },
+  { name: 'Double Mint', emoji: '🌿🌿' },
+  { name: 'Elf Bull', emoji: '🧝🐂' },
+  { name: 'Energy', emoji: '⚡' },
+  { name: 'Energy Drink', emoji: '⚡🥤' },
+  { name: 'Energy Juice', emoji: '⚡🧃' },
+  { name: 'Fantasy Cherry', emoji: '🍒✨' },
+  { name: 'Forest Berries', emoji: '🫐🌲' },
+  { name: 'Fresh Berries', emoji: '🫐✨' },
+  { name: 'Fresh Mint', emoji: '🌿✨' },
+  { name: 'Fresh Mint + Strawberry Banana Ice', emoji: '🌿🍓🍌🧊' },
+  { name: 'Fresh Orange', emoji: '🍊✨' },
+  { name: 'Frost Mint', emoji: '❄️🌿' },
+  { name: 'Frosted Berries', emoji: '🫐❄️' },
+  { name: 'Frozen Mint', emoji: '🧊🌿' },
+  { name: 'Fruit Mint', emoji: '🍓🌿' },
+  { name: 'Fruit Splash', emoji: '🍓💦' },
+  { name: 'Gin Tonic', emoji: '🍸' },
+  { name: 'Grape', emoji: '🍇' },
+  { name: 'Grape apple ice', emoji: '🍇🍏🧊' },
+  { name: 'Grape Bubblegum', emoji: '🍇🫧' },
+  { name: 'Grape Candy', emoji: '🍇🍬' },
+  { name: 'Grape Candy Ice', emoji: '🍇🍬🧊' },
+  { name: 'Grape Doce', emoji: '🍇🍯' },
+  { name: 'Grape Energy', emoji: '🍇⚡' },
+  { name: 'Grape Fruit', emoji: '🍇🍊' },
+  { name: 'Grape Fruit Ice', emoji: '🍇🍊🧊' },
+  { name: 'Grape Ice', emoji: '🍇🧊' },
+  { name: 'Grape KiwiFruit', emoji: '🍇🥝' },
+  { name: 'Grape Melon Ice', emoji: '🍇🍈🧊' },
+  { name: 'Grape Paradise', emoji: '🍇🏝️' },
+  { name: 'Grapefruit Burst', emoji: '🍊💥' },
+  { name: 'Grappe Ice', emoji: '🍇🧊' },
+  { name: 'Green Apple', emoji: '🍏' },
+  { name: 'Green Apple Ice', emoji: '🍏🧊' },
+  { name: 'Green Apple Kiwi Ice', emoji: '🍏🥝🧊' },
+  { name: 'Green Apple Peach Kiwi', emoji: '🍏🍑🥝' },
+  { name: 'Green Grape Ice', emoji: '💚🍇🧊' },
+  { name: 'Guava Berries Ice', emoji: '🫐🧊' },
+  { name: 'Guava Ice', emoji: '🥭🧊' },
+  { name: 'Guava Kiwi Strawberry', emoji: '🥭🥝🍓' },
+  { name: 'Guava Raspeberry', emoji: '🥭🍓' },
+  { name: 'Gum Mint', emoji: '🫧🌿' },
+  { name: 'Gummy Bear', emoji: '🧸' },
+  { name: 'Halls Orange', emoji: '🍊💊' },
+  { name: 'Hawaiian Ice', emoji: '🏖️🧊' },
+  { name: 'Hawaiian Pog', emoji: '🌴🍊' },
+  { name: 'Holz Blueberry', emoji: '🫐🪵' },
+  { name: 'Holz Cherry', emoji: '🍒🪵' },
+  { name: 'Holz Grape', emoji: '🍇🪵' },
+  { name: 'Holz Lemon', emoji: '🍋🪵' },
+  { name: 'Holz Mango', emoji: '🥭🪵' },
+  { name: 'Holz Menthol', emoji: '🌿🪵' },
+  { name: 'Holz Orange', emoji: '🍊🪵' },
+  { name: 'Holz Strawberry', emoji: '🍓🪵' },
+  { name: 'Holz Watermelon', emoji: '🍉🪵' },
+  { name: 'HoneyDew Melon Ice', emoji: '🍈🧊' },
+  { name: 'Ice Cherry', emoji: '🍒🧊' },
+  { name: 'Ice Grape', emoji: '🍇🧊' },
+  { name: 'Ice Mango', emoji: '🥭🧊' },
+  { name: 'Ice Mint', emoji: '🌿🧊' },
+  { name: 'Ice Passion Fruit', emoji: '🥭🧊' },
+  { name: 'Ice Peach', emoji: '🍑🧊' },
+  { name: 'Ice Watermelon', emoji: '🍉🧊' },
+  { name: 'Icy Mint', emoji: '🧊🌿' },
+  { name: 'Jolli Candy', emoji: '🍬' },
+  { name: 'JollyApple', emoji: '🍏' },
+  { name: 'Juice Peach', emoji: '🍑🧃' },
+  { name: 'Juice Rum', emoji: '🍹' },
+  { name: 'Juicy Grape', emoji: '🍇💦' },
+  { name: 'Juicy Peach', emoji: '🍑💦' },
+  { name: 'Just Mint', emoji: '🌿' },
+  { name: 'Kiwi', emoji: '🥝' },
+  { name: 'Kiwi Guava Strawberry', emoji: '🥝🥭🍓' },
+  { name: 'Kiwi Melon Ice', emoji: '🥝🍈🧊' },
+  { name: 'Kiwi Passion Fruit Guava', emoji: '🥝🥭' },
+  { name: 'Kiwi PassionFruit Guava', emoji: '🥝🥭' },
+  { name: 'Kiwi Pineapple Mango', emoji: '🥝🍍🥭' },
+  { name: 'Kiwi Watermellon', emoji: '🥝🍉' },
+  { name: 'Kiwi Watermelon', emoji: '🥝🍉' },
+  { name: 'Kiwiberry Ice', emoji: '🥝🫐🧊' },
+  { name: 'Lava Flow', emoji: '🌋' },
+  { name: 'Lemon Blueberry Razz', emoji: '🍋🫐💙' },
+  { name: 'Lemon Grass', emoji: '🍋🌾' },
+  { name: 'Lemon Ice', emoji: '🍋🧊' },
+  { name: 'Lemon Lime', emoji: '🍋🍈' },
+  { name: 'Lemon Lime Passion Fruit', emoji: '🍋🍈🥭' },
+  { name: 'Lemon Mint', emoji: '🍋🌿' },
+  { name: 'Lime Pomelo', emoji: '🍈🍊' },
+  { name: 'Love 66', emoji: '❤️' },
+  { name: 'Lush Ice', emoji: '🍉🧊' },
+  { name: 'Lychee', emoji: '🍈' },
+  { name: 'Lychee Ice', emoji: '🍈🧊' },
+  { name: 'Lychee Strawberry Watermellon', emoji: '🍈🍓🍉' },
+  { name: 'Lychee Strawberry Watermelon', emoji: '🍈🍓🍉' },
+  { name: 'Lychee Watermelon Ice', emoji: '🍈🍉🧊' },
+  { name: 'Mad Blue', emoji: '💙😤' },
+  { name: 'Mamba', emoji: '🐍' },
+  { name: 'Mandarin Lime', emoji: '🍊🍈' },
+  { name: 'Mango', emoji: '🥭' },
+  { name: 'Mango Blackcurrant', emoji: '🥭🫐' },
+  { name: 'Mango Grape Ice', emoji: '🥭🍇🧊' },
+  { name: 'Mango Ice', emoji: '🥭🧊' },
+  { name: 'Mango Kiss', emoji: '🥭💋' },
+  { name: 'Mango Lychee', emoji: '🥭🍈' },
+  { name: 'Mango Milkshake', emoji: '🥭🥛' },
+  { name: 'Mango Passion', emoji: '🥭🥭' },
+  { name: 'Mango passion fruit', emoji: '🥭🥭' },
+  { name: 'Mango Passion Fruit Ice', emoji: '🥭🥭🧊' },
+  { name: 'Mango Passion Ice', emoji: '🥭🧊' },
+  { name: 'Mango Peach', emoji: '🥭🍑' },
+  { name: 'Mango Peach Grape', emoji: '🥭🍑🍇' },
+  { name: 'Mango Peach Orange', emoji: '🥭🍑🍊' },
+  { name: 'Mango Pineapple', emoji: '🥭🍍' },
+  { name: 'Mango Pomelo Dragon', emoji: '🥭🐉' },
+  { name: 'Mary Dream', emoji: '💭' },
+  { name: 'Melon Ice', emoji: '🍈🧊' },
+  { name: 'Melon Pineapple Menthol', emoji: '🍈🍍🌿' },
+  { name: 'Melon Watermelon Ice + Halls Black Cherry + Triple Grape Ice', emoji: '🍈🍉🍒🍇🧊' },
+  { name: 'Menthol', emoji: '🌿' },
+  { name: 'Mint', emoji: '🌿' },
+  { name: 'Mint Ice', emoji: '🌿🧊' },
+  { name: 'Mint Menthol', emoji: '🌿🌿' },
+  { name: 'Mixed Berries', emoji: '🫐🍓' },
+  { name: 'Mixed Berry', emoji: '🫐🍓' },
+  { name: 'Mixed Fruit', emoji: '🍓🥝🍇' },
+  { name: 'Mojito', emoji: '🍹' },
+  { name: 'OMG', emoji: '😮' },
+  { name: 'Orange', emoji: '🍊' },
+  { name: 'Orange Ice', emoji: '🍊🧊' },
+  { name: 'Orange Star Fruit Kiwi Ice', emoji: '🍊⭐🥝🧊' },
+  { name: 'Passion Fruit', emoji: '🥭' },
+  { name: 'Passion Fruit Kiwi Guava', emoji: '🥭🥝' },
+  { name: 'Passion Fruit Kiwi Lime', emoji: '🥭🥝🍈' },
+  { name: 'Passion Fruit Lemon', emoji: '🥭🍋' },
+  { name: 'Passion Fruit Orange Guava', emoji: '🥭🍊' },
+  { name: 'Passion grapefruit', emoji: '🥭🍊' },
+  { name: 'Passion Guava', emoji: '🥭' },
+  { name: 'Passion Mix Ice', emoji: '🥭🧊' },
+  { name: 'Peach', emoji: '🍑' },
+  { name: 'Peach Cantaloupe Papaya', emoji: '🍑🍈' },
+  { name: 'Peach Crunch', emoji: '🍑💥' },
+  { name: 'Peach Frost', emoji: '🍑❄️' },
+  { name: 'Peach Grape', emoji: '🍑🍇' },
+  { name: 'Peach Grape Ice', emoji: '🍑🍇🧊' },
+  { name: 'Peach Ice', emoji: '🍑🧊' },
+  { name: 'Peach mango', emoji: '🍑🥭' },
+  { name: 'Peach Mango Ice', emoji: '🍑🥭🧊' },
+  { name: 'Peach Mango Lemon', emoji: '🍑🥭🍋' },
+  { name: 'Peach Mango Watermelon', emoji: '🍑🥭🍉' },
+  { name: 'Peach Pie', emoji: '🍑🥧' },
+  { name: 'Peach Raspberry', emoji: '🍑🍓' },
+  { name: 'Peper Mint', emoji: '🌿' },
+  { name: 'Pineapple', emoji: '🍍' },
+  { name: 'Pineapple Coconut', emoji: '🍍🥥' },
+  { name: 'Pineapple coconut ice', emoji: '🍍🥥🧊' },
+  { name: 'Pineapple Grape Ice + Banana Grape Ice', emoji: '🍍🍇🍌🧊' },
+  { name: 'Pineapple Grape Ice + Banana Grape Ice + Mango Strawberry Ice', emoji: '🍍🍇🍌🥭🍓🧊' },
+  { name: 'Pineapple GrapeFruit', emoji: '🍍🍊' },
+  { name: 'Pineapple Ice', emoji: '🍍🧊' },
+  { name: 'Pineapple lemon', emoji: '🍍🍋' },
+  { name: 'Pineapple Lemonade', emoji: '🍍🍋' },
+  { name: 'Pineapple Mango', emoji: '🍍🥭' },
+  { name: 'Pineapple Mango Orange', emoji: '🍍🥭🍊' },
+  { name: 'Pineapple Menthol', emoji: '🍍🌿' },
+  { name: 'Pineapple Peach Lemonade', emoji: '🍍🍑🍋' },
+  { name: 'Pink Bomb', emoji: '💣🩷' },
+  { name: 'Pink Grapefruit', emoji: '🩷🍊' },
+  { name: 'Pink Lemonade', emoji: '🩷🍋' },
+  { name: 'Pome ice', emoji: '🫒🧊' },
+  { name: 'Pomelo Pearl Grape', emoji: '🍊🫧🍇' },
+  { name: 'Pop Ice', emoji: '🧊' },
+  { name: 'Purple Grape Ice', emoji: '💜🍇🧊' },
+  { name: 'Rainbow Candy', emoji: '🌈🍬' },
+  { name: 'Rainbow Cloudz', emoji: '🌈☁️' },
+  { name: 'Raspberry Cherry', emoji: '🍓🍒' },
+  { name: 'Raspberry Coke', emoji: '🍓🥤' },
+  { name: 'Raspberry Lemonade', emoji: '🍓🍋' },
+  { name: 'Raspberry Lychee', emoji: '🍓🍈' },
+  { name: 'Raspberry Orange Ice', emoji: '🍓🍊🧊' },
+  { name: 'RaspBerry PomeGranete', emoji: '🍓🫒' },
+  { name: 'Raspberry Watermelon', emoji: '🍓🍉' },
+  { name: 'Raspy Blue', emoji: '💙' },
+  { name: 'Red Apple Ice', emoji: '🍎🧊' },
+  { name: 'Red Mojito', emoji: '🍹❤️' },
+  { name: 'Rich Mango', emoji: '🥭✨' },
+  { name: 'Roman', emoji: '🏛️' },
+  { name: 'Rose Sour Plum Mint', emoji: '🌹🍑🌿' },
+  { name: 'Sakura Grape', emoji: '🌸🍇' },
+  { name: 'Skittles', emoji: '🌈🍬' },
+  { name: 'Smooth Grape', emoji: '🍇✨' },
+  { name: 'Smooth Tobacco', emoji: '🚬✨' },
+  { name: 'Sour Apple', emoji: '🍏😤' },
+  { name: 'Sour Apple Ice', emoji: '🍏😤🧊' },
+  { name: 'Sour Green Apple Ice', emoji: '🍏😤🧊' },
+  { name: 'Spearmint', emoji: '🌿' },
+  { name: 'Spicy Mango', emoji: '🥭🌶️' },
+  { name: 'Strawberry', emoji: '🍓' },
+  { name: 'Strawberry Apple Blackcurrant', emoji: '🍓🍏🫐' },
+  { name: 'Strawberry Apple Watermelon', emoji: '🍓🍏🍉' },
+  { name: 'Strawberry Banana', emoji: '🍓🍌' },
+  { name: 'Strawberry banana ice', emoji: '🍓🍌🧊' },
+  { name: 'Strawberry Blast', emoji: '🍓💥' },
+  { name: 'Strawberry blueberry cherry', emoji: '🍓🫐🍒' },
+  { name: 'Strawberry Cheesecake', emoji: '🍓🧀' },
+  { name: 'Strawberry Cream', emoji: '🍓🍦' },
+  { name: 'Strawberry Duo Ice', emoji: '🍓🧊' },
+  { name: 'Strawberry Guava Ice', emoji: '🍓🥭🧊' },
+  { name: 'Strawberry Ice', emoji: '🍓🧊' },
+  { name: 'Strawberry Ice Cream', emoji: '🍓🍨' },
+  { name: 'Strawberry Kiwi', emoji: '🍓🥝' },
+  { name: 'Strawberry Kiwi Ice', emoji: '🍓🥝🧊' },
+  { name: 'Strawberry Kiwi Ice + Fruit Strawberry Ice + Grape Apple Ice', emoji: '🍓🥝🍇🍏🧊' },
+  { name: 'Strawberry Kiwi Ice + Passion Fruit Strawberry Ice', emoji: '🍓🥝🥭🧊' },
+  { name: 'Strawberry Kiwi Watermelon', emoji: '🍓🥝🍉' },
+  { name: 'Strawberry Litchi', emoji: '🍓🍈' },
+  { name: 'Strawberry Lychee', emoji: '🍓🍈' },
+  { name: 'Strawberry Mango', emoji: '🍓🥭' },
+  { name: 'Strawberry milk', emoji: '🍓🥛' },
+  { name: 'Strawberry Mint', emoji: '🍓🌿' },
+  { name: 'Strawberry Pina Colada', emoji: '🍓🍍🥥' },
+  { name: 'Strawberry Shake', emoji: '🍓🥤' },
+  { name: 'Strawberry Sundae', emoji: '🍓🍨' },
+  { name: 'Strawberry Watermelon', emoji: '🍓🍉' },
+  { name: 'Strawberry Watermelon Ice', emoji: '🍓🍉🧊' },
+  { name: 'Strawberry Yogurt', emoji: '🍓🥛' },
+  { name: 'StrawLemon Ice', emoji: '🍓🍋🧊' },
+  { name: 'StrawLychee', emoji: '🍓🍈' },
+  { name: 'StrawNana Ice', emoji: '🍓🍌🧊' },
+  { name: 'Super Berry', emoji: '🫐💪' },
+  { name: 'Sweet Peach', emoji: '🍑🍯' },
+  { name: 'Tangerina Ice', emoji: '🍊🧊' },
+  { name: 'Tobacco', emoji: '🚬' },
+  { name: 'Tobacco Menthol', emoji: '🚬🌿' },
+  { name: 'Tobacco Nutz', emoji: '🚬🥜' },
+  { name: 'Triple Berry Ice', emoji: '🫐🍓🫐🧊' },
+  { name: 'Triple Grape Ice + Melon Watermelon Ice', emoji: '🍇🍇🍇🍈🍉🧊' },
+  { name: 'Tropical Fruit', emoji: '🌴🍓' },
+  { name: 'Tropical Island', emoji: '🏝️' },
+  { name: 'Tropical Rainbow Blast', emoji: '🌈🌴💥' },
+  { name: 'Vanilla Cream Cake', emoji: '🍦🎂' },
+  { name: 'Vanilla Ice Cream', emoji: '🍦' },
+  { name: 'Vanilla matcha', emoji: '🍦🍵' },
+  { name: 'Very Berries', emoji: '🫐✨' },
+  { name: 'Virginica Tobacco', emoji: '🚬' },
+  { name: 'Watermelon', emoji: '🍉' },
+  { name: 'Watermelon Apple Ice', emoji: '🍉🍏🧊' },
+  { name: 'Watermelon Bubble Gum', emoji: '🍉🫧' },
+  { name: 'Watermelon Candy Ice', emoji: '🍉🍬🧊' },
+  { name: 'Watermelon Cherry Ice + Double Apple Ice + Berries Watermelon Ice', emoji: '🍉🍒🍏🫐🧊' },
+  { name: 'Watermelon Ice', emoji: '🍉🧊' },
+  { name: 'Watermelon Lemon', emoji: '🍉🍋' },
+  { name: 'Watermelon Lemon Ice', emoji: '🍉🍋🧊' },
+  { name: 'Watermelon Mint', emoji: '🍉🌿' },
+  { name: 'Watermelon Mix', emoji: '🍉' },
+  { name: 'Watermelon Nana Duo Ice', emoji: '🍉🍌🧊' },
+  { name: 'White Gummy', emoji: '🤍🧸' },
+  { name: 'White Peach', emoji: '🤍🍑' },
+  { name: 'White Slush', emoji: '🤍🧊' },
 ];
 
-async function seedFlavors() {
-  console.log('=== SEED: Adicionando sabores ===\n');
+async function run() {
+  console.log('=== SUBSTITUINDO TODOS OS SABORES ===\n');
 
-  // Primeiro, limpar sabores existentes (opcional - comente se quiser manter)
-  // await supabase.from('flavors').delete().neq('id', 0);
+  // Deletar todos os sabores existentes
+  console.log('Limpando sabores antigos...');
+  const { error: delErr } = await supabase.from('flavors').delete().neq('id', 0);
+  if (delErr) console.log('Erro ao deletar:', delErr.message);
+  else console.log('Sabores antigos removidos!\n');
 
+  // Inserir novos sabores em lotes
+  const BATCH_SIZE = 50;
   let added = 0;
-  let skipped = 0;
 
-  for (const flavor of FLAVORS) {
-    // Verificar se já existe
-    const { data: existing } = await supabase
-      .from('flavors')
-      .select('id')
-      .eq('name', flavor.name)
-      .limit(1);
+  for (let i = 0; i < FLAVORS.length; i += BATCH_SIZE) {
+    const batch = FLAVORS.slice(i, i + BATCH_SIZE).map(f => ({
+      name: f.name,
+      emoji: f.emoji,
+      is_active: true
+    }));
 
-    if (existing && existing.length > 0) {
-      console.log(`  ⏭ ${flavor.emoji} ${flavor.name} - já existe`);
-      skipped++;
-      continue;
-    }
-
-    const { error } = await supabase
-      .from('flavors')
-      .insert([{
-        name: flavor.name,
-        emoji: flavor.emoji,
-        is_active: true
-      }]);
-
+    const { data, error } = await supabase.from('flavors').insert(batch).select();
     if (error) {
-      console.log(`  ❌ ${flavor.emoji} ${flavor.name} - ERRO: ${error.message}`);
+      console.log(`Erro no lote ${Math.floor(i / BATCH_SIZE) + 1}:`, error.message);
     } else {
-      console.log(`  ✅ ${flavor.emoji} ${flavor.name}`);
-      added++;
+      added += data.length;
+      console.log(`Lote ${Math.floor(i / BATCH_SIZE) + 1}: ${data.length} sabores inseridos`);
     }
   }
 
   console.log(`\n=== RESUMO ===`);
-  console.log(`Adicionados: ${added}`);
-  console.log(`Já existiam: ${skipped}`);
-  console.log(`Total: ${added + skipped}`);
+  console.log(`Total inserido: ${added} sabores`);
 
-  // Listar todos os sabores
-  console.log('\n=== TODOS OS SABORES ===');
-  const { data: allFlavors } = await supabase
-    .from('flavors')
-    .select('*')
-    .order('name');
-
-  if (allFlavors) {
-    allFlavors.forEach(f => {
-      console.log(`  ${f.emoji || '🏷'} ${f.name} (ativo: ${f.is_active})`);
-    });
-    console.log(`\nTotal: ${allFlavors.length} sabores`);
-  }
+  // Listar todos
+  const { data: all } = await supabase.from('flavors').select('name, emoji').order('name');
+  console.log(`\nTodos os ${all?.length || 0} sabores:`);
+  all?.forEach(f => console.log(`  ${f.emoji || '🏷'} ${f.name}`));
 }
 
-seedFlavors().catch(console.error);
+run().catch(console.error);

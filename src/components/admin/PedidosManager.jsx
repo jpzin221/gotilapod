@@ -220,45 +220,45 @@ export default function PedidosManager() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-3xl font-bold text-gray-800">Gerenciar Pedidos</h2>
-          <p className="text-gray-600 mt-1">
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-800">Gerenciar Pedidos</h2>
+          <p className="text-gray-600 mt-1 text-sm">
             {pedidos.length} pedidos no total
           </p>
         </div>
         <button
           onClick={carregarPedidos}
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition"
+          className="px-4 py-3 sm:py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm min-h-[44px] flex items-center justify-center gap-2"
         >
           🔄 Atualizar
         </button>
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-lg shadow-md p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+        <div className="space-y-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:space-y-0">
           {/* Busca */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
             <input
               type="text"
-              placeholder="Buscar por número, cliente ou telefone..."
+              placeholder="Buscar pedido, cliente..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full pl-9 sm:pl-10 pr-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm min-h-[44px]"
             />
           </div>
 
           {/* Filtro Status */}
           <div className="relative">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
             <select
               value={filtroStatus}
               onChange={(e) => setFiltroStatus(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent appearance-none"
+              className="w-full pl-9 sm:pl-10 pr-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent appearance-none text-sm min-h-[44px]"
             >
               <option value="todos">Todos os Status</option>
               {statusOptions.map(status => (
@@ -272,67 +272,63 @@ export default function PedidosManager() {
       </div>
 
       {/* Lista de Pedidos */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {pedidosFiltrados.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">Nenhum pedido encontrado</p>
+          <div className="bg-white rounded-lg shadow-md p-6 sm:p-8 text-center">
+            <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
+            <p className="text-gray-600 text-sm">Nenhum pedido encontrado</p>
           </div>
         ) : (
           pedidosFiltrados.map(pedido => (
-            <div key={pedido.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                {/* Informações do Pedido */}
-                <div className="lg:col-span-2">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Package className="w-6 h-6 text-primary" />
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-800">
-                        {pedido.numero_pedido}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {formatDate(pedido.created_at)}
-                      </p>
-                    </div>
+            <div key={pedido.id} className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition">
+              {/* Mobile layout */}
+              <div className="sm:hidden space-y-3">
+                <div className="flex items-center gap-3">
+                  <Package className="w-5 h-5 text-primary flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-bold text-gray-800 truncate">{pedido.numero_pedido}</h3>
+                    <p className="text-xs text-gray-500">{formatDate(pedido.created_at)}</p>
                   </div>
-
-                  <div className="space-y-2 text-sm">
-                    <p><span className="font-semibold">Cliente:</span> {pedido.nome_cliente || 'N/A'}</p>
-                    <p><span className="font-semibold">CPF:</span> {pedido.cpf_cliente || 'N/A'}</p>
-                    <p><span className="font-semibold">Telefone:</span> {pedido.telefone || 'N/A'}</p>
-                    <p><span className="font-semibold">Valor:</span> {formatPrice(pedido.valor_total)}</p>
-
-                    {pedido.endereco_entrega && (
-                      <div className="text-xs text-gray-600 mt-2 p-2 bg-gray-50 rounded">
-                        <MapPin className="w-3 h-3 inline mr-1" />
-                        <span className="font-semibold">Endereço:</span>
-                        <br />
-                        {pedido.endereco_entrega.endereco || ''}, {pedido.endereco_entrega.numero || 'S/N'}
-                        {pedido.endereco_entrega.complemento && ` - ${pedido.endereco_entrega.complemento}`}
-                        <br />
-                        {pedido.endereco_entrega.bairro || ''} - {pedido.endereco_entrega.cidade || ''}/{pedido.endereco_entrega.estado || ''}
-                        <br />
-                        CEP: {pedido.endereco_entrega.cep || 'N/A'}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Status Atual */}
-                <div className="flex flex-col justify-center">
-                  <p className="text-sm text-gray-600 mb-2">Status Atual:</p>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${STATUS_COLORS[pedido.status] || 'bg-gray-100 text-gray-800'}`}>
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[pedido.status] || 'bg-gray-100 text-gray-800'}`}>
                     {STATUS_LABELS[pedido.status] || pedido.status}
                   </span>
                 </div>
 
-                {/* Alterar Status */}
-                <div className="flex flex-col justify-center">
-                  <label className="text-sm text-gray-600 mb-2">Alterar para:</label>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div><span className="text-gray-500">Cliente:</span> <span className="font-medium">{pedido.nome_cliente || 'N/A'}</span></div>
+                  <div><span className="text-gray-500">Valor:</span> <span className="font-bold text-emerald-600">{formatPrice(pedido.valor_total)}</span></div>
+                  <div><span className="text-gray-500">Tel:</span> <span className="font-medium">{pedido.telefone || 'N/A'}</span></div>
+                  <div><span className="text-gray-500">CPF:</span> <span className="font-medium text-xs">{pedido.cpf_cliente || 'N/A'}</span></div>
+                </div>
+
+                {pedido.endereco_entrega && (
+                  <div className="text-xs text-gray-600 p-2 bg-gray-50 rounded-lg">
+                    <MapPin className="w-3 h-3 inline mr-1" />
+                    {pedido.endereco_entrega.endereco || ''}, {pedido.endereco_entrega.numero || 'S/N'}
+                    {pedido.endereco_entrega.complemento && ` - ${pedido.endereco_entrega.complemento}`}
+                    <br />
+                    {pedido.endereco_entrega.bairro || ''} - {pedido.endereco_entrega.cidade || ''}/{pedido.endereco_entrega.estado || ''}
+                  </div>
+                )}
+
+                {pedido.itens && pedido.itens.length > 0 && (
+                  <div className="text-xs space-y-0.5">
+                    <p className="font-semibold text-gray-700">Itens:</p>
+                    {pedido.itens.map((item, index) => (
+                      <p key={index} className="text-gray-600">
+                        {item.quantidade}x {item.nome}
+                        {item.sabor && <span className="text-primary"> - {item.sabor}</span>}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Alterar status:</label>
                   <select
                     value={pedido.status}
                     onChange={(e) => alterarStatus(pedido.id, e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm min-h-[44px]"
                   >
                     {statusOptions.map(status => (
                       <option key={status.value} value={status.value}>
@@ -343,22 +339,69 @@ export default function PedidosManager() {
                 </div>
               </div>
 
-              {/* Itens do Pedido */}
-              {pedido.itens && pedido.itens.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-sm font-semibold text-gray-700 mb-2">Itens:</p>
-                  <div className="space-y-1">
-                    {pedido.itens.map((item, index) => (
-                      <p key={index} className="text-sm text-gray-600">
-                        {item.quantidade}x {item.nome}
-                        {item.sabor && <span className="text-primary"> - {item.sabor}</span>}
-                      </p>
-                    ))}
+              {/* Desktop layout */}
+              <div className="hidden sm:block">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                  <div className="lg:col-span-2">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Package className="w-6 h-6 text-primary" />
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-800">{pedido.numero_pedido}</h3>
+                        <p className="text-sm text-gray-500">{formatDate(pedido.created_at)}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <p><span className="font-semibold">Cliente:</span> {pedido.nome_cliente || 'N/A'}</p>
+                      <p><span className="font-semibold">CPF:</span> {pedido.cpf_cliente || 'N/A'}</p>
+                      <p><span className="font-semibold">Telefone:</span> {pedido.telefone || 'N/A'}</p>
+                      <p><span className="font-semibold">Valor:</span> {formatPrice(pedido.valor_total)}</p>
+                      {pedido.endereco_entrega && (
+                        <div className="text-xs text-gray-600 mt-2 p-2 bg-gray-50 rounded">
+                          <MapPin className="w-3 h-3 inline mr-1" />
+                          <span className="font-semibold">Endereço:</span><br />
+                          {pedido.endereco_entrega.endereco || ''}, {pedido.endereco_entrega.numero || 'S/N'}
+                          {pedido.endereco_entrega.complemento && ` - ${pedido.endereco_entrega.complemento}`}<br />
+                          {pedido.endereco_entrega.bairro || ''} - {pedido.endereco_entrega.cidade || ''}/{pedido.endereco_entrega.estado || ''}<br />
+                          CEP: {pedido.endereco_entrega.cep || 'N/A'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <p className="text-sm text-gray-600 mb-2">Status Atual:</p>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${STATUS_COLORS[pedido.status] || 'bg-gray-100 text-gray-800'}`}>
+                      {STATUS_LABELS[pedido.status] || pedido.status}
+                    </span>
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <label className="text-sm text-gray-600 mb-2">Alterar para:</label>
+                    <select
+                      value={pedido.status}
+                      onChange={(e) => alterarStatus(pedido.id, e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    >
+                      {statusOptions.map(status => (
+                        <option key={status.value} value={status.value}>{status.label}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
-              )}
+                {pedido.itens && pedido.itens.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <p className="text-sm font-semibold text-gray-700 mb-2">Itens:</p>
+                    <div className="space-y-1">
+                      {pedido.itens.map((item, index) => (
+                        <p key={index} className="text-sm text-gray-600">
+                          {item.quantidade}x {item.nome}
+                          {item.sabor && <span className="text-primary"> - {item.sabor}</span>}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
 
-              {/* Mini Timeline */}
+              {/* Mini Timeline - both layouts */}
               <MiniTimeline currentStatus={pedido.status} />
             </div>
           ))
