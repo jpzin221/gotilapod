@@ -56,17 +56,20 @@ export default function PromotionsSection({ products, onProductClick, activeCate
   return (
     <section className="mb-12">
       {/* Header da Seção */}
-      <div className="bg-gradient-to-r from-red-600 via-green-600 to-red-700 rounded-2xl p-4 sm:p-6 mb-6 shadow-xl border-4 border-yellow-400">
+      <div style={{
+        background: `linear-gradient(to right, ${bannerSettings.gradient_start || '#dc2626'}, ${bannerSettings.gradient_end || '#16a34a'})`,
+        borderColor: bannerSettings.border_color || '#facc15'
+      }} className="rounded-2xl p-4 sm:p-6 mb-6 shadow-xl border-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center animate-pulse flex-shrink-0">
               <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="text-base sm:text-xl md:text-2xl font-bold text-white mb-0.5 sm:mb-1 leading-tight">
+              <h2 className="text-base sm:text-xl md:text-2xl font-bold mb-0.5 sm:mb-1 leading-tight" style={{ color: bannerSettings.text_color || '#ffffff' }}>
                 {formatTextWithEmojis(bannerSettings.title)}
               </h2>
-              <p className="text-white/90 text-xs sm:text-sm leading-tight">
+              <p className="text-xs sm:text-sm leading-tight" style={{ color: bannerSettings.text_color || '#ffffff' }}>
                 {formatTextWithEmojis(bannerSettings.subtitle)}
               </p>
             </div>
@@ -93,10 +96,13 @@ export default function PromotionsSection({ products, onProductClick, activeCate
       </div>
 
       {/* Footer da Seção */}
-      <div className="mt-6 p-3 sm:p-4 bg-gradient-to-r from-red-50 via-green-50 to-red-50 border-2 border-red-300 rounded-lg">
+      <div style={{
+        background: bannerSettings.footer_bg || '#fef2f2',
+        borderColor: bannerSettings.footer_border || '#fca5a5'
+      }} className="mt-6 p-3 sm:p-4 border-2 rounded-lg">
         <div className="flex items-center gap-2 sm:gap-3 justify-center text-center">
           <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 flex-shrink-0" />
-          <p className="text-xs sm:text-sm text-gray-700">
+          <p className="text-xs sm:text-sm" style={{ color: bannerSettings.footer_text_color || '#1f2937' }}>
             <span className="font-bold text-red-600">{formatTextWithEmojis(bannerSettings.footer_text)}</span>
           </p>
         </div>

@@ -210,10 +210,11 @@ export default function Admin() {
 
   const loadPedidos = async () => {
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-      const response = await fetch(`${backendUrl}/api/pedidos/todos`);
-      const data = await response.json();
-      if (data.success) setPedidos(data.pedidos || []);
+      const { data, error } = await supabase
+        .from('pedidos')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error) setPedidos(data || []);
     } catch (err) {
       console.error('Error loading pedidos:', err);
     }

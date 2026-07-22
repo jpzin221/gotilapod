@@ -8,7 +8,14 @@ export default function PromotionBannerManager() {
     subtitle: '',
     badge_text: '',
     footer_text: '',
-    is_active: true
+    is_active: true,
+    gradient_start: '#dc2626',
+    gradient_end: '#16a34a',
+    border_color: '#facc15',
+    text_color: '#ffffff',
+    footer_bg: '#fef2f2',
+    footer_border: '#fca5a5',
+    footer_text_color: '#1f2937'
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -43,7 +50,14 @@ export default function PromotionBannerManager() {
         subtitle: settings.subtitle,
         badge_text: settings.badge_text,
         footer_text: settings.footer_text,
-        is_active: settings.is_active
+        is_active: settings.is_active,
+        gradient_start: settings.gradient_start,
+        gradient_end: settings.gradient_end,
+        border_color: settings.border_color,
+        text_color: settings.text_color,
+        footer_bg: settings.footer_bg,
+        footer_border: settings.footer_border,
+        footer_text_color: settings.footer_text_color
       });
 
       setMessage({ type: 'success', text: 'Configurações salvas com sucesso!' });
@@ -94,14 +108,17 @@ export default function PromotionBannerManager() {
       {/* Preview do Banner */}
       <div className="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
         <p className="text-xs text-gray-500 mb-3 font-semibold">PREVIEW:</p>
-        <div className="bg-gradient-to-r from-red-600 via-green-600 to-red-700 rounded-2xl p-6 border-4 border-yellow-400">
+        <div style={{
+          background: `linear-gradient(to right, ${settings.gradient_start}, ${settings.gradient_end})`,
+          borderColor: settings.border_color
+        }} className="rounded-2xl p-6 border-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                 <Tag className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white mb-1">
+                <h2 className="text-2xl font-bold mb-1" style={{ color: settings.text_color }}>
                   {settings.title || 'Título do Banner'}
                 </h2>
                 <p className="text-white/90 text-sm">
@@ -115,8 +132,11 @@ export default function PromotionBannerManager() {
             </div>
           </div>
         </div>
-        <div className="mt-3 bg-gradient-to-r from-red-50 via-green-50 to-red-50 border-2 border-red-300 rounded-lg p-3 text-center">
-          <p className="text-sm text-gray-700">
+        <div style={{
+          background: settings.footer_bg,
+          borderColor: settings.footer_border
+        }} className="mt-3 border-2 rounded-lg p-3 text-center">
+          <p style={{ color: settings.footer_text_color }} className="text-sm">
             {settings.footer_text || 'Texto do rodapé'}
           </p>
         </div>
@@ -181,6 +201,62 @@ export default function PromotionBannerManager() {
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             placeholder="Ex: 🎉 Aproveite as festas! Ofertas especiais de fim de ano"
           />
+        </div>
+
+        {/* Cores do Banner */}
+        <div className="pt-4 border-t border-gray-200">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">🎨 Cores do Banner</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Gradiente Início</label>
+              <div className="flex items-center gap-2">
+                <input type="color" value={settings.gradient_start} onChange={(e) => setSettings({...settings, gradient_start: e.target.value})} className="w-10 h-10 rounded cursor-pointer border-0" />
+                <span className="text-xs text-gray-400">{settings.gradient_start}</span>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Gradiente Fim</label>
+              <div className="flex items-center gap-2">
+                <input type="color" value={settings.gradient_end} onChange={(e) => setSettings({...settings, gradient_end: e.target.value})} className="w-10 h-10 rounded cursor-pointer border-0" />
+                <span className="text-xs text-gray-400">{settings.gradient_end}</span>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Cor da Borda</label>
+              <div className="flex items-center gap-2">
+                <input type="color" value={settings.border_color} onChange={(e) => setSettings({...settings, border_color: e.target.value})} className="w-10 h-10 rounded cursor-pointer border-0" />
+                <span className="text-xs text-gray-400">{settings.border_color}</span>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Cor do Texto</label>
+              <div className="flex items-center gap-2">
+                <input type="color" value={settings.text_color} onChange={(e) => setSettings({...settings, text_color: e.target.value})} className="w-10 h-10 rounded cursor-pointer border-0" />
+                <span className="text-xs text-gray-400">{settings.text_color}</span>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Fundo Rodapé</label>
+              <div className="flex items-center gap-2">
+                <input type="color" value={settings.footer_bg} onChange={(e) => setSettings({...settings, footer_bg: e.target.value})} className="w-10 h-10 rounded cursor-pointer border-0" />
+                <span className="text-xs text-gray-400">{settings.footer_bg}</span>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Borda Rodapé</label>
+              <div className="flex items-center gap-2">
+                <input type="color" value={settings.footer_border} onChange={(e) => setSettings({...settings, footer_border: e.target.value})} className="w-10 h-10 rounded cursor-pointer border-0" />
+                <span className="text-xs text-gray-400">{settings.footer_border}</span>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Texto Rodapé</label>
+              <div className="flex items-center gap-2">
+                <input type="color" value={settings.footer_text_color} onChange={(e) => setSettings({...settings, footer_text_color: e.target.value})} className="w-10 h-10 rounded cursor-pointer border-0" />
+                <span className="text-xs text-gray-400">{settings.footer_text_color}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Ativo/Inativo */}
