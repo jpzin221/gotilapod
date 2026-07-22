@@ -79,7 +79,7 @@ export default function SocialProofNotification() {
             cidade,
             produto: produto.name,
             preco: `R$ ${produto.price?.toFixed(2).replace('.', ',')}`,
-            imagem: produto.image,
+            imagem: produto.image_url,
             tempo,
             quantidade
         };

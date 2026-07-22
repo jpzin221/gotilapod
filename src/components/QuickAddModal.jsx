@@ -101,7 +101,7 @@ export default function QuickAddModal({ product, isOpen, onClose }) {
                         </button>
                         <div className="flex items-center gap-3 pr-8">
                             <img
-                                src={product.image}
+                                src={product.image_url}
                                 alt={product.name}
                                 className="w-14 h-14 rounded-lg object-cover bg-white"
                             />

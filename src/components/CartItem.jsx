@@ -70,7 +70,7 @@ export default function CartItem({ item }) {
       <div className="flex gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-gray-50 transition">
         {/* Imagem */}
         <img
-          src={item.image}
+          src={item.image_url}
           alt={item.name}
           className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg flex-shrink-0"
         />

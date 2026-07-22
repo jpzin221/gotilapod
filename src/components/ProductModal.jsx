@@ -152,7 +152,7 @@ export default function ProductModal({ product, isOpen, onClose }) {
               title="Clique para ampliar"
             >
               <img
-                src={product.image}
+                src={product.image_url}
                 alt={product.name}
                 className="w-full h-full object-contain"
               />
@@ -569,7 +569,7 @@ export default function ProductModal({ product, isOpen, onClose }) {
       {/* Modal de Visualização de Imagem */}
       {showImageModal && (
         <ImageModal
-          imageUrl={product.image}
+          imageUrl={product.image_url}
           imageName={product.name}
           onClose={() => setShowImageModal(false)}
         />

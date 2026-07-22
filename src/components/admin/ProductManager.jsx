@@ -104,7 +104,7 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
         const productData = {
           id: product.id, name: product.name, description: product.description,
           detailed_description: product.detailed_description, price: product.price,
-          original_price: product.original_price, image: product.image,
+          original_price: product.original_price, image_url: product.image_url,
           category: product.category, badge: product.badge, rating: product.rating,
           reviews: product.reviews, puff_count: product.puff_count,
           stock_quantity: product.stock_quantity, low_stock_threshold: product.low_stock_threshold,
@@ -256,9 +256,9 @@ export default function ProductManager({ products, onSave, onDelete, onRefresh }
                         <div className="flex items-center gap-4">
                           <GripVertical className="w-4 h-4 text-gray-600 flex-shrink-0 cursor-grab active:cursor-grabbing" />
 
-                          {product.image ? (
+                          {product.image_url ? (
                             <img
-                              src={product.image}
+                              src={product.image_url}
                               alt={product.name}
                               className={`w-14 h-14 object-cover rounded-lg flex-shrink-0 ${isOutOfStock ? 'grayscale' : ''}`}
                             />
