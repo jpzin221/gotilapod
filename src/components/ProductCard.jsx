@@ -7,7 +7,13 @@ import QuickAddModal from './QuickAddModal';
 export default function ProductCard({ product, onClick }) {
   const { addToCart } = useCart();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-  const [promotionBadgeText, setPromotionBadgeText] = useState('🎁 OFERTA NATAL');
+  const [promotionSettings, setPromotionSettings] = useState({
+    badge_text: '🎁 OFERTA NATAL',
+    gradient_start: '#dc2626',
+    gradient_end: '#16a34a',
+    border_color: '#facc15',
+    text_color: '#ffffff'
+  });
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -25,17 +31,22 @@ export default function ProductCard({ product, onClick }) {
     setCurrentImageIndex(prev => (prev - 1 + productImages.length) % productImages.length);
   }, [productImages.length]);
 
-  // Buscar texto do badge de promoção
   useEffect(() => {
     const loadPromotionBadge = async () => {
       try {
         const settings = await promotionBannerService.getSettings();
-        if (settings?.badge_text) {
-          setPromotionBadgeText(settings.badge_text);
+        if (settings) {
+          setPromotionSettings(prev => ({
+            ...prev,
+            badge_text: settings.badge_text || prev.badge_text,
+            gradient_start: settings.gradient_start || prev.gradient_start,
+            gradient_end: settings.gradient_end || prev.gradient_end,
+            border_color: settings.border_color || prev.border_color,
+            text_color: settings.text_color || prev.text_color
+          }));
         }
       } catch (error) {
         console.error('Erro ao carregar badge de promoção:', error);
-        // Mantém valor padrão
       }
     };
 
@@ -121,8 +132,17 @@ export default function ProductCard({ product, onClick }) {
 
             {/* Badge de Promoção - PRIORIDADE MÁXIMA */}
             {product.em_promocao ? (
-              <div className="bg-gradient-to-r from-red-600 to-green-600 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-bounce border-2 border-yellow-400 whitespace-nowrap w-fit">
-                {promotionBadgeText}
+              <div
+                className="text-[10px] sm:text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-bounce whitespace-nowrap w-fit"
+                style={{
+                  background: `linear-gradient(to right, ${promotionSettings.gradient_start}, ${promotionSettings.gradient_end})`,
+                  color: promotionSettings.text_color,
+                  borderColor: promotionSettings.border_color,
+                  borderWidth: '2px',
+                  borderStyle: 'solid'
+                }}
+              >
+                {promotionSettings.badge_text}
               </div>
             ) : (
               /* Badge Principal - só aparece se NÃO estiver em promoção */
