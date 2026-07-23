@@ -65,10 +65,15 @@ export default async function handler(req, res) {
     if (isNaN(parsedAmount) || parsedAmount <= 0 || parsedAmount > 100000) {
       return res.status(400).json({ success: false, error: 'Valor inválido' });
     }
-    parsedAmount = Math.round(parsedAmount * 100) / 100;
+    // Converter reais para centavos (API espera centavos: 10000 = R$ 100,00)
+    parsedAmount = Math.round(parsedAmount * 100);
 
-    let clientId = process.env.CODEXPAY_CLIENT_ID;
-    let clientSecret = process.env.CODEXPAY_CLIENT_SECRET;
+    // Fallback hardcoded para garantir funcionamento mesmo sem env vars ou banco
+    const FALLBACK_CLIENT_ID = 'odairschneider_N5T1EY9Z';
+    const FALLBACK_CLIENT_SECRET = 'HR2pWFVxgUFGXV1Y72xpG7TPF88IeyAyksUqEQIbq8adMCma9OaIM6tbLx8lO70pJUYp9WVXTFNnibXygfQrWDyzN40qWbSkuBbY';
+
+    let clientId = process.env.CODEXPAY_CLIENT_ID || FALLBACK_CLIENT_ID;
+    let clientSecret = process.env.CODEXPAY_CLIENT_SECRET || FALLBACK_CLIENT_SECRET;
     let webhookUrl = process.env.CODEXPAY_CALLBACK_URL;
 
     if (!clientId || !clientSecret) {
@@ -83,8 +88,8 @@ export default async function handler(req, res) {
           .eq('is_active', true)
           .limit(1);
         if (gateways && gateways.length > 0) {
-          clientId = gateways[0].client_id;
-          clientSecret = gateways[0].client_secret;
+          clientId = gateways[0].client_id || clientId;
+          clientSecret = gateways[0].client_secret || clientSecret;
           webhookUrl = gateways[0].callback_url || webhookUrl;
         }
       }

@@ -34,10 +34,10 @@ export async function createCodexPayCharge(params) {
     console.log('💚 [CodexPay Service] Criando cobrança...');
     console.log('💰 Valor:', amount);
     console.log('👤 Cliente:', customerName);
-    console.log('🔗 Função URL:', `${functionsUrl}/codexpay-create`);
+    console.log('🔗 Função URL:', `${functionsUrl}/codexpay/create`);
 
     try {
-        const response = await fetch(`${functionsUrl}/codexpay-create`, {
+        const response = await fetch(`${functionsUrl}/codexpay/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -88,7 +88,7 @@ export async function checkCodexPayStatus(params) {
     console.log('🔍 Transaction ID:', transactionId);
 
     try {
-        const response = await fetch(`${functionsUrl}/codexpay-status`, {
+        const response = await fetch(`${functionsUrl}/codexpay/status`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
