@@ -1176,6 +1176,7 @@ export const categoryService = {
         slug: categoryData.slug || categoryData.name.toLowerCase().replace(/\s+/g, '-'),
         description: categoryData.description,
         icon: categoryData.icon,
+        image_url: categoryData.image_url || null,
         display_order: categoryData.display_order || 0,
         is_active: categoryData.is_active !== undefined ? categoryData.is_active : true
       })

@@ -191,13 +191,16 @@ function App() {
 
   // Ordenar categorias e esconder "Sem Categoria" no final (ou não exibir)
   const orderedCategories = useMemo(() => {
-    const entries = Object.entries(groupedProducts);
+    const categoryImageMap = {};
+    allCategories.forEach(c => { if (c.image_url) categoryImageMap[c.name] = c.image_url; });
+
+    const entries = Object.entries(groupedProducts).map(([name, prods]) => [name, prods, categoryImageMap[name] || null]);
     // Separar "Sem Categoria" do resto
     const semCategoria = entries.filter(([name]) => name === 'Sem Categoria');
     const outras = entries.filter(([name]) => name !== 'Sem Categoria');
     // Não exibir "Sem Categoria" no frontend público (apenas admin vê)
     return outras;
-  }, [groupedProducts]);
+  }, [groupedProducts, allCategories]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -261,12 +264,13 @@ function App() {
 
               {/* Seções de Produtos por Categoria */}
               {orderedCategories.length > 0 ? (
-                orderedCategories.map(([category, categoryProducts]) => (
+                orderedCategories.map(([category, categoryProducts, categoryImage]) => (
                   <ProductSection
                     key={category}
                     title={category}
                     products={categoryProducts}
                     onProductClick={handleProductClick}
+                    categoryImage={categoryImage}
                   />
                 ))
               ) : (

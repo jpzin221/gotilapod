@@ -1,12 +1,15 @@
 import ProductCard from './ProductCard';
 
-export default function ProductSection({ title, products, onProductClick }) {
+export default function ProductSection({ title, products, onProductClick, categoryImage }) {
   return (
     <section className="mb-10">
       {/* Separador visual de categoria */}
       <div className="relative mb-5">
         <div className="flex items-center gap-3 px-4">
           <div className="w-1.5 h-8 bg-gradient-to-b from-primary to-secondary rounded-full flex-shrink-0"></div>
+          {categoryImage ? (
+            <img src={categoryImage} alt={title} className="h-8 w-auto object-contain flex-shrink-0" />
+          ) : null}
           <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight uppercase">
             {title}
           </h2>

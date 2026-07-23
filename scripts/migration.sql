@@ -73,3 +73,6 @@ DO $$ BEGIN
   CREATE POLICY "Public read flavors" ON flavors FOR SELECT USING (true);
 EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
+
+-- 8. Adicionar coluna image_url na tabela categories (imagem da marca/categoria)
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS image_url text;

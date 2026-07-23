@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import {
     Loader2, Save, Plus, Trash2, Edit, GripVertical,
-    Tag, Eye, EyeOff, CheckCircle, AlertCircle
+    Tag, Eye, EyeOff, CheckCircle, AlertCircle, Upload, X
 } from 'lucide-react';
-import { categoryService } from '../../lib/supabase';
+import { categoryService, imageUploadService } from '../../lib/supabase';
 
 export default function CategoryManager() {
     const [categories, setCategories] = useState([]);
@@ -16,9 +16,11 @@ export default function CategoryManager() {
         slug: '',
         description: '',
         icon: '📦',
+        image_url: '',
         is_active: true
     });
     const [message, setMessage] = useState({ type: '', text: '' });
+    const [uploadingImage, setUploadingImage] = useState(false);
 
     useEffect(() => {
         loadCategories();
@@ -77,6 +79,7 @@ export default function CategoryManager() {
             slug: category.slug,
             description: category.description || '',
             icon: category.icon || '📦',
+            image_url: category.image_url || '',
             is_active: category.is_active
         });
         setEditingId(category.id);
@@ -102,6 +105,7 @@ export default function CategoryManager() {
             slug: '',
             description: '',
             icon: '📦',
+            image_url: '',
             is_active: true
         });
         setEditingId(null);
@@ -115,6 +119,21 @@ export default function CategoryManager() {
             .replace(/[\u0300-\u036f]/g, '')
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-+|-+$/g, '');
+    };
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            setUploadingImage(true);
+            const url = await imageUploadService.upload(file, 'categories');
+            setFormData({ ...formData, image_url: url });
+        } catch (error) {
+            console.error('Erro no upload:', error);
+            showMessage('error', 'Erro ao fazer upload da imagem');
+        } finally {
+            setUploadingImage(false);
+        }
     };
 
     if (loading) {
@@ -221,10 +240,37 @@ export default function CategoryManager() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Imagem da Categoria */}
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    Imagem (Logo da Marca)
+                                </label>
+                                {formData.image_url && (
+                                    <div className="relative mb-2 inline-block">
+                                        <img src={formData.image_url} alt="Preview" className="h-16 w-auto rounded-lg border-2 border-gray-200 object-contain bg-gray-50" />
+                                        <button type="button" onClick={() => setFormData({ ...formData, image_url: '' })}
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600">
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                )}
+                                <div className="flex gap-2">
+                                    <label className="cursor-pointer">
+                                        <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition ${uploadingImage ? 'bg-gray-200' : 'bg-gray-100 hover:bg-gray-200'}`}>
+                                            {uploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                                            <span>{uploadingImage ? 'Enviando...' : 'Upload'}</span>
+                                        </div>
+                                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploadingImage} />
+                                    </label>
+                                    <input type="text" value={formData.image_url} onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                                        placeholder="Ou cole a URL" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary text-sm" />
+                                </div>
+                            </div>
+
                             {/* Ícone/Emoji */}
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                    Ícone (Emoji)
+                                    Ícone (Emoji) — fallback se não tiver imagem
                                 </label>
                                 <input
                                     type="text"
@@ -301,6 +347,9 @@ export default function CategoryManager() {
                                         <GripVertical className="w-4 h-4" />
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Imagem
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                         Nome
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -321,7 +370,11 @@ export default function CategoryManager() {
                                 {categories.map((category) => (
                                     <tr key={category.id} className="hover:bg-gray-50 transition">
                                         <td className="px-6 py-4">
-                                            <span className="text-2xl">{category.icon || '📦'}</span>
+                                            {category.image_url ? (
+                                                <img src={category.image_url} alt={category.name} className="h-10 w-auto object-contain rounded" />
+                                            ) : (
+                                                <span className="text-2xl">{category.icon || '📦'}</span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="font-semibold text-gray-800">{category.name}</span>
