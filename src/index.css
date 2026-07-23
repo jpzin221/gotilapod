@@ -297,14 +297,13 @@ html {
 /* Responsividade global */
 @media (max-width: 640px) {
   html {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
 
-@media (max-width: 380px) {
-  html {
-    font-size: 13px;
-  }
+/* Previne zoom no iOS ao focar inputs */
+input, select, textarea, button {
+  font-size: 16px;
 }
 
 /* Dark mode overrides para o Admin */
