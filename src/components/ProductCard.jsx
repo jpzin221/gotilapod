@@ -119,8 +119,8 @@ export default function ProductCard({ product, onClick }) {
         }`}
       onClick={isOutOfStock ? undefined : onClick}
     >
-      {/* Imagem - mais alta no mobile para melhor visualização */}
-      <div className="relative aspect-[3/4] sm:aspect-square bg-gradient-to-br from-gray-50 to-gray-100 flex-shrink-0 overflow-hidden">
+      {/* Imagem */}
+      <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 flex-shrink-0 overflow-hidden">
         {/* Container de Badges - Hierarquia clara e sem duplicação */}
         <div className="absolute top-2 left-2 right-2 z-[5] flex flex-col sm:flex-row sm:justify-between gap-1.5">
           <div className="flex flex-col gap-1.5">
@@ -179,19 +179,19 @@ export default function ProductCard({ product, onClick }) {
 
         {/* Sem Estoque */}
         {product.stock_quantity === 0 && (
-          <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[5] rounded-lg">
+          <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[5]">
             <span className="text-white font-bold text-sm sm:text-base">Esgotado</span>
           </div>
         )}
 
         {/* Carousel de Imagens */}
-        <div className="relative w-full h-full">
+        <div className="relative w-full">
           {productImages.length > 0 ? (
             <>
               <img
                 src={productImages[currentImageIndex]}
                 alt={product.name}
-                className="w-full h-full object-contain sm:object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full max-h-52 sm:max-h-none sm:h-full sm:aspect-square object-contain sm:object-cover group-hover:scale-105 transition-transform duration-300"
               />
               {productImages.length > 1 && (
                 <>
@@ -212,7 +212,7 @@ export default function ProductCard({ product, onClick }) {
               )}
             </>
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100">
+            <div className="w-full h-40 sm:h-48 flex items-center justify-center bg-gray-100">
               <Star className="w-8 h-8 text-gray-300" />
             </div>
           )}
