@@ -68,14 +68,12 @@ export default async function handler(req, res) {
     // Converter reais para centavos (API espera centavos: 10000 = R$ 100,00)
     parsedAmount = Math.round(parsedAmount * 100);
 
-    // Fallback hardcoded para garantir funcionamento mesmo sem env vars ou banco
-    const FALLBACK_CLIENT_ID = 'odairschneider_N5T1EY9Z';
-    const FALLBACK_CLIENT_SECRET = 'HR2pWFVxgUFGXV1Y72xpG7TPF88IeyAyksUqEQIbq8adMCma9OaIM6tbLx8lO70pJUYp9WVXTFNnibXygfQrWDyzN40qWbSkuBbY';
+    let clientId = process.env.CODEXPAY_CLIENT_ID || null;
+    let clientSecret = process.env.CODEXPAY_CLIENT_SECRET || null;
+    let webhookUrl = process.env.CODEXPAY_CALLBACK_URL || null;
 
-    let clientId = process.env.CODEXPAY_CLIENT_ID || FALLBACK_CLIENT_ID;
-    let clientSecret = process.env.CODEXPAY_CLIENT_SECRET || FALLBACK_CLIENT_SECRET;
-    let webhookUrl = process.env.CODEXPAY_CALLBACK_URL;
-
+    // Prioridade 1: Variáveis de ambiente
+    // Prioridade 2: Banco de dados (Supabase)
     if (!clientId || !clientSecret) {
       const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
       const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
@@ -94,6 +92,12 @@ export default async function handler(req, res) {
         }
       }
     }
+
+    // Prioridade 3: Fallback hardcoded (conta de teste com limites baixos)
+    const FALLBACK_CLIENT_ID = 'odairschneider_N5T1EY9Z';
+    const FALLBACK_CLIENT_SECRET = 'HR2pWFVxgUFGXV1Y72xpG7TPF88IeyAyksUqEQIbq8adMCma9OaIM6tbLx8lO70pJUYp9WVXTFNnibXygfQrWDyzN40qWbSkuBbY';
+    clientId = clientId || FALLBACK_CLIENT_ID;
+    clientSecret = clientSecret || FALLBACK_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
       return res.status(400).json({ success: false, error: 'Credenciais CodexPay não configuradas' });
@@ -126,7 +130,11 @@ export default async function handler(req, res) {
 
     const data = await response.json();
     if (!response.ok) {
-      return res.status(response.status).json({ success: false, error: 'Erro ao gerar PIX', details: data });
+      console.error('CodexPay API error:', response.status, JSON.stringify(data));
+      const errorMsg = data.message === 'Contact support'
+        ? 'Erro na conta CodexPay. Verifique as credenciais ou entre em contato com o suporte.'
+        : (data.message || 'Erro ao gerar PIX');
+      return res.status(response.status).json({ success: false, error: errorMsg, details: data });
     }
 
     const qrCodeResponse = data.qrCodeResponse || data;
@@ -159,7 +167,10 @@ export default async function handler(req, res) {
       raw: data
     });
   } catch (error) {
-    console.error('CodexPay create error:', error);
-    return res.status(500).json({ success: false, error: 'Erro ao gerar PIX' });
+    console.error('CodexPay create error:', error.message || error);
+    const errorMsg = error.message?.includes('Contact support')
+      ? 'Conta CodexPay com restrições. Entre em contato com o suporte da CodexPay.'
+      : 'Erro ao gerar PIX';
+    return res.status(500).json({ success: false, error: errorMsg });
   }
 }
