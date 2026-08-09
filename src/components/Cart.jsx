@@ -110,23 +110,38 @@ export default function Cart() {
       let data = null;
       let success = false;
 
+      // Tentar ViaCEP primeiro
       try {
         const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
         if (response.ok) {
-          data = await response.json();
-          if (!data.erro) success = true;
+          const viaCepData = await response.json();
+          if (!viaCepData.erro) {
+            data = viaCepData;
+            success = true;
+          }
         }
-      } catch (viaCepError) {}
+      } catch (viaCepError) {
+        console.warn('ViaCEP falhou:', viaCepError);
+      }
 
+      // Fallback para BrasilAPI
       if (!success) {
         try {
           const response = await fetch(`https://brasilapi.com.br/api/cep/v1/${cleanCep}`);
           if (response.ok) {
             const brasilData = await response.json();
-            data = { cep: brasilData.cep, logradouro: brasilData.street, bairro: brasilData.neighborhood, localidade: brasilData.city, uf: brasilData.state };
+            data = {
+              cep: brasilData.cep,
+              logradouro: brasilData.street,
+              bairro: brasilData.neighborhood,
+              localidade: brasilData.city,
+              uf: brasilData.state
+            };
             success = true;
           }
-        } catch (brasilError) {}
+        } catch (brasilError) {
+          console.warn('BrasilAPI falhou:', brasilError);
+        }
       }
 
       if (success && data) {
@@ -139,7 +154,7 @@ export default function Cart() {
 
         // Salvar endereco no localStorage
         localStorage.setItem(CART_ADDRESS_KEY, JSON.stringify({
-          cep: formatted,
+          cep: cepValue,
           cepData: data,
           shipping: parseFloat(randomShipping),
           deliveryTime: randomTime
@@ -148,13 +163,11 @@ export default function Cart() {
         setCepValid(false);
         setCepData(null);
         setCalculatedShipping(null);
-        alert('CEP nao encontrado!');
       }
     } catch (error) {
       console.error('Erro ao validar CEP:', error);
       setCepValid(false);
       setCepData(null);
-      alert('Erro ao validar CEP. Tente novamente.');
     } finally {
       setValidatingCep(false);
     }
