@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, X, Check, ShoppingBag } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { productService } from '../../lib/supabase';
@@ -9,6 +9,8 @@ export default function CartCrossSell() {
     const [loading, setLoading] = useState(true);
     const [showFlavorModal, setShowFlavorModal] = useState(false);
     const [selectedFlavor, setSelectedFlavor] = useState(null);
+    const bannerRef = useRef(null);
+    const hasScrolledRef = useRef(false);
 
     useEffect(() => {
         const loadProducts = async () => {
@@ -27,7 +29,18 @@ export default function CartCrossSell() {
     useEffect(() => {
         setShowFlavorModal(false);
         setSelectedFlavor(null);
+        hasScrolledRef.current = false;
     }, [cartItems.length]);
+
+    // Auto-scroll quando o banner aparece
+    useEffect(() => {
+        if (bannerRef.current && !hasScrolledRef.current && !loading && products.length > 0) {
+            hasScrolledRef.current = true;
+            setTimeout(() => {
+                bannerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+    }, [loading, products.length]);
 
     if (cartItems.length === 0 || loading || products.length === 0) return null;
 
@@ -35,17 +48,23 @@ export default function CartCrossSell() {
     const remainingValue = getRemainingForFreeShipping();
     const cartProductIds = cartItems.map(item => item.id);
 
+    // Lógica: encontrar EXATAMENTE UM produto que feche o valor do frete gratis
     const getSuggestion = () => {
         const available = products.filter(p => !cartProductIds.includes(p.id) && p.is_active);
         if (available.length === 0) return null;
+
         if (!hasFreeShippingNow && remainingValue > 0) {
-            const maxPrice = remainingValue * 1.05;
-            return available
-                .filter(p => p.price <= maxPrice)
-                .sort((a, b) => Math.abs(remainingValue - a.price) - Math.abs(remainingValue - b.price))[0]
-                || available.sort((a, b) => a.price - b.price)[0];
+            // Pegar produto com preco >= valor restante (mais proximo possivel)
+            const candidates = available
+                .filter(p => p.price >= remainingValue)
+                .sort((a, b) => a.price - b.price);
+
+            // Se nao achar nenhum >=, pegar o mais caro disponivel
+            return candidates[0] || available.sort((a, b) => b.price - a.price)[0];
         }
-        return available.sort((a, b) => (b.rating || 0) - (a.rating || 0))[0];
+
+        // Ja tem frete gratis - mostrar mais vendido
+        return available.sort((a, b) => (b.reviews || 0) - (a.reviews || 0))[0];
     };
 
     const suggestion = getSuggestion();
@@ -94,8 +113,8 @@ export default function CartCrossSell() {
     return (
         <>
             {/* Banner de sugestao */}
-            <div className="px-3 py-3">
-                <div className="flex items-center gap-3 bg-white rounded-xl p-3 border border-gray-100 shadow-sm">
+            <div ref={bannerRef} className="px-3 py-3">
+                <div className="flex items-center gap-3 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-3 border border-primary/20">
                     <img
                         src={getImageUrl(suggestion)}
                         alt={suggestion.name}
@@ -103,9 +122,25 @@ export default function CartCrossSell() {
                         onError={(e) => { e.target.src = '/images/placeholder.svg'; }}
                     />
                     <div className="flex-1 min-w-0">
-                        <p className="text-[11px] text-gray-500 leading-tight">
-                            {wouldGetFreeShipping ? '🎁 Adicione e ganhe frete gratis:' : '➕ Voce tambem pode gostar:'}
-                        </p>
+                        {wouldGetFreeShipping ? (
+                            <>
+                                <p className="text-[11px] text-primary font-bold leading-tight">
+                                    🎁 Adicione e ganhe frete gratis!
+                                </p>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                    Falta {formatPrice(remainingValue)} • Este produto fecha!
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <p className="text-[11px] text-gray-500 leading-tight">
+                                    ➕ Voce tambem pode gostar:
+                                </p>
+                                <p className="text-xs text-gray-600 mt-0.5">
+                                    Frete gratis ja conquistado
+                                </p>
+                            </>
+                        )}
                         <p className="text-xs font-semibold text-gray-800 truncate mt-0.5">
                             {suggestion.name}
                         </p>
@@ -125,7 +160,6 @@ export default function CartCrossSell() {
             {showFlavorModal && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end justify-center" style={{ zIndex: 99999999 }}>
                     <div className="bg-white w-full max-w-md rounded-t-3xl animate-slide-up">
-                        {/* Header do modal */}
                         <div className="flex items-center justify-between p-4 border-b border-gray-100">
                             <div className="flex items-center gap-3">
                                 <img
@@ -148,7 +182,6 @@ export default function CartCrossSell() {
                             </button>
                         </div>
 
-                        {/* Lista de sabores - grid 2 colunas */}
                         <div className="p-4 max-h-[50vh] overflow-y-auto">
                             <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-3 font-semibold">
                                 Selecione um sabor:
@@ -180,7 +213,6 @@ export default function CartCrossSell() {
                             </div>
                         </div>
 
-                        {/* Botao confirmar - fixo embaixo */}
                         <div className="p-4 border-t border-gray-100 bg-gray-50">
                             <button
                                 onClick={handleConfirmFlavor}
