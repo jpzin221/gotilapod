@@ -59,9 +59,10 @@ export default function CartItem({ item }) {
       <div className="flex gap-3 p-3">
         {/* Imagem */}
         <img
-          src={item.image_url}
+          src={item.image_url || item.image || '/images/placeholder.svg'}
           alt={item.name}
           className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg flex-shrink-0"
+          onError={(e) => { e.target.src = '/images/placeholder.svg'; }}
         />
 
         {/* Info */}
