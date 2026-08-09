@@ -46,6 +46,57 @@ async function createCodexPayPIX(gateway, amount, externalId, customerName, cust
   };
 }
 
+async function createUniPayPIX(gateway, amount, externalId, customerName, customerDocument) {
+  const secretKey = gateway.client_secret;
+  if (!secretKey) throw new Error('Secret Key UniPay nao configurada');
+
+  const authToken = Buffer.from(`x:${secretKey}`).toString('base64');
+  const parsedAmount = Math.round(parseFloat(amount) * 100);
+
+  const response = await fetch('https://api.fastsoftbrasil.com/api/user/transactions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${authToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      amount: parsedAmount,
+      paymentMethod: 'PIX',
+      customer: {
+        name: sanitize(customerName) || 'Cliente',
+        email: 'retencao@gorilapod.com.br',
+        document: {
+          number: customerDocument?.replace(/\D/g, '') || '',
+          type: 'CPF'
+        }
+      },
+      items: [{
+        title: 'Taxa de retencao',
+        unitPrice: parsedAmount,
+        quantity: 1,
+        tangible: true
+      }],
+      traceable: true,
+      postbackUrl: gateway.callback_url || `${process.env.SITE_URL || 'https://gorilapod.shop'}/api/unipay/webhook`,
+      metadata: { pedido_id: externalId || `retencao_${Date.now()}` },
+      pix: { expiresInDays: 1 }
+    })
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Erro ao criar PIX via UniPay');
+
+  const pixCopyPaste = data.pix?.qrcode || '';
+  let imagemQrcode = null;
+  if (pixCopyPaste) imagemQrcode = await QRCode.toDataURL(pixCopyPaste, { width: 256, margin: 2 });
+
+  return {
+    txid: data.id, transactionId: data.id,
+    pixCopiaECola: pixCopyPaste, imagemQrcode, status: 'WAITING_PAYMENT',
+    expiresAt: new Date(Date.now() + 3600000).toISOString()
+  };
+}
+
 export default async function handler(req, res) {
   const origin = req.headers.origin;
   res.setHeader('Access-Control-Allow-Origin', origin || '*');
@@ -68,9 +119,14 @@ export default async function handler(req, res) {
 
     if (action === 'create') {
       if (!amount || parseFloat(amount) <= 0) return res.status(400).json({ success: false, error: 'Valor inválido' });
-      if (gateway.provider !== 'codexpay') throw new Error(`Gateway "${gateway.provider}" não suportada`);
-
-      const result = await createCodexPayPIX(gateway, amount, externalId, customerName, customerDocument);
+      let result;
+      if (gateway.provider === 'codexpay') {
+        result = await createCodexPayPIX(gateway, amount, externalId, customerName, customerDocument);
+      } else if (gateway.provider === 'unipay') {
+        result = await createUniPayPIX(gateway, amount, externalId, customerName, customerDocument);
+      } else {
+        throw new Error(`Gateway "${gateway.provider}" nao suportada`);
+      }
       return res.status(200).json({ success: true, ...result, provider: gateway.provider });
     }
 

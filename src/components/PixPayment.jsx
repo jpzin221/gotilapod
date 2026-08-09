@@ -138,6 +138,21 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
             })
           });
           data = await response.json();
+        } else if (pixData.provider === 'unipay') {
+          // Usar API route do UniPay
+          const functionsUrl = import.meta.env.PROD
+            ? '/api'
+            : 'http://localhost:3000/api';
+
+          const response = await fetch(`${functionsUrl}/unipay/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              transactionId: pixData.txid,
+              externalReference: pixData.externalReference
+            })
+          });
+          data = await response.json();
         } else {
           // Backend padrão
           const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
@@ -435,6 +450,18 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
           // Usar CodexPay
           const codexPayService = await import('../services/codexpay-service');
           data = await codexPayService.createCodexPayCharge({
+            amount: pedido.valorTotal,
+            customerName: pedido.nomeCliente,
+            customerDocument: pedido.cpfCliente,
+            customerEmail: '',
+            externalId: `pedido_${Date.now()}_${pedido.id || ''}`
+          });
+          break;
+
+        case 'unipay':
+          // Usar UniPay (FastSoft Brasil)
+          const uniPayService = await import('../services/unipay-service');
+          data = await uniPayService.createUniPayCharge({
             amount: pedido.valorTotal,
             customerName: pedido.nomeCliente,
             customerDocument: pedido.cpfCliente,

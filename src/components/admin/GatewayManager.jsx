@@ -58,6 +58,15 @@ const PROVIDER_CONFIG = {
             client_secret: 'Client Secret',
             callback_url: 'URL de Callback (Webhook)'
         }
+    },
+    unipay: {
+        name: 'UniPay',
+        color: 'bg-violet-500',
+        fields: ['client_secret', 'callback_url'],
+        labels: {
+            client_secret: 'Secret Key',
+            callback_url: 'URL de Postback (Webhook)'
+        }
     }
 };
 
