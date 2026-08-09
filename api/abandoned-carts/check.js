@@ -3,8 +3,11 @@ import { createClient } from '@supabase/supabase-js';
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method !== 'GET') return res.status(200).json({ ok: true });
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'GET' && req.method !== 'POST') return res.status(200).json({ ok: true });
 
   try {
     const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
@@ -15,7 +18,20 @@ export default async function handler(req, res) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Buscar configuracao do WhatsApp
+    // POST: Marcar carrinho como convertido
+    if (req.method === 'POST') {
+      const { cart_id, pedido_id } = req.body;
+      if (!cart_id) return res.status(400).json({ success: false, error: 'cart_id obrigatorio' });
+
+      await supabase
+        .from('abandoned_carts')
+        .update({ status: 'converted', converted_at: new Date().toISOString(), pedido_id: pedido_id || null, updated_at: new Date().toISOString() })
+        .eq('id', cart_id);
+
+      return res.status(200).json({ success: true, message: 'Carrinho marcado como convertido' });
+    }
+
+    // GET: Verificar e enviar lembretes
     const { data: config } = await supabase
       .from('whatsapp_config')
       .select('*')

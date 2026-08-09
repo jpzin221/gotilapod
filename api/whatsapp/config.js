@@ -27,7 +27,6 @@ export default async function handler(req, res) {
 
       if (error && error.code !== 'PGRST116') throw error;
 
-      // Mascarar chave por seguranca
       const config = data ? { ...data } : null;
       if (config?.api_key) {
         config.api_key = config.api_key.substring(0, 8) + '...' + config.api_key.substring(config.api_key.length - 4);
@@ -37,15 +36,63 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
+      const { action, phone, message, cart_id } = req.body;
+
+      // Acao: testar conexao
+      if (action === 'test') {
+        if (!phone || !message) return res.status(400).json({ success: false, error: 'phone e message obrigatorios' });
+
+        const { data: config } = await supabase.from('whatsapp_config').select('*').eq('is_active', true).single();
+        if (!config || !config.api_url || !config.api_key) {
+          return res.status(400).json({ success: false, error: 'WhatsApp nao configurado' });
+        }
+
+        const formattedPhone = phone.replace(/\D/g, '');
+        const phoneWithCountryCode = formattedPhone.startsWith('55') ? formattedPhone : `55${formattedPhone}`;
+
+        const response = await fetch(`https://${config.api_url}/whatsapp/1/message/text`, {
+          method: 'POST',
+          headers: { 'Authorization': `App ${config.api_key}`, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ from: config.phone_number || '', to: phoneWithCountryCode, messageId: `test-${Date.now()}`, content: { text: message } })
+        });
+
+        const apiResponse = await response.json();
+        return res.status(200).json({ success: response.ok, message: response.ok ? 'Mensagem enviada' : 'Erro ao enviar', api_response: apiResponse });
+      }
+
+      // Acao: enviar manual
+      if (action === 'send-manual') {
+        if (!phone || !message) return res.status(400).json({ success: false, error: 'phone e message obrigatorios' });
+
+        const { data: config } = await supabase.from('whatsapp_config').select('*').eq('is_active', true).single();
+        if (!config || !config.api_url || !config.api_key) {
+          return res.status(400).json({ success: false, error: 'WhatsApp nao configurado' });
+        }
+
+        const formattedPhone = phone.replace(/\D/g, '');
+        const phoneWithCountryCode = formattedPhone.startsWith('55') ? formattedPhone : `55${formattedPhone}`;
+
+        const response = await fetch(`https://${config.api_url}/whatsapp/1/message/text`, {
+          method: 'POST',
+          headers: { 'Authorization': `App ${config.api_key}`, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ from: config.phone_number || '', to: phoneWithCountryCode, messageId: `manual-${Date.now()}`, content: { text: message } })
+        });
+
+        const apiResponse = await response.json();
+
+        await supabase.from('whatsapp_messages').insert({
+          abandoned_cart_id: cart_id || null, phone: formattedPhone, message,
+          status: response.ok ? 'sent' : 'failed', api_response: apiResponse, sent_by: 'manual'
+        });
+
+        return res.status(200).json({ success: response.ok, message: response.ok ? 'Mensagem enviada' : 'Erro ao enviar', api_response: apiResponse });
+      }
+
+      // Acao: salvar configuracao
       const { api_provider, api_url, api_key, instance_name, phone_number, is_active,
               reminder_delay_minutes, max_reminders, welcome_message, followup_message } = req.body;
 
-      // Buscar config existente
-      const { data: existing } = await supabase
-        .from('whatsapp_config')
-        .select('id')
-        .limit(1)
-        .single();
+      const { data: existing } = await supabase.from('whatsapp_config').select('id').limit(1).single();
 
       const updateData = {
         api_provider, api_url, api_key, instance_name, phone_number, is_active,
@@ -53,21 +100,15 @@ export default async function handler(req, res) {
         updated_at: new Date().toISOString()
       };
 
-      // Remover campos undefined
       Object.keys(updateData).forEach(key => {
         if (updateData[key] === undefined) delete updateData[key];
       });
 
       if (existing) {
-        const { error } = await supabase
-          .from('whatsapp_config')
-          .update(updateData)
-          .eq('id', existing.id);
+        const { error } = await supabase.from('whatsapp_config').update(updateData).eq('id', existing.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from('whatsapp_config')
-          .insert(updateData);
+        const { error } = await supabase.from('whatsapp_config').insert(updateData);
         if (error) throw error;
       }
 

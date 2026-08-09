@@ -36,3 +36,4 @@ certificado-base64.txt
 
 # Local Netlify folder
 .netlify
+.vercel

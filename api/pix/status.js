@@ -1,39 +1,45 @@
-export default async function handler(req, res) {
-  const origin = req.headers.origin;
-  res.setHeader('Access-Control-Allow-Origin', origin || '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Content-Type', 'application/json');
+import { createClient } from '@supabase/supabase-js';
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+export default async function handler(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  if (req.method !== 'GET') return res.status(200).json({ ok: true });
 
   try {
-    const txid = req.query.txid?.replace(/[^a-zA-Z-9_-]/g, '').substring(0, 100);
-    if (!txid) return res.status(400).json({ success: false, error: 'TXID não fornecido' });
+    const { txid } = req.query;
+    if (!txid) return res.status(400).json({ success: false, error: 'txid obrigatorio' });
 
-    // Demo mode
-    if (!process.env.EFI_CERTIFICATE_BASE64 || txid.startsWith('DEMO')) {
-      return res.status(200).json({
-        success: true, txid, status: 'ATIVA', valor: { original: '85.00' },
-        message: 'Status de demonstração'
-      });
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+
+    if (supabaseUrl && supabaseKey) {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const { data: pedido } = await supabase
+        .from('pedidos')
+        .select('*')
+        .eq('txid', txid)
+        .single();
+
+      if (pedido && (pedido.pago || pedido.status === 'confirmado')) {
+        return res.status(200).json({
+          success: true,
+          status: 'CONCLUIDA',
+          txid,
+          pago: true,
+          pedido: { id: pedido.id, numero_pedido: pedido.numero_pedido, valor_total: pedido.valor_total, status: pedido.status }
+        });
+      }
     }
 
-    const Gerencianet = (await import('gn-api-sdk-node')).default;
-    const efi = new Gerencianet({
-      client_id: process.env.EFI_CLIENT_ID,
-      client_secret: process.env.EFI_CLIENT_SECRET,
-      certificate: Buffer.from(process.env.EFI_CERTIFICATE_BASE64, 'base64'),
-      sandbox: process.env.EFI_SANDBOX === 'true'
-    });
-
-    const response = await efi.pixDetailCharge({ txid });
     return res.status(200).json({
-      success: true, txid: response.txid, status: response.status,
-      valor: response.valor, horario: response.horario, pix: response.pix || []
+      success: true,
+      status: 'PENDENTE',
+      txid,
+      message: 'Aguardando confirmacao de pagamento'
     });
   } catch (error) {
-    return res.status(500).json({ success: false, error: 'Erro ao verificar status', message: error.message });
+    console.error('PIX status error:', error);
+    return res.status(200).json({ success: true, status: 'PENDENTE', message: 'Erro ao verificar status' });
   }
 }

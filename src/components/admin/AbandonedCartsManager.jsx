@@ -30,15 +30,12 @@ export default function AbandonedCartsManager() {
 
   const loadAll = async () => {
     try {
-      const [statsRes, cartsRes, historyRes, configRes] = await Promise.all([
+      const [statsRes, configRes] = await Promise.all([
         fetch('/api/abandoned-carts/stats').then(r => r.json()),
-        fetch('/api/abandoned-carts/stats').then(r => r.json()), // Reutilizar
-        fetch('/api/abandoned-carts/history?limit=100').then(r => r.json()),
         fetch('/api/whatsapp/config').then(r => r.json())
       ]);
 
       if (statsRes.stats) setStats(statsRes.stats);
-      if (historyRes.messages) setMessages(historyRes.messages);
       if (configRes.config) {
         setConfig(configRes.config);
         setConfigForm(configRes.config);
@@ -87,10 +84,10 @@ export default function AbandonedCartsManager() {
     }
     setTesting(true);
     try {
-      const res = await fetch('/api/whatsapp/test', {
+      const res = await fetch('/api/whatsapp/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: testPhone, message: testMessage })
+        body: JSON.stringify({ action: 'test', phone: testPhone, message: testMessage })
       });
       const data = await res.json();
       alert(data.success ? 'Mensagem enviada com sucesso!' : 'Erro: ' + data.error);
@@ -107,10 +104,11 @@ export default function AbandonedCartsManager() {
       return;
     }
     try {
-      const res = await fetch('/api/whatsapp/send-manual', {
+      const res = await fetch('/api/whatsapp/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action: 'send-manual',
           cart_id: manualCartId || null,
           phone: manualPhone,
           message: manualMessage
