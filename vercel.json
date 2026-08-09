@@ -16,11 +16,5 @@
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
       ]
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/abandoned-carts/check",
-      "schedule": "*/5 * * * *"
-    }
   ]
 }
