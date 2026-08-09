@@ -154,9 +154,9 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
           });
           data = await response.json();
         } else {
-          // Backend padrão
+          // Backend padrao - usa /api/pix/create (que tambem serve para status via GET)
           const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-          const response = await fetch(`${backendUrl}/api/pix/status/${pixData.txid}`);
+          const response = await fetch(`${backendUrl}/api/pix/create?txid=${pixData.txid}`);
           data = await response.json();
         }
 

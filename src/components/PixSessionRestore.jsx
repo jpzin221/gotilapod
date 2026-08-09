@@ -54,7 +54,7 @@ export default function PixSessionRestore({ isOpen, onClose, sessionData }) {
     setChecking(true);
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-      const response = await fetch(`${backendUrl}/api/pix/status/${sessionData.pixData.txid}`);
+      const response = await fetch(`${backendUrl}/api/pix/create?txid=${sessionData.pixData.txid}`);
       const data = await response.json();
 
       if (data.success && data.status === 'CONCLUIDA') {
