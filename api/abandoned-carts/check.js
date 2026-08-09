@@ -69,6 +69,51 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: true, message: 'Carrinho registrado', cart_id: data.id });
       }
 
+      // Acao: enviar mensagem manual
+      if (action === 'send') {
+        if (!cart_id) return res.status(400).json({ success: false, error: 'cart_id obrigatorio' });
+
+        const { data: config } = await supabase.from('whatsapp_config').select('*').eq('is_active', true).single();
+        if (!config || !config.api_url || !config.api_key) {
+          return res.status(400).json({ success: false, error: 'WhatsApp nao configurado' });
+        }
+
+        const { data: cart } = await supabase.from('abandoned_carts').select('*').eq('id', cart_id).single();
+        if (!cart) return res.status(404).json({ success: false, error: 'Carrinho nao encontrado' });
+
+        const customerName = cart.customer_name || 'Cliente';
+        const itemCount = cart.cart_items?.length || 0;
+        const total = parseFloat(cart.cart_total) || 0;
+        const storeUrl = process.env.SITE_URL || 'https://www.gorilapodoficial.shop';
+        const message = config.welcome_message
+          .replace('{nome}', customerName)
+          .replace('{itens}', `${itemCount} ${itemCount === 1 ? 'item' : 'itens'}`)
+          .replace('{total}', `R$ ${total.toFixed(2)}`)
+          .replace('{link}', storeUrl);
+
+        const formattedPhone = cart.phone.replace(/\D/g, '');
+        const phoneWithCountryCode = formattedPhone.startsWith('55') ? formattedPhone : `55${formattedPhone}`;
+
+        const response = await fetch(`https://${config.api_url}/whatsapp/1/message/text`, {
+          method: 'POST',
+          headers: { 'Authorization': `App ${config.api_key}`, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ from: config.phone_number || '', to: phoneWithCountryCode, messageId: `manual-${cart_id}-${Date.now()}`, content: { text: message } })
+        });
+
+        const apiResponse = await response.json();
+
+        await supabase.from('whatsapp_messages').insert({
+          abandoned_cart_id: cart_id, phone: cart.phone, message,
+          status: response.ok ? 'sent' : 'failed', api_response: apiResponse, sent_by: 'manual'
+        });
+
+        await supabase.from('abandoned_carts').update({
+          attempts: cart.attempts + 1, last_attempt_at: new Date().toISOString(), status: 'contacted', updated_at: new Date().toISOString()
+        }).eq('id', cart_id);
+
+        return res.status(200).json({ success: response.ok, message: response.ok ? 'Mensagem enviada' : 'Erro ao enviar' });
+      }
+
       return res.status(400).json({ success: false, error: 'Acao invalida' });
     }
 

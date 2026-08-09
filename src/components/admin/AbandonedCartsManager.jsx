@@ -131,10 +131,10 @@ export default function AbandonedCartsManager() {
 
   const handleSendNow = async (cartId) => {
     try {
-      const res = await fetch('/api/abandoned-carts/send', {
+      const res = await fetch('/api/abandoned-carts/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cart_id: cartId })
+        body: JSON.stringify({ action: 'send', cart_id: cartId })
       });
       const data = await res.json();
       alert(data.success ? 'Mensagem enviada!' : 'Erro: ' + data.error);
