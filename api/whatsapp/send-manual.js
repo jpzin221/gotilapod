@@ -31,17 +31,28 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'WhatsApp nao configurado' });
     }
 
-    // Enviar via Evolution API
+    // Enviar via Infobip API
     const apiUrl = config.api_url.replace(/\/$/, '');
-    const response = await fetch(`${apiUrl}/message/sendText/${config.instance_name}`, {
+    const apiKey = config.api_key;
+    const senderNumber = config.phone_number || '';
+
+    const formattedPhone = phone.replace(/\D/g, '');
+    const phoneWithCountryCode = formattedPhone.startsWith('55') ? formattedPhone : `55${formattedPhone}`;
+
+    const response = await fetch(`https://${apiUrl}/whatsapp/1/message/text`, {
       method: 'POST',
       headers: {
-        'apikey': config.api_key,
-        'Content-Type': 'application/json'
+        'Authorization': `App ${apiKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
-        number: phone.replace(/\D/g, ''),
-        text: message
+        from: senderNumber,
+        to: phoneWithCountryCode,
+        messageId: `manual-${Date.now()}`,
+        content: {
+          text: message
+        }
       })
     });
 
@@ -50,7 +61,7 @@ export default async function handler(req, res) {
     // Registrar mensagem
     await supabase.from('whatsapp_messages').insert({
       abandoned_cart_id: cart_id || null,
-      phone: phone.replace(/\D/g, ''),
+      phone: formattedPhone,
       message,
       status: response.ok ? 'sent' : 'failed',
       api_response: apiResponse,
@@ -59,15 +70,14 @@ export default async function handler(req, res) {
 
     // Atualizar tentativas se tem cart_id
     if (cart_id) {
-      await supabase.rpc('increment', { table_name: 'abandoned_carts', column_name: 'attempts', row_id: cart_id }).catch(() => {
-        // Fallback: update manual
-        supabase.from('abandoned_carts').update({
-          attempts: supabase.rpc ? undefined : 0,
+      await supabase
+        .from('abandoned_carts')
+        .update({
           last_attempt_at: new Date().toISOString(),
           status: 'contacted',
           updated_at: new Date().toISOString()
-        }).eq('id', cart_id);
-      });
+        })
+        .eq('id', cart_id);
     }
 
     return res.status(200).json({

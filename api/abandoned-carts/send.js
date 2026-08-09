@@ -49,19 +49,31 @@ export default async function handler(req, res) {
     const message = config.welcome_message
       .replace('{nome}', customerName)
       .replace('{itens}', `${itemCount} ${itemCount === 1 ? 'item' : 'itens'}`)
-      .replace('{total}', `R$ ${total.toFixed(2)}`);
+      .replace('{total}', `R$ ${total.toFixed(2)}`)
+      .replace('{link}', process.env.SITE_URL || 'https://www.gorilapodoficial.shop');
 
-    // Enviar via Evolution API
+    // Enviar via Infobip API
     const apiUrl = config.api_url.replace(/\/$/, '');
-    const response = await fetch(`${apiUrl}/message/sendText/${config.instance_name}`, {
+    const apiKey = config.api_key;
+    const senderNumber = config.phone_number || '';
+
+    const phone = cart.phone.replace(/\D/g, '');
+    const formattedPhone = phone.startsWith('55') ? phone : `55${phone}`;
+
+    const response = await fetch(`https://${apiUrl}/whatsapp/1/message/text`, {
       method: 'POST',
       headers: {
-        'apikey': config.api_key,
-        'Content-Type': 'application/json'
+        'Authorization': `App ${apiKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
-        number: cart.phone,
-        text: message
+        from: senderNumber,
+        to: formattedPhone,
+        messageId: `manual-${cart.id}-${Date.now()}`,
+        content: {
+          text: message
+        }
       })
     });
 
