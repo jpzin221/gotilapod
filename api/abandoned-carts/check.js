@@ -1,10 +1,27 @@
 import { createClient } from '@supabase/supabase-js';
 
+const ALLOWED_ORIGINS = [
+  'https://gorilapod.vercel.app',
+  'https://gorilapod.shop',
+  'https://www.gorilapod.shop',
+  'https://www.gorilapodoficial.shop',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+
+function getAllowedOrigin(origin) {
+  if (!origin) return '*';
+  if (ALLOWED_ORIGINS.includes(origin)) return origin;
+  if (origin.includes('localhost')) return origin;
+  return '*';
+}
+
 export default async function handler(req, res) {
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  res.setHeader('Access-Control-Allow-Origin', getAllowedOrigin(origin));
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Content-Type', 'application/json');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET' && req.method !== 'POST') return res.status(200).json({ ok: true });
@@ -18,17 +35,41 @@ export default async function handler(req, res) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // POST: Marcar carrinho como convertido
+    // POST: Acoes various
     if (req.method === 'POST') {
-      const { cart_id, pedido_id } = req.body;
-      if (!cart_id) return res.status(400).json({ success: false, error: 'cart_id obrigatorio' });
+      const { action, cart_id, pedido_id, session_id, phone, customer_name, cart_items, cart_total, shipping_address } = req.body;
 
-      await supabase
-        .from('abandoned_carts')
-        .update({ status: 'converted', converted_at: new Date().toISOString(), pedido_id: pedido_id || null, updated_at: new Date().toISOString() })
-        .eq('id', cart_id);
+      // Acao: marcar como convertido
+      if (action === 'convert') {
+        if (!cart_id) return res.status(400).json({ success: false, error: 'cart_id obrigatorio' });
+        await supabase.from('abandoned_carts').update({
+          status: 'converted', converted_at: new Date().toISOString(), pedido_id: pedido_id || null, updated_at: new Date().toISOString()
+        }).eq('id', cart_id);
+        return res.status(200).json({ success: true, message: 'Carrinho marcado como convertido' });
+      }
 
-      return res.status(200).json({ success: true, message: 'Carrinho marcado como convertido' });
+      // Acao: rastrear carrinho
+      if (action === 'track') {
+        if (!session_id || !phone) return res.status(400).json({ success: false, error: 'session_id e phone obrigatorios' });
+
+        const { data: existing } = await supabase.from('abandoned_carts').select('id, status').eq('session_id', session_id).single();
+
+        if (existing) {
+          await supabase.from('abandoned_carts').update({
+            phone, customer_name, cart_items, cart_total, shipping_address, updated_at: new Date().toISOString()
+          }).eq('id', existing.id);
+          return res.status(200).json({ success: true, message: 'Carrinho atualizado', cart_id: existing.id });
+        }
+
+        const { data, error } = await supabase.from('abandoned_carts').insert({
+          session_id, phone: phone.replace(/\D/g, ''), customer_name, cart_items, cart_total, shipping_address, status: 'pending'
+        }).select().single();
+
+        if (error) throw error;
+        return res.status(200).json({ success: true, message: 'Carrinho registrado', cart_id: data.id });
+      }
+
+      return res.status(400).json({ success: false, error: 'Acao invalida' });
     }
 
     // GET: Verificar e enviar lembretes

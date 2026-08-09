@@ -134,10 +134,11 @@ export default function CheckoutForm({ isOpen, onClose, onSubmit, total, cepData
       const sessionId = localStorage.getItem('cart_session_id') || `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       localStorage.setItem('cart_session_id', sessionId);
 
-      await fetch('/api/abandoned-carts/track', {
+      await fetch('/api/abandoned-carts/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action: 'track',
           session_id: sessionId,
           phone: phone.replace(/\D/g, ''),
           customer_name: name || null,
