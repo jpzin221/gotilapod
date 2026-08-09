@@ -351,11 +351,11 @@ export default function HeroSection({ businessHours, storeLocation, deliveryRadi
         >
           {slides.map((slide, index) => (
             <div key={index} className="min-w-full">
-              {/* Container com aspect-ratio adaptativo - sem barras pretas:
+              {/* Container com aspect-ratio adaptativo:
                   - Mobile: proporção 16:9 para banners widescreen
                   - Desktop: proporção mais larga para telas grandes
               */}
-              <div className="relative w-full aspect-[4/5] sm:aspect-[2/1] md:aspect-[5/2] lg:aspect-[21/8] flex items-center justify-center overflow-hidden">
+              <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[5/2] lg:aspect-[21/8] max-h-[50vh] sm:max-h-none flex items-center justify-center overflow-hidden bg-black">
                 <picture className="absolute inset-0 w-full h-full">
                   <source
                     media="(min-width: 640px)"
@@ -364,7 +364,7 @@ export default function HeroSection({ businessHours, storeLocation, deliveryRadi
                   <img
                     src={slide.imageMobile || slide.imageDesktop}
                     alt={slide.title || 'Banner promocional'}
-                    className="w-full h-full object-cover object-center"
+                    className="w-full h-full object-cover sm:object-cover object-center"
                     loading={index === 0 ? 'eager' : 'lazy'}
                   />
                 </picture>
@@ -372,21 +372,21 @@ export default function HeroSection({ businessHours, storeLocation, deliveryRadi
                 {/* Overlay e texto apenas se tiver título definido */}
                 {slide.title && slide.title.trim() !== '' && (
                   <>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
                     {/* Conteúdo do Slide - Sempre no rodapé */}
-                    <div className="absolute bottom-0 left-0 right-0 z-10 w-full p-3 sm:p-4 md:p-6 lg:p-8">
+                    <div className="absolute bottom-0 left-0 right-0 z-10 w-full p-2 sm:p-4 md:p-6 lg:p-8">
                       <div className="max-w-2xl">
                         {slide.badge && (
-                          <span className="inline-block bg-gradient-to-r from-primary to-secondary text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full mb-1 sm:mb-2">
+                          <span className="inline-block bg-gradient-to-r from-primary to-secondary text-white text-[9px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full mb-1 sm:mb-2">
                             {slide.badge}
                           </span>
                         )}
-                        <h2 className="text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold text-white drop-shadow-lg leading-tight">
+                        <h2 className="text-sm sm:text-xl md:text-2xl lg:text-4xl font-bold text-white drop-shadow-lg leading-tight">
                           {processTextWithEmojis(slide.title)}
                         </h2>
                         {slide.subtitle && (
-                          <p className="text-xs sm:text-sm md:text-base text-gray-200 leading-snug mt-1">
+                          <p className="text-[10px] sm:text-sm md:text-base text-gray-200 leading-snug mt-0.5 sm:mt-1">
                             {slide.subtitle}
                           </p>
                         )}

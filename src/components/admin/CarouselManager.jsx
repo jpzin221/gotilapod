@@ -294,7 +294,7 @@ export default function CarouselManager() {
             {/* Imagem Mobile */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Imagem Mobile * (Proporção 9:16 recomendada)
+                Imagem Mobile * (Proporção 16:9 recomendada)
               </label>
               
               {mobilePreview && (
@@ -302,7 +302,7 @@ export default function CarouselManager() {
                   <img 
                     src={mobilePreview} 
                     alt="Preview Mobile" 
-                    className="w-32 h-56 object-cover rounded-lg border-2 border-gray-200"
+                    className="w-56 h-32 object-cover rounded-lg border-2 border-gray-200"
                   />
                   <button
                     onClick={handleRemoveMobileImage}
