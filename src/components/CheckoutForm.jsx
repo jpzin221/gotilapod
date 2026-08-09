@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { User, MapPin, Shield, Lock, CheckCircle, ChevronRight, Truck } from 'lucide-react';
 import { usePhoneAuth } from '../context/PhoneAuthContext';
 
+const CHECKOUT_DATA_KEY = 'gorila_checkout_data';
+
 export default function CheckoutForm({ isOpen, onClose, onSubmit, total, cepData }) {
   const { user, isAuthenticated } = usePhoneAuth();
 
@@ -19,6 +21,33 @@ export default function CheckoutForm({ isOpen, onClose, onSubmit, total, cepData
   });
 
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Restaurar dados salvos ao abrir
+  useEffect(() => {
+    if (isOpen) {
+      const saved = localStorage.getItem(CHECKOUT_DATA_KEY);
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          setFormData(prev => ({ ...prev, ...data }));
+        } catch (e) {}
+      }
+    }
+  }, [isOpen]);
+
+  // Salvar dados pessoais no localStorage quando mudarem
+  useEffect(() => {
+    if (formData.nome || formData.cpf || formData.telefone) {
+      const personalData = {
+        nome: formData.nome,
+        cpf: formData.cpf,
+        telefone: formData.telefone,
+        numero: formData.numero,
+        complemento: formData.complemento
+      };
+      localStorage.setItem(CHECKOUT_DATA_KEY, JSON.stringify(personalData));
+    }
+  }, [formData.nome, formData.cpf, formData.telefone, formData.numero, formData.complemento]);
 
   useEffect(() => {
     if (isAuthenticated && user && isOpen) {

@@ -1,5 +1,5 @@
 import { X, ShoppingBag, Trash2, Ticket, Check, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import CartItem from './CartItem';
 import FreeShippingBar from './FreeShippingBar';
@@ -7,6 +7,8 @@ import CheckoutForm from './CheckoutForm';
 import PixPayment from './PixPayment';
 import Portal from './Portal';
 import CartCrossSell from './cart/CartCrossSell';
+
+const CART_ADDRESS_KEY = 'gorila_cart_address';
 
 export default function Cart() {
   const {
@@ -38,6 +40,27 @@ export default function Cart() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
   const [showCouponInput, setShowCouponInput] = useState(false);
+
+  // Restaurar endereco salvo no localStorage ao abrir o carrinho
+  useEffect(() => {
+    if (isCartOpen) {
+      const saved = localStorage.getItem(CART_ADDRESS_KEY);
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          if (data.cep && data.cepData && data.shipping !== null) {
+            setCep(data.cep);
+            setCepValid(true);
+            setCepData(data.cepData);
+            setCalculatedShipping(data.shipping);
+            setDeliveryTime(data.deliveryTime || 30);
+          }
+        } catch (e) {
+          console.warn('Erro ao restaurar endereco:', e);
+        }
+      }
+    }
+  }, [isCartOpen]);
 
   const total = getTotal();
   const totalWithCoupon = getTotalWithCoupon();
@@ -113,6 +136,14 @@ export default function Cart() {
         setCepData(data);
         const randomShipping = (Math.random() * (13.50 - 8.00) + 8.00).toFixed(2);
         setCalculatedShipping(parseFloat(randomShipping));
+
+        // Salvar endereco no localStorage
+        localStorage.setItem(CART_ADDRESS_KEY, JSON.stringify({
+          cep: formatted,
+          cepData: data,
+          shipping: parseFloat(randomShipping),
+          deliveryTime: randomTime
+        }));
       } else {
         setCepValid(false);
         setCepData(null);
@@ -233,10 +264,12 @@ export default function Cart() {
                     <CartItem key={item.cartItemKey} item={item} />
                   ))}
 
-                  {/* Cross-sell */}
-                  <div className="bg-gray-50">
-                    <CartCrossSell />
-                  </div>
+                  {/* Cross-sell - so aparece apos CEP validado */}
+                  {cepValid && (
+                    <div className="bg-gray-50">
+                      <CartCrossSell />
+                    </div>
+                  )}
 
                   {/* Barra de frete gratis */}
                   <div className="bg-white px-4 py-3">
@@ -246,7 +279,14 @@ export default function Cart() {
                   {/* Limpar carrinho */}
                   <div className="bg-white px-4 py-2">
                     <button
-                      onClick={clearCart}
+                      onClick={() => {
+                        clearCart();
+                        localStorage.removeItem(CART_ADDRESS_KEY);
+                        setCep('');
+                        setCepValid(false);
+                        setCepData(null);
+                        setCalculatedShipping(null);
+                      }}
                       className="w-full flex items-center justify-center gap-2 text-red-500 hover:text-red-700 hover:bg-red-50 py-2 rounded-lg transition text-sm"
                     >
                       <Trash2 className="w-4 h-4" />
