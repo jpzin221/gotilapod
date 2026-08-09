@@ -1,4 +1,4 @@
-import { X, ShoppingBag, Trash2 } from 'lucide-react';
+import { X, ShoppingBag, Trash2, Ticket, Check, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import CartItem from './CartItem';
@@ -14,10 +14,15 @@ export default function Cart() {
     isCartOpen,
     setIsCartOpen,
     getTotal,
+    getTotalWithCoupon,
     getTotalItems,
     clearCart,
     getDeliveryFee,
-    hasFreeShipping
+    hasFreeShipping,
+    appliedCoupon,
+    couponDiscount,
+    applyCoupon,
+    removeCoupon
   } = useCart();
 
   const [showCheckout, setShowCheckout] = useState(false);
@@ -29,8 +34,12 @@ export default function Cart() {
   const [cepData, setCepData] = useState(null);
   const [calculatedShipping, setCalculatedShipping] = useState(null);
   const [deliveryTime, setDeliveryTime] = useState(null);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
 
   const total = getTotal();
+  const totalWithCoupon = getTotalWithCoupon();
   const totalItems = getTotalItems();
 
   // Verificar se é CEP de teste com frete grátis
@@ -41,7 +50,25 @@ export default function Cart() {
 
   // Frete grátis se: CEP de teste OU atingiu valor mínimo
   const shippingCost = !cepValid ? 0 : (isTestCepWithFreeShipping || hasMinValueFreeShipping ? 0 : calculatedShipping || 0);
-  const finalTotal = total + shippingCost;
+  const finalTotal = totalWithCoupon + shippingCost;
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    setCouponError('');
+    const result = await applyCoupon(couponCode.trim());
+    if (result.success) {
+      setCouponCode('');
+    } else {
+      setCouponError(result.error);
+    }
+    setCouponLoading(false);
+  };
+
+  const handleRemoveCoupon = () => {
+    removeCoupon();
+    setCouponError('');
+  };
 
   const formatPrice = (price) => {
     return price.toLocaleString('pt-BR', {
@@ -175,7 +202,10 @@ export default function Cart() {
         quantidade: item.quantity,
         preco: item.price,
         sabor: item.selectedFlavors ? item.selectedFlavors.join(', ') : (item.selectedFlavor?.name || null)
-      }))
+      })),
+      // Dados do cupom
+      appliedCoupon: appliedCoupon,
+      couponDiscount: couponDiscount
     };
 
     setPedidoData(pedido);
@@ -266,6 +296,63 @@ export default function Cart() {
             {/* Footer com totais */}
             {cartItems.length > 0 && (
               <div className="bg-white border-t border-gray-200 p-4">
+                {/* Campo de Cupom */}
+                {appliedCoupon ? (
+                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Ticket className="w-5 h-5 text-green-600" />
+                        <div>
+                          <p className="text-sm font-bold text-green-800">{appliedCoupon.code}</p>
+                          <p className="text-xs text-green-600">
+                            {appliedCoupon.discount_percent
+                              ? `${appliedCoupon.discount_percent}% OFF`
+                              : `R$ ${appliedCoupon.discount_amount} OFF`
+                            } - Economize {formatPrice(couponDiscount)}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleRemoveCoupon}
+                        className="text-red-500 hover:text-red-700 text-xs font-semibold"
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <Ticket className="w-4 h-4 inline mr-1" />
+                      Cupom de Desconto
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
+                        placeholder="Digite seu cupom"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm uppercase focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                      />
+                      <button
+                        onClick={handleApplyCoupon}
+                        disabled={couponLoading || !couponCode.trim()}
+                        className="px-4 py-2 bg-purple-500 text-white rounded-lg text-sm font-semibold hover:bg-purple-600 disabled:opacity-50 transition flex items-center gap-1"
+                      >
+                        {couponLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Check className="w-4 h-4" />
+                        )}
+                        Aplicar
+                      </button>
+                    </div>
+                    {couponError && (
+                      <p className="text-xs text-red-500 mt-1">{couponError}</p>
+                    )}
+                  </div>
+                )}
+
                 {/* Campo de CEP */}
                 <div className="mb-4">
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -346,6 +433,16 @@ export default function Cart() {
                     <span className="text-gray-600">Subtotal</span>
                     <span className="font-semibold">{formatPrice(total)}</span>
                   </div>
+
+                  {couponDiscount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-green-600 flex items-center gap-1">
+                        <Ticket className="w-3 h-3" />
+                        Desconto ({appliedCoupon.code})
+                      </span>
+                      <span className="font-semibold text-green-600">-{formatPrice(couponDiscount)}</span>
+                    </div>
+                  )}
 
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Taxa de entrega</span>

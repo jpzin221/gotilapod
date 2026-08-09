@@ -1239,3 +1239,176 @@ export const categoryService = {
     return true;
   }
 };
+
+// Servico de Cupons
+export const couponService = {
+  // Buscar todos os cupons
+  async getAll() {
+    const { data, error } = await supabase
+      .from('coupons')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Buscar cupom por codigo
+  async getByCode(code) {
+    const { data, error } = await supabase
+      .from('coupons')
+      .select('*')
+      .eq('code', code.toUpperCase())
+      .eq('is_active', true)
+      .single();
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  },
+
+  // Validar cupom
+  async validate(code, orderTotal = 0) {
+    const coupon = await this.getByCode(code);
+    if (!coupon) return { valid: false, error: 'Cupom nao encontrado' };
+    if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
+      return { valid: false, error: 'Cupom expirado' };
+    }
+    if (coupon.max_uses && coupon.used_count >= coupon.max_uses) {
+      return { valid: false, error: 'Cupom atingiu o limite de usos' };
+    }
+    if (coupon.min_order_value && orderTotal < coupon.min_order_value) {
+      return { valid: false, error: `Valor minimo: R$ ${coupon.min_order_value.toFixed(2)}` };
+    }
+    return { valid: true, coupon };
+  },
+
+  // Calcular desconto do cupom
+  calculateDiscount(coupon, orderTotal) {
+    if (coupon.discount_percent) {
+      return orderTotal * (coupon.discount_percent / 100);
+    }
+    if (coupon.discount_amount) {
+      return Math.min(coupon.discount_amount, orderTotal);
+    }
+    return 0;
+  },
+
+  // Criar cupom
+  async create(couponData) {
+    const { data, error } = await supabase
+      .from('coupons')
+      .insert({ ...couponData, code: couponData.code.toUpperCase() })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  // Atualizar cupom
+  async update(id, updates) {
+    const { data, error } = await supabase
+      .from('coupons')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  // Deletar cupom
+  async delete(id) {
+    const { error } = await supabase
+      .from('coupons')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return true;
+  },
+
+  // Registrar uso do cupom
+  async registerUse(couponId, pedidoId, userPhone, userName, discountApplied, orderTotal, source = 'exit_intent') {
+    const { data, error } = await supabase
+      .from('coupon_uses')
+      .insert({
+        coupon_id: couponId,
+        pedido_id: pedidoId,
+        user_phone: userPhone,
+        user_name: userName,
+        discount_applied: discountApplied,
+        order_total: orderTotal,
+        source
+      })
+      .select()
+      .single();
+    if (error) throw error;
+
+    // Incrementar used_count no cupom
+    await supabase.rpc('increment_coupon_usage', { coupon_id: couponId }).catch(() => {
+      // Fallback: update manual se a RPC nao existir
+      supabase.from('coupons').update({ used_count: supabase.rpc ? undefined : 0 }).eq('id', couponId);
+    });
+
+    return data;
+  },
+
+  // Buscar historico de uso de um cupom
+  async getUses(couponId) {
+    const { data, error } = await supabase
+      .from('coupon_uses')
+      .select('*')
+      .eq('coupon_id', couponId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Buscar todos os usos (relatorio geral)
+  async getAllUses() {
+    const { data, error } = await supabase
+      .from('coupon_uses')
+      .select('*, coupons(code, description, discount_percent)')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Estatisticas do relatorio
+  async getStats() {
+    const coupons = await this.getAll();
+    const uses = await this.getAllUses();
+
+    const totalCoupons = coupons.length;
+    const activeCoupons = coupons.filter(c => c.is_active).length;
+    const totalUses = uses.length;
+    const totalDiscountGiven = uses.reduce((sum, u) => sum + (parseFloat(u.discount_applied) || 0), 0);
+    const totalRevenueFromCoupons = uses.reduce((sum, u) => sum + (parseFloat(u.order_total) || 0), 0);
+
+    // Usos por cupom
+    const usesByCoupon = coupons.map(c => ({
+      ...c,
+      uses: uses.filter(u => u.coupon_id === c.id).length,
+      totalDiscount: uses.filter(u => u.coupon_id === c.id).reduce((s, u) => s + (parseFloat(u.discount_applied) || 0), 0),
+      totalRevenue: uses.filter(u => u.coupon_id === c.id).reduce((s, u) => s + (parseFloat(u.order_total) || 0), 0)
+    }));
+
+    // Usos por dia (ultimos 30 dias)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const recentUses = uses.filter(u => new Date(u.created_at) >= thirtyDaysAgo);
+    const usesByDay = {};
+    recentUses.forEach(u => {
+      const day = new Date(u.created_at).toLocaleDateString('pt-BR');
+      usesByDay[day] = (usesByDay[day] || 0) + 1;
+    });
+
+    return {
+      totalCoupons,
+      activeCoupons,
+      totalUses,
+      totalDiscountGiven,
+      totalRevenueFromCoupons,
+      usesByCoupon,
+      usesByDay,
+      recentUses
+    };
+  }
+};

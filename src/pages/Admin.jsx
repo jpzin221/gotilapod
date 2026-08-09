@@ -21,6 +21,7 @@ import FlavorManager from '../components/admin/FlavorManager';
 import GatewayManager from '../components/admin/GatewayManager';
 import SiteConfigManager from '../components/admin/SiteConfigManager';
 import UsersManager from '../components/admin/UsersManager';
+import CouponManager from '../components/admin/CouponManager';
 
 function DashboardTab({ stats, dark }) {
   const [animatedValues, setAnimatedValues] = useState({});
@@ -283,6 +284,7 @@ const SIDEBAR_ITEMS = [
   { id: 'trajectory', label: 'Trajetos', icon: Route },
   { id: 'fluxo', label: 'Fluxo Status', icon: TrendingUp },
   { id: 'gateways', label: 'Pagamentos', icon: CreditCard },
+  { id: 'coupons', label: 'Cupons', icon: Tag },
   { id: 'hours', label: 'Horarios', icon: Clock },
   { id: 'siteconfig', label: 'Configuracoes', icon: Settings },
 ];
@@ -586,6 +588,7 @@ export default function Admin() {
           {activeTab === 'promotions' && <PromotionBannerManager />}
           {activeTab === 'flavors' && <FlavorManager />}
           {activeTab === 'gateways' && <GatewayManager />}
+          {activeTab === 'coupons' && <CouponManager />}
           {activeTab === 'siteconfig' && <SiteConfigManager />}
         </main>
       </div>

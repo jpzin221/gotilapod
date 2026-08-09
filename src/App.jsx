@@ -21,6 +21,7 @@ import FloatingCartButton from './components/FloatingCartButton';
 import WhatsAppButton from './components/WhatsAppButton';
 import InstagramButton from './components/InstagramButton';
 import SocialProofNotification from './components/SocialProofNotification';
+import ExitIntentPopup from './components/ExitIntentPopup';
 import { useCart } from './context/CartContext';
 import { useSiteConfig } from './context/SiteConfigContext';
 import { storeInfo } from './data/products';
@@ -361,6 +362,9 @@ function App() {
 
         {/* Notificações de Prova Social */}
         <SocialProofNotification />
+
+        {/* Popup de Exit Intent */}
+        <ExitIntentPopup />
       </div>
 
       {/* Carrinho */}

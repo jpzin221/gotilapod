@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { QrCode, Copy, CheckCircle, Clock, X, AlertCircle } from 'lucide-react';
 import Portal from './Portal';
 import { usePhoneAuth } from '../context/PhoneAuthContext';
-import { pedidoService, productService, supabase } from '../lib/supabase';
+import { pedidoService, productService, supabase, couponService } from '../lib/supabase';
 
 export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
   const navigate = useNavigate();
@@ -221,6 +221,8 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
           cliente_cpf: pedido.cpfCliente,
           endereco_entrega: pedido.endereco,
           itens: pedido.itens,
+          desconto: pedido.couponDiscount || 0,
+          cupom_codigo: pedido.appliedCoupon?.code || null,
           status: 'confirmado',
           pago: true,
           pago_em: new Date().toISOString(),
@@ -243,6 +245,23 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
             }]);
           } catch (statusError) {
             console.warn('⚠️ Erro ao salvar histórico de status:', statusError);
+          }
+
+          // Registrar uso do cupom se aplicado
+          if (pedido.appliedCoupon && pedido.couponDiscount > 0) {
+            try {
+              await couponService.registerUse(
+                pedido.appliedCoupon.id,
+                pedidoSalvo.id,
+                (pedido.telefone || user?.telefone)?.replace(/\D/g, ''),
+                pedido.nomeCliente || user?.nome || 'Cliente',
+                pedido.couponDiscount,
+                pedido.valorTotal,
+                'exit_intent'
+              );
+            } catch (couponError) {
+              console.warn('⚠️ Erro ao registrar uso do cupom:', couponError);
+            }
           }
 
           try {

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { storeInfo } from '../data/products';
+import { couponService } from '../lib/supabase';
 
 const CartContext = createContext();
 
@@ -8,6 +9,8 @@ export function CartProvider({ children }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponDiscount, setCouponDiscount] = useState(0);
 
   // Carregar carrinho do localStorage
   useEffect(() => {
@@ -176,7 +179,41 @@ export function CartProvider({ children }) {
   // Limpar carrinho
   const clearCart = () => {
     setCartItems([]);
+    setAppliedCoupon(null);
+    setCouponDiscount(0);
   };
+
+  // Aplicar cupom
+  const applyCoupon = async (code) => {
+    try {
+      const total = getTotal();
+      const result = await couponService.validate(code, total);
+      if (!result.valid) {
+        return { success: false, error: result.error };
+      }
+      const discount = couponService.calculateDiscount(result.coupon, total);
+      setAppliedCoupon(result.coupon);
+      setCouponDiscount(discount);
+      return { success: true, coupon: result.coupon, discount };
+    } catch (error) {
+      return { success: false, error: 'Erro ao validar cupom' };
+    }
+  };
+
+  // Remover cupom
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponDiscount(0);
+  };
+
+  // Recalcular desconto quando o total mudar
+  useEffect(() => {
+    if (appliedCoupon) {
+      const total = cartItems.reduce((sum, item) => sum + (item.totalPrice || (item.price * item.quantity)), 0);
+      const newDiscount = couponService.calculateDiscount(appliedCoupon, total);
+      setCouponDiscount(newDiscount);
+    }
+  }, [cartItems, appliedCoupon]);
 
   // Calcular total (usa totalPrice com desconto se existir)
   const getTotal = () => {
@@ -184,6 +221,12 @@ export function CartProvider({ children }) {
       const itemTotal = item.totalPrice || (item.price * item.quantity);
       return total + itemTotal;
     }, 0);
+  };
+
+  // Total com desconto de cupom aplicado
+  const getTotalWithCoupon = () => {
+    const total = getTotal();
+    return Math.max(0, total - couponDiscount);
   };
 
   // Calcular quantidade total de itens
@@ -220,6 +263,7 @@ export function CartProvider({ children }) {
     decreaseQuantity,
     clearCart,
     getTotal,
+    getTotalWithCoupon,
     getTotalItems,
     hasFreeShipping,
     getShippingProgress,
@@ -229,7 +273,11 @@ export function CartProvider({ children }) {
     DELIVERY_FEE,
     showToast,
     setShowToast,
-    toastMessage
+    toastMessage,
+    appliedCoupon,
+    couponDiscount,
+    applyCoupon,
+    removeCoupon
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
