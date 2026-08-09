@@ -264,6 +264,35 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
             }
           }
 
+          // Marcar carrinho abandonado como convertido
+          try {
+            const sessionId = localStorage.getItem('cart_session_id');
+            if (sessionId) {
+              const { supabase: supabaseClient } = await import('../lib/supabase');
+              const { data: abandonedCart } = await supabaseClient
+                .from('abandoned_carts')
+                .select('id')
+                .eq('session_id', sessionId)
+                .single();
+
+              if (abandonedCart) {
+                await supabaseClient
+                  .from('abandoned_carts')
+                  .update({
+                    status: 'converted',
+                    converted_at: new Date().toISOString(),
+                    pedido_id: pedidoSalvo.id,
+                    updated_at: new Date().toISOString()
+                  })
+                  .eq('id', abandonedCart.id);
+
+                localStorage.removeItem('cart_session_id');
+              }
+            }
+          } catch (convertError) {
+            console.warn('⚠️ Erro ao marcar conversao:', convertError);
+          }
+
           try {
             const functionsUrl = import.meta.env.PROD
               ? '/api'

@@ -46,3 +46,11 @@ ON CONFLICT (code) DO NOTHING;
 SELECT 'coupons' as tabela, COUNT(*) as total FROM coupons
 UNION ALL
 SELECT 'coupon_uses' as tabela, COUNT(*) as total FROM coupon_uses;
+
+-- 6. DESABILITAR RLS (permite acesso via anon key)
+ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
+ALTER TABLE coupon_uses ENABLE ROW LEVEL SECURITY;
+
+-- Criar politicas permissivas
+CREATE POLICY "Allow all access on coupons" ON coupons FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all access on coupon_uses" ON coupon_uses FOR ALL USING (true) WITH CHECK (true);

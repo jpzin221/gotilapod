@@ -119,6 +119,39 @@ export default function CheckoutForm({ isOpen, onClose, onSubmit, total, cepData
     if (name === 'telefone') formattedValue = formatPhone(value);
     if (name === 'cep') formattedValue = formatCEP(value);
     setFormData({ ...formData, [name]: formattedValue });
+
+    // Rastrear carrinho quando usuario preencher telefone (step 1)
+    if (name === 'telefone' && formattedValue.length >= 15) {
+      trackAbandonedCart(formattedValue, formData.nome);
+    }
+  };
+
+  const trackAbandonedCart = async (phone, name) => {
+    try {
+      const cartData = localStorage.getItem('cart');
+      const cartItems = cartData ? JSON.parse(cartData) : [];
+      const cartTotal = cartItems.reduce((sum, item) => sum + (item.totalPrice || (item.price * item.quantity)), 0);
+      const sessionId = localStorage.getItem('cart_session_id') || `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem('cart_session_id', sessionId);
+
+      await fetch('/api/abandoned-carts/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          phone: phone.replace(/\D/g, ''),
+          customer_name: name || null,
+          cart_items: cartItems.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price
+          })),
+          cart_total: cartTotal
+        })
+      });
+    } catch (error) {
+      console.warn('Erro ao rastrear carrinho:', error);
+    }
   };
 
   const handleSubmit = async (e) => {
