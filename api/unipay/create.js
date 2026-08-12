@@ -265,8 +265,10 @@ export default async function handler(req, res) {
       return res.status(response.status).json({ success: false, error: errorMsg, details: data });
     }
 
-    const transactionId = data.id;
-    const pixData = data.pix || {};
+    // FastSoft responde com envelope: { status, message, data: { ...transacao } }
+    const uniData = data.data || data;
+    const transactionId = uniData.id || data.id;
+    const pixData = uniData.pix || {};
     const pixCopyPaste = pixData.qrcode || '';
 
     let qrCodeBase64 = '';
@@ -287,11 +289,12 @@ export default async function handler(req, res) {
       txid: transactionId,
       transactionId: transactionId,
       externalReference,
-      status: data.status || 'WAITING_PAYMENT',
+      status: uniData.status || 'WAITING_PAYMENT',
       amount: parsedAmount,
       pixCopiaECola: pixCopyPaste,
       qrcode: pixCopyPaste,
       imagemQrcode: qrCodeBase64,
+      pixExpirationDate: pixData.expirationDate || null,
       provider: 'unipay',
       raw: data
     });
