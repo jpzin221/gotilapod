@@ -29,8 +29,11 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
         const sessionAge = now - session.timestamp;
         const oneHour = 3600000; // 1 hora em ms
 
-        // Se a sessão tem menos de 1 hora E ainda está pendente, restaurar
-        if (sessionAge < oneHour && session.paymentStatus === 'pending') {
+        // Validar se sessão tem dados completos (imagemQrcode + pixCopiaECola)
+        const hasValidData = session.pixData?.imagemQrcode && session.pixData?.pixCopiaECola;
+
+        // Se a sessão tem menos de 1 hora, está pendente E tem dados válidos, restaurar
+        if (sessionAge < oneHour && session.paymentStatus === 'pending' && hasValidData) {
           setPixData(session.pixData);
           setPaymentStatus(session.paymentStatus);
           const remainingTime = Math.max(0, 3600 - Math.floor(sessionAge / 1000));
@@ -41,7 +44,7 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
           sessionStorage.removeItem('justCompletedPayment');
           sessionStorage.removeItem('lastPedido');
         } else {
-          // Sessão expirada, limpar
+          // Sessão expirada, sem dados válidos ou corrompida - limpar e criar nova
           localStorage.removeItem('pixPaymentSession');
         }
       } catch (error) {
@@ -66,33 +69,25 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
   // Criar cobrança PIX quando modal abre
   useEffect(() => {
     if (isOpen && pedido && !pixData) {
-      // Só criar nova cobrança se não tiver dados salvos
-      const savedSession = localStorage.getItem('pixPaymentSession');
-      if (!savedSession) {
-        // 🎯 UTMFY - Disparar evento de início de checkout
-        try {
-          if (window.utmify) {
-            window.utmify.track('InitiateCheckout', {
-              value: pedido.valorTotal,
-              currency: 'BRL',
-              content_ids: pedido.itens?.map(item => item.id || item.nome) || [],
-              num_items: pedido.itens?.length || 0
-            });
-          }
-        } catch (e) {
-          console.warn('⚠️ UTMFY InitiateCheckout error:', e);
+      // 🎯 UTMFY - Disparar evento de início de checkout
+      try {
+        if (window.utmify) {
+          window.utmify.track('InitiateCheckout', {
+            value: pedido.valorTotal,
+            currency: 'BRL',
+            content_ids: pedido.itens?.map(item => item.id || item.nome) || [],
+            num_items: pedido.itens?.length || 0
+          });
         }
-
-        createPixCharge();
-      } else {
+      } catch (e) {
+        console.warn('⚠️ UTMFY InitiateCheckout error:', e);
       }
+
+      createPixCharge();
     }
 
     return () => {
       // NÃO limpar ao fechar - manter sessão
-      // setPixData(null);
-      // setPaymentStatus('pending');
-      // setError(null);
     };
   }, [isOpen, pedido]);
 
@@ -542,6 +537,7 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
 
       if (data.success) {
         setPixData({ ...data, provider: gateway.provider });
+        setPaymentStatus('pending');
       } else {
         throw new Error(data.error || 'Erro ao criar cobrança');
       }
