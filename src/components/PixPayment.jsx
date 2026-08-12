@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { QrCode, Copy, CheckCircle, Clock, X, AlertCircle, Share2, MessageCircle, Smartphone } from 'lucide-react';
+import { QrCode, Copy, CheckCircle, Clock, X, AlertCircle } from 'lucide-react';
 import Portal from './Portal';
 import { usePhoneAuth } from '../context/PhoneAuthContext';
-import { useSiteConfig } from '../context/SiteConfigContext';
-import { storeInfo } from '../data/products';
 import { pedidoService, productService, supabase, couponService } from '../lib/supabase';
 
 export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
   const navigate = useNavigate();
   const { isAuthenticated, user, userExists, addPedido } = usePhoneAuth();
-  const { get } = useSiteConfig();
   const [pixData, setPixData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -563,40 +560,6 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const sendPixWhatsApp = () => {
-    const whatsapp = (get('whatsapp', '') || storeInfo.whatsapp || '').replace(/\D/g, '');
-    if (!whatsapp) return;
-
-    const valorFormatado = (pedido?.valorTotal || 0).toFixed(2);
-
-    const mensagem = `Olá! Finalizei um pedido na *Gorila Pod* no valor de *R$ ${valorFormatado}* e o pagamento será feito por PIX.\n\nSegue o código PIX para pagamento:\n\n${pixData.pixCopiaECola}\n\n*Atenção: pagamento somente pelo QR Code ou código acima. Não realizamos cobranças por outros meios.*`;
-
-    window.open(`https://wa.me/55${whatsapp}?text=${encodeURIComponent(mensagem)}`, '_blank');
-  };
-
-  const sharePix = async () => {
-    const data = {
-      title: 'PIX Gorila Pod',
-      text: `Pagamento PIX - R$ ${(pedido.valorTotal || 0).toFixed(2)}`,
-      url: pixData.pixCopiaECola
-    };
-
-    // Tentar usar a Web Share API (mobile)
-    if (navigator.share) {
-      try {
-        await navigator.share(data);
-        return;
-      } catch (err) {
-        // Usuário cancelou ou falhou - usa fallback
-        console.log('Share cancelado ou indisponível:', err.message);
-      }
-    }
-
-    // Fallback: copiar o código e avisar
-    await copyToClipboard();
-    alert('Código PIX copiado! Envie ele no app do seu banco para pagar.');
-  };
-
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -713,34 +676,25 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
           {/* QR Code PIX */}
           {!loading && paymentStatus === 'pending' && pixData && (
             <div>
-              {/* Cabeçalho com gradiente */}
-              <div className="text-center mb-4 sm:mb-6">
-                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-primary to-secondary rounded-2xl shadow-lg mb-2 sm:mb-3">
-                  <QrCode className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                </div>
-                <h3 className="text-lg sm:text-2xl font-bold text-gray-800">
+              {/* Cabeçalho */}
+              <div className="text-center mb-5">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                   Pague com PIX
                 </h3>
-                <p className="text-gray-500 text-xs sm:text-sm mt-0.5 mb-1">
-                  Escaneie o QR Code ou use o PIX Copia e Cola
-                </p>
-                <p className="text-2xl sm:text-4xl font-extrabold text-primary mt-1">
+                <p className="text-2xl sm:text-3xl font-extrabold text-primary mt-1">
                   R$ {(pedido.valorTotal || 0).toFixed(2)}
                 </p>
-
-                {/* Timer */}
-                <div className="inline-flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3 px-3 py-1.5 bg-orange-50 border border-orange-200 rounded-full">
-                  <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-600" />
-                  <span className="text-xs sm:text-sm font-semibold text-orange-600">
+                <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-orange-50 rounded-full">
+                  <Clock className="w-3.5 h-3.5 text-orange-500" />
+                  <span className="text-xs font-semibold text-orange-600">
                     Expira em {formatTime(timeLeft)}
                   </span>
                 </div>
               </div>
 
-              {/* QR Code Imagem - moldura bonita */}
-              <div className="relative mb-4 sm:mb-5">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 rounded-3xl rotate-1"></div>
-                <div className="relative bg-white p-3 sm:p-5 rounded-3xl border-2 border-gray-100 shadow-xl flex items-center justify-center">
+              {/* QR Code */}
+              <div className="flex justify-center mb-5">
+                <div className="bg-white p-4 rounded-2xl shadow-md border border-gray-100">
                   {(() => {
                     const isValidBase64Image = pixData.imagemQrcode && (
                       pixData.imagemQrcode.startsWith('data:image') ||
@@ -756,22 +710,15 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
                               : `data:image/png;base64,${pixData.imagemQrcode}`
                           }
                           alt="QR Code PIX"
-                          className="w-52 h-52 sm:w-64 sm:h-64 object-contain"
-                          onError={(e) => {
-                            console.error('❌ Erro ao carregar QR Code');
-                            e.target.style.display = 'none';
-                          }}
+                          className="w-48 h-48 sm:w-56 sm:h-56"
                         />
                       );
                     } else {
                       return (
-                        <div className="w-52 h-52 sm:w-64 sm:h-64 flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border-2 border-dashed border-gray-300 p-4">
-                          <QrCode className="w-16 h-16 text-primary/40 mb-3" />
-                          <p className="text-sm text-gray-600 text-center font-medium">
+                        <div className="w-48 h-48 sm:w-56 sm:h-56 flex flex-col items-center justify-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                          <QrCode className="w-12 h-12 text-gray-300 mb-2" />
+                          <p className="text-xs text-gray-400 text-center px-4">
                             Use o código PIX abaixo
-                          </p>
-                          <p className="text-xs text-gray-500 text-center mt-1">
-                            Copie e cole no seu banco
                           </p>
                         </div>
                       );
@@ -780,102 +727,48 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
                 </div>
               </div>
 
-              {/* PIX Copia e Cola - bonito */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
-                    <Smartphone className="w-4 h-4 text-primary" />
-                    PIX Copia e Cola
-                  </label>
-                  {copied && (
-                    <span className="text-xs font-medium text-green-600 flex items-center gap-1">
-                      <CheckCircle className="w-3.5 h-3.5" /> Copiado!
-                    </span>
-                  )}
-                </div>
-                <div className="relative">
-                  <textarea
+              {/* PIX Copia e Cola */}
+              <div className="mb-5">
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  PIX Copia e Cola
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
                     value={pixData.pixCopiaECola}
                     readOnly
-                    rows="3"
                     onClick={(e) => e.target.select()}
-                    className="w-full px-3 py-2.5 pr-14 border-2 border-gray-200 rounded-xl text-sm bg-gray-50 text-gray-700 focus:border-primary focus:bg-white transition-all resize-none"
+                    className="flex-1 px-3 py-3 border-2 border-gray-100 rounded-xl text-sm bg-gray-50 text-gray-500 font-mono truncate"
                   />
                   <button
                     onClick={copyToClipboard}
-                    className={`absolute right-2 top-1/2 -translate-y-1/2 px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    className={`px-5 py-3 rounded-xl font-bold text-sm whitespace-nowrap transition-all flex items-center gap-2 ${
                       copied
                         ? 'bg-green-500 text-white'
                         : 'bg-primary text-white hover:bg-primary/90'
                     }`}
-                    title="Copiar código PIX"
                   >
-                    {copied ? <CheckCircle className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                    {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    {copied ? 'Copiado!' : 'Copiar'}
                   </button>
                 </div>
               </div>
 
-              {/* Botões de Ação: Compartilhar e Copa */}
-              <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
-                <button
-                  onClick={sharePix}
-                  className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-sm transition-all"
-                >
-                  <Share2 className="w-4 h-4" />
-                  Compartilhar
-                </button>
-                <button
-                  onClick={copyToClipboard}
-                  className="flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold text-sm transition-all"
-                >
-                  {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  {copied ? 'Copiado!' : 'Copiar Código'}
-                </button>
+              {/* Instrução simples */}
+              <div className="text-center mb-4">
+                <p className="text-sm text-gray-500">
+                  Abra o app do seu banco, escolha pagar via PIX e escaneie o QR Code ou cole o código acima.
+                </p>
               </div>
 
-              {/* Enviar via WhatsApp */}
-              <button
-                onClick={sendPixWhatsApp}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold text-sm transition-all shadow-md mb-4"
-              >
-                <MessageCircle className="w-4 h-4" />
-                Enviar QR Code no WhatsApp
-              </button>
-
-              {/* Instruções - compactas e bonitas */}
-              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-4">
-                <h4 className="font-semibold text-blue-900 text-sm mb-2.5 flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Como pagar:
-                </h4>
-                <ol className="text-sm text-blue-800 space-y-1.5 list-none">
-                  <li className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
-                    Abra o app do seu banco
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
-                    Escolha pagar com <strong>PIX</strong>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
-                    Escaneie o QR Code ou cole o código
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">4</span>
-                    Confirme e aguarde a confirmação automática
-                  </li>
-                </ol>
-              </div>
-
-              {/* Status - animação bonita */}
-              <div className="flex items-center justify-center gap-2.5 py-2">
+              {/* Status */}
+              <div className="flex items-center justify-center gap-2 py-2">
                 <div className="relative flex w-2.5 h-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full w-2.5 h-2.5 bg-green-500"></span>
                 </div>
-                <span className="text-sm text-gray-600 font-medium">
-                  Aguardando seu pagamento...
+                <span className="text-sm text-gray-500 font-medium">
+                  Aguardando pagamento...
                 </span>
               </div>
             </div>
