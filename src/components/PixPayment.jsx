@@ -513,7 +513,9 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
             amount: pedido.valorTotal,
             customerName: pedido.nomeCliente,
             customerDocument: pedido.cpfCliente,
-            customerEmail: '',
+            customerEmail: pedido.emailCliente || '',
+            customerPhone: pedido.telefone || '',
+            customerAddress: pedido.endereco || null,
             externalId: `pedido_${Date.now()}_${pedido.id || ''}`
           });
           break;

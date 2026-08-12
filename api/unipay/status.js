@@ -126,7 +126,8 @@ export default async function handler(req, res) {
 
             if (response.ok) {
               const uniPayData = await response.json();
-              const paymentStatus = uniPayData.status?.toUpperCase();
+              const innerData = uniPayData.data || uniPayData;
+              const paymentStatus = String(innerData.status || uniPayData.status || '').toUpperCase();
 
               if (paymentStatus === 'PAID' || paymentStatus === 'AUTHORIZED') {
                 if (pedido && !pedido.pago) {
@@ -183,9 +184,11 @@ export async function webhookHandler(req, res) {
 
   try {
     const body = req.body || {};
-    const transactionId = body.id || body.transaction_id || body.transactionId;
-    const status = (body.status || '').toUpperCase();
-    const externalReference = body.metadata?.pedido_id || body.metadata?.external_id || body.externalReference;
+    // FastSoft envia { type, objectId, url, data: { id, status, amount, ... } }
+    const inner = body.data || body;
+    const transactionId = inner.id || body.transaction_id || body.transactionId;
+    const status = String(inner.status || body.status || '').toUpperCase();
+    const externalReference = inner.metadata?.pedido_id || body.metadata?.pedido_id || body.metadata?.external_id || inner.externalRef || body.externalReference;
 
     console.log('💜 [UniPay Webhook] Recebido:', { transactionId, status, externalReference });
 
@@ -220,7 +223,7 @@ export async function webhookHandler(req, res) {
       return res.status(200).json({ received: true, message: 'Already paid' });
     }
 
-    const valorApi = body.amount ? parseFloat(body.amount) / 100 : null;
+    const valorApi = (inner.amount ?? body.amount) ? parseFloat(inner.amount ?? body.amount) / 100 : null;
     if (valorApi && Math.abs(parseFloat(pedido.valor_total) - valorApi) > 0.01) {
       console.warn('💜 [UniPay Webhook] Valor divergente:', { db: pedido.valor_total, api: valorApi });
       return res.status(200).json({ received: true, message: 'Amount mismatch' });

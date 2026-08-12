@@ -79,9 +79,11 @@ export async function webhookHandler(req, res) {
 
   try {
     const body = req.body || {};
-    const transactionId = body.id || body.transaction_id || body.transactionId;
-    const status = (body.status || '').toUpperCase();
-    const externalReference = body.metadata?.pedido_id || body.metadata?.external_id || body.externalReference;
+    // FastSoft envia { type, objectId, url, data: { id, status, amount, ... } }
+    const inner = body.data || body;
+    const transactionId = inner.id || body.transaction_id || body.transactionId;
+    const status = String(inner.status || body.status || '').toUpperCase();
+    const externalReference = inner.metadata?.pedido_id || body.metadata?.pedido_id || inner.externalRef || body.externalReference;
 
     console.log('💜 [UniPay Webhook] Recebido:', { transactionId, status, externalReference });
 
@@ -116,7 +118,7 @@ export async function webhookHandler(req, res) {
       return res.status(200).json({ received: true, message: 'Already paid' });
     }
 
-    const valorApi = body.amount ? parseFloat(body.amount) / 100 : null;
+    const valorApi = (inner.amount ?? body.amount) ? parseFloat(inner.amount ?? body.amount) / 100 : null;
     if (valorApi && Math.abs(parseFloat(pedido.valor_total) - valorApi) > 0.01) {
       console.warn('💜 [UniPay Webhook] Valor divergente:', { db: pedido.valor_total, api: valorApi });
       return res.status(200).json({ received: true, message: 'Amount mismatch' });
@@ -179,7 +181,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ success: false, error: 'Method not allowed' });
 
   try {
-    const { amount, customerName, customerDocument, customerEmail, externalId } = req.body;
+    const { amount, customerName, customerDocument, customerEmail, customerPhone, customerAddress, externalId } = req.body;
 
     let parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0 || parsedAmount > 100000) {
@@ -197,6 +199,22 @@ export default async function handler(req, res) {
     const safeCustomerName = sanitize(customerName);
     const externalReference = externalId || `PEDIDO-${Date.now()}`;
     const cleanDocument = customerDocument?.replace(/\D/g, '') || '';
+    const cleanPhone = customerPhone?.replace(/\D/g, '').replace(/^55/, '') || '';
+
+    const addr = customerAddress || {};
+    const shipping = {
+      fee: 0,
+      address: {
+        street: sanitize(addr.endereco) || 'Sem Logradouro',
+        streetNumber: sanitize(addr.numero) || 'S/N',
+        complement: sanitize(addr.complemento) || '',
+        zipCode: (addr.cep || '').replace(/\D/g, '') || '00000000',
+        neighborhood: sanitize(addr.bairro) || 'Centro',
+        city: sanitize(addr.cidade) || 'Sao Paulo',
+        state: (addr.estado || 'SP').toUpperCase().substring(0, 2),
+        country: 'br'
+      }
+    };
 
     const payload = {
       amount: parsedAmount,
@@ -207,14 +225,18 @@ export default async function handler(req, res) {
         document: {
           number: cleanDocument,
           type: 'CPF'
-        }
+        },
+        phone: cleanPhone,
+        externalRef: externalReference
       },
+      shipping,
       items: [
         {
           title: 'Produto Gorila Pod',
           unitPrice: parsedAmount,
           quantity: 1,
-          tangible: true
+          tangible: true,
+          externalRef: externalReference
         }
       ],
       traceable: true,
