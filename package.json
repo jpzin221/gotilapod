@@ -11,6 +11,7 @@
     "test:env": "node scripts/testarEnv.js",
     "import:json": "node scripts/importJSON.js",
     "import:products": "node scripts/importProducts.js",
+    "setup:whatsapp": "node scripts/configurar-infobip.js",
     "predeploy": "node scripts/pre-deploy-check.js",
     "deploy:check": "npm run predeploy && npm run build",
     "clean": "rm -rf dist node_modules",

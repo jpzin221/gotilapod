@@ -52,7 +52,120 @@ async function getUniPayCredentials() {
   return { secretKey, postbackUrl };
 }
 
+async function updatePedidoStatus(supabase, pedidoId) {
+  await supabase
+    .from('pedidos')
+    .update({
+      pago: true,
+      status: 'confirmado',
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', pedidoId);
+
+  await supabase
+    .from('pedido_status_history')
+    .insert({
+      pedido_id: pedidoId,
+      status: 'confirmado',
+      observacao: 'Pagamento confirmado via status check direto na API UniPay'
+    });
+}
+
+export async function webhookHandler(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  if (req.method !== 'POST') return res.status(200).json({ received: true });
+
+  try {
+    const body = req.body || {};
+    const transactionId = body.id || body.transaction_id || body.transactionId;
+    const status = (body.status || '').toUpperCase();
+    const externalReference = body.metadata?.pedido_id || body.metadata?.external_id || body.externalReference;
+
+    console.log('💜 [UniPay Webhook] Recebido:', { transactionId, status, externalReference });
+
+    if (!transactionId && !externalReference) {
+      return res.status(200).json({ received: true, message: 'Missing transactionId/externalReference' });
+    }
+
+    if (status !== 'PAID' && status !== 'AUTHORIZED' && status !== 'COMPLETED') {
+      return res.status(200).json({ received: true, message: `Status ${status} - no action` });
+    }
+
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseKey) {
+      return res.status(200).json({ received: true, message: 'Supabase not configured' });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    let query = supabase.from('pedidos').select('*');
+    if (transactionId) query = query.eq('txid', String(transactionId));
+    else if (externalReference) query = query.eq('numero_pedido', externalReference);
+
+    const { data: pedido, error: fetchError } = await query.single();
+
+    if (fetchError || !pedido) {
+      console.warn('💜 [UniPay Webhook] Pedido nao encontrado:', { transactionId, externalReference });
+      return res.status(200).json({ received: true, message: 'Order not found' });
+    }
+
+    if (pedido.pago || pedido.status === 'confirmado') {
+      return res.status(200).json({ received: true, message: 'Already paid' });
+    }
+
+    const valorApi = body.amount ? parseFloat(body.amount) / 100 : null;
+    if (valorApi && Math.abs(parseFloat(pedido.valor_total) - valorApi) > 0.01) {
+      console.warn('💜 [UniPay Webhook] Valor divergente:', { db: pedido.valor_total, api: valorApi });
+      return res.status(200).json({ received: true, message: 'Amount mismatch' });
+    }
+
+    const { error: updateError } = await supabase.from('pedidos').update({
+      pago: true,
+      status: 'confirmado',
+      pago_em: new Date().toISOString(),
+      webhook_received_at: new Date().toISOString()
+    }).eq('id', pedido.id);
+
+    if (updateError) throw updateError;
+
+    try {
+      await supabase.from('pedido_status_history').insert([{
+        pedido_id: pedido.id,
+        status: 'confirmado',
+        observacao: 'Pagamento confirmado via webhook UniPay (FastSoft Brasil)'
+      }]);
+    } catch (histError) {
+      console.warn('💜 [UniPay Webhook] Aviso: historico nao salvo:', histError.message);
+
+      try {
+        await supabase.from('status_historico').insert([{
+          pedido_id: pedido.id,
+          status: 'confirmado',
+          descricao: 'Pagamento confirmado via webhook UniPay (FastSoft Brasil)',
+          created_at: new Date().toISOString()
+        }]);
+      } catch (altHistError) {
+        console.warn('💜 [UniPay Webhook] Aviso: status_historico tambem falhou:', altHistError.message);
+      }
+    }
+
+    console.log('💜 [UniPay Webhook] Pedido confirmado:', pedido.id);
+    return res.status(200).json({ received: true, message: 'Payment confirmed', orderId: pedido.id });
+  } catch (error) {
+    console.error('❌ [UniPay Webhook] Erro:', error);
+    return res.status(200).json({ received: true, message: 'Error processing' });
+  }
+}
+
 export default async function handler(req, res) {
+  const isWebhook = (req.url || '').includes('/unipay/webhook');
+  if (isWebhook) {
+    return webhookHandler(req, res);
+  }
+
   const origin = req.headers.origin;
   const allowedOrigin = getAllowedOrigin(origin);
 

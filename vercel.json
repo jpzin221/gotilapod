@@ -4,6 +4,7 @@
   "framework": "vite",
   "installCommand": "npm install",
   "rewrites": [
+    { "source": "/api/unipay/webhook", "destination": "/api/unipay/status" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/((?!assets/|.*\\..*).*)", "destination": "/index.html" }
   ],

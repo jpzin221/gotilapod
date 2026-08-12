@@ -160,7 +160,7 @@ export default function PixPayment({ isOpen, onClose, onBack, pedido }) {
           data = await response.json();
         }
 
-        if (data.success && data.status === 'CONCLUIDA') {
+        if (data.success && (data.status === 'CONCLUIDA' || data.status === 'PAID' || data.status === 'AUTHORIZED' || data.pago === true)) {
           setPaymentStatus('paid');
           clearInterval(checkInterval);
         }
