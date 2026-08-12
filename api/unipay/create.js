@@ -181,7 +181,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ success: false, error: 'Method not allowed' });
 
   try {
-    const { amount, customerName, customerDocument, customerEmail, customerPhone, customerAddress, externalId } = req.body;
+    const { amount, customerName, customerDocument, customerEmail, customerPhone, customerAddress, externalId, items } = req.body;
 
     let parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0 || parsedAmount > 100000) {
@@ -230,15 +230,23 @@ export default async function handler(req, res) {
         externalRef: externalReference
       },
       shipping,
-      items: [
-        {
-          title: 'Produto Gorila Pod',
-          unitPrice: parsedAmount,
-          quantity: 1,
-          tangible: true,
-          externalRef: externalReference
-        }
-      ],
+      items: Array.isArray(items) && items.length > 0
+        ? items.map((it, i) => ({
+            title: sanitize(it.nome) || sanitize(it.title) || 'Produto',
+            unitPrice: parsedAmount,
+            quantity: it.quantidade || it.quantity || 1,
+            tangible: true,
+            externalRef: externalReference
+          }))
+        : [
+            {
+              title: 'Produto ebook 92',
+              unitPrice: parsedAmount,
+              quantity: 1,
+              tangible: true,
+              externalRef: externalReference
+            }
+          ],
       traceable: true,
       postbackUrl: postbackUrl || `${origin}/api/unipay/webhook`,
       metadata: {
